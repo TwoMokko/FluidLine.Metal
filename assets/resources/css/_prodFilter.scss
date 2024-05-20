@@ -1,0 +1,35 @@
+@use "function" as *;
+@use "variable" as *;
+@use "mixins" as *;
+
+.prod-filter {
+    &-head {
+        @include textHeader;
+    }
+    &-wrap {
+        display: flex;
+        padding: 40px 80px;
+        gap: 80px;
+        border-radius: 24px;
+        background-color: $colorAccentLight;
+        &-item {
+            > div {
+                &:not(:last-child) {
+                    margin-bottom: 24px;
+                }
+                &:nth-child(1) {
+
+                }
+                &:nth-child(2) {
+
+                }
+                &:nth-child(3) {
+
+                }
+                &:nth-child(4) {
+
+                }
+            }
+        }
+    }
+}
