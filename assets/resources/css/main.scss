@@ -9,6 +9,7 @@
 @import "prodFilter";
 @import "prodTable";
 @import "carousel";
+@import "popup";
 
 * {
     box-sizing: border-box;
@@ -72,5 +73,11 @@ a {
 .logo {
     > img {
         width: 244px;
+    }
+}
+
+input, textarea {
+    &:focus-visible {
+        outline: none;
     }
 }
