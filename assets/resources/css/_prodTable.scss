@@ -2,3 +2,42 @@
 @use "variable" as *;
 @use "mixins" as *;
 
+.prod-table {
+    display: flex;
+    margin-bottom: 70px;
+    > table {
+        width: max-content;
+        > thead > tr > th {
+            border-radius: 4px 0 0 0;
+        }
+    }
+    > div {
+        overflow-x: auto;
+        scrollbar-width: none;
+        width: 100%;
+        position: relative;
+        border-radius: 0 4px 0 0;
+        > table {
+            width: 100%;
+        }
+    }
+    table {
+        border-spacing: 0;
+        //width: 100%;
+        th, td {
+            text-wrap: nowrap;
+            height: 52px;
+            padding: 8px;
+            font-size: 14px;
+            line-height: 18px;
+            text-align: left;
+        }
+        td {
+            border-bottom: 1px solid $colorTextAccent;
+        }
+        > thead {
+            background-color: $colorBackgroundAccent;
+            color: $colorTextLight;
+        }
+    }
+}

@@ -11,7 +11,7 @@ function selectCustom(): void {
             duration = 450; // длительность анимации
 
         _this.hide();
-        _this.wrap('<div class="select"></div>');
+        _this.wrap('<div class="select-wrap"></div>');
         $('<div>', {
             class: 'new-select',
             text: _this.children('option:disabled').text()
@@ -19,13 +19,13 @@ function selectCustom(): void {
 
         const selectHead = _this.next('.new-select');
         $('<div>', {
-            class: 'new-select__list'
+            class: 'new-select-list'
         }).insertAfter(selectHead);
 
-        const selectList = selectHead.next('.new-select__list');
+        const selectList = selectHead.next('.new-select-list');
         for (let i = 1; i < selectOptionLength; i++) {
             $('<div>', {
-                class: 'new-select__item',
+                class: 'new-select-list-item',
                 html: $('<span>', {
                     text: selectOption.eq(i).text()
                 })
@@ -34,7 +34,7 @@ function selectCustom(): void {
                 .appendTo(selectList);
         }
 
-        const selectItem = selectList.find('.new-select__item');
+        const selectItem = selectList.find('.new-select-list-item');
         selectList.slideUp(0);
         selectHead.on('click', function() {
             if ( !$(this).hasClass('on') ) {

@@ -6,3 +6,9 @@
     line-height: 58px;
     font-weight: 700;
 }
+
+@mixin textMain {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 400;
+}
