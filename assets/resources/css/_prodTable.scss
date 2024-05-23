@@ -6,9 +6,17 @@
     display: flex;
     margin-bottom: 70px;
     > table {
+        text-align: left;
         width: max-content;
         > thead > tr > th {
+            padding-left: 46px;
             border-radius: 4px 0 0 0;
+        }
+        td {
+            white-space: nowrap;
+            word-break: keep-all;
+            padding-right: 64px;
+            padding-left: 12px;
         }
     }
     > div {
@@ -19,18 +27,46 @@
         border-radius: 0 4px 0 0;
         > table {
             width: 100%;
+            th {
+                min-width: 50px;
+                text-align: left;
+                .table-colspan {
+                    display: flex;
+                    justify-content: space-around;
+                }
+            }
+            td {
+                text-align: center;
+                border-left: 1px dashed $colorAccent;
+            }
+            th, td {
+                //white-space: pre-line;
+                &:not(:last-child) {
+                    padding: 0 16px;
+                }
+                &:last-child {
+                    display: flex;
+                    justify-content: center;
+                    width: 180px;
+                }
+            }
         }
     }
     table {
         border-spacing: 0;
         //width: 100%;
+        tbody > tr {
+            &:nth-child(even) {
+                background-color: $colorAccentLightMore;
+            }
+            &:nth-child(odd) {
+                background-color: $colorAccentLight;
+            }
+        }
         th, td {
-            text-wrap: nowrap;
-            height: 52px;
-            padding: 8px;
+            height: 64px;
             font-size: 14px;
             line-height: 18px;
-            text-align: left;
         }
         td {
             border-bottom: 1px solid $colorTextAccent;
@@ -38,6 +74,22 @@
         > thead {
             background-color: $colorBackgroundAccent;
             color: $colorTextLight;
+        }
+    }
+    &-btn {
+        margin: auto;
+        width: 100px;
+        //white-space: pre-line;
+        display: table-caption;
+        max-width: 190px;
+        padding: 4px 16px;
+        text-align: center;
+        background-color: $colorBtnAccent;
+        color: $colorTextLight;
+        border-radius: 8px;
+        cursor: pointer;
+        &:hover {
+            opacity: 0.8;
         }
     }
 }

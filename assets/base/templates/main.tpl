@@ -9,9 +9,9 @@
 
         <main>
             [[*content]]
-            [[!$carousel]]
         </main>
 
+        [[!$carousel]]
         [[!$footer]]
 
         [[$scripts]]

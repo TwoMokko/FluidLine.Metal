@@ -109,6 +109,8 @@
         display: flex;
         gap: 20px;
         align-items: center;
+        width: fit-content;
+        cursor: pointer;
         > input {
             display: none;
         }
@@ -118,6 +120,9 @@
             height: 24px;
             background-color: white;
             border-radius: 4px;
+            cursor: pointer;
+        }
+        > label {
             cursor: pointer;
         }
         & > input:checked + div {
