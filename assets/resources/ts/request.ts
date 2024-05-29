@@ -121,5 +121,21 @@ namespace Common {
 
             Request.send(formData, url, func);
         }
+
+        public static sendJQ(url: string, func?: Function): void {
+            $.post( url, function( data: any ) {
+                // $( ".result" ).html( data );
+                console.log(data);
+            }) .done(function() {
+                console.log( "second success" );
+            })
+                .fail(function() {
+                    console.log( "error" );
+                })
+                .always(function() {
+                    console.log( "finished" );
+                });
+        }
     }
+
 }

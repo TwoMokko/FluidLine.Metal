@@ -1,61 +1,87 @@
-$(() => {
-    selectCustom();
-})
-
-function selectCustom(): void {
-    $('.select').each(function() {
-        const _this = $(this),
-            selectOption = _this.find('option'),
-            selectOptionLength = selectOption.length,
-            selectedOption = selectOption.filter(':selected'),
-            duration = 450; // длительность анимации
-
-        _this.hide();
-        _this.wrap('<div class="select-wrap"></div>');
-        $('<div>', {
-            class: 'new-select',
-            text: _this.children('option:disabled').text()
-        }).insertAfter(_this);
-
-        const selectHead = _this.next('.new-select');
-        $('<div>', {
-            class: 'new-select-list'
-        }).insertAfter(selectHead);
-
-        const selectList = selectHead.next('.new-select-list');
-        for (let i = 1; i < selectOptionLength; i++) {
-            $('<div>', {
-                class: 'new-select-list-item',
-                html: $('<span>', {
-                    text: selectOption.eq(i).text()
-                })
-            })
-                .attr('data-value', selectOption.eq(i).val())
-                .appendTo(selectList);
-        }
-
-        const selectItem = selectList.find('.new-select-list-item');
-        selectList.slideUp(0);
-        selectHead.on('click', function() {
-            if ( !$(this).hasClass('on') ) {
-                $(this).addClass('on');
-                selectList.slideDown(duration);
-
-                selectItem.on('click', function() {
-                    let chooseItem = $(this).data('value');
-
-                    _this.val(chooseItem).attr('selected', 'selected');
-                    // $('select').val(chooseItem).attr('selected', 'selected');
-                    selectHead.text( $(this).find('span').text() );
-
-                    selectList.slideUp(duration);
-                    selectHead.removeClass('on');
-                });
-
-            } else {
-                $(this).removeClass('on');
-                selectList.slideUp(duration);
-            }
-        });
-    });
-}
+// $(() => {
+//
+// })
+//
+// function selectCustom(): void {
+//     $('.select').each(function() {
+//         const _this = $(this),
+//             selectOption = _this.find('option'),
+//             selectOptionLength = selectOption.length,
+//             selectedOption = selectOption.filter(':selected'),
+//             duration = 450; // длительность анимации
+//
+//         _this.hide();
+//         _this.wrap('<div class="select-wrap"></div>');
+//         $('<div>', {
+//             class: 'new-select',
+//             text: _this.children('option:disabled').text()
+//         }).insertAfter(_this);
+//
+//         const selectHead = _this.next('.new-select');
+//         $('<div>', {
+//             class: 'new-select-list'
+//         }).insertAfter(selectHead);
+//
+//         const selectList = selectHead.next('.new-select-list');
+//         for (let i = 1; i < selectOptionLength; i++) {
+//             $('<div>', {
+//                 class: 'new-select-list-item',
+//                 html: $('<span>', {
+//                     text: selectOption.eq(i).text()
+//                 })
+//             })
+//                 .attr('data-value', selectOption.eq(i).val())
+//                 .appendTo(selectList);
+//         }
+//
+//         const selectItem = selectList.find('.new-select-list-item');
+//         selectList.slideUp(0);
+//         selectHead.on('click', function() {
+//             if ( !$(this).hasClass('on') ) {
+//                 $(this).addClass('on');
+//                 selectList.slideDown(duration);
+//
+//                 selectItem.on('click', function() {
+//                     let chooseItem = $(this).data('value');
+//
+//                     _this.val(chooseItem).attr('selected', 'selected');
+//                     // $('select').val(chooseItem).attr('selected', 'selected');
+//                     selectHead.text( $(this).find('span').text() );
+//
+//                     selectList.slideUp(duration);
+//                     selectHead.removeClass('on');
+//                 });
+//
+//             } else {
+//                 $(this).removeClass('on');
+//                 selectList.slideUp(duration);
+//             }
+//         });
+//     });
+// }
+//
+// function getFilterOption(): object {
+//     let dataOption: object;
+//
+//     $.post( "/assets/base/snippets/api/api.php?task=filterOptions", function( data: object ) {
+//         // $( ".result" ).html( data );
+//         dataOption = data;
+//         // console.log(dataOption);
+//
+//     }) .done(function() {
+//         console.log( "second success" );
+//     })
+//         .fail(function() {
+//             console.log( "error" );
+//         })
+//         .always(function() {
+//             console.log( "finished" );
+//             return dataOption;
+//         });
+//
+//
+// }
+//
+// function fillFilterData(): void {
+//     console.log('fill filter')
+// }

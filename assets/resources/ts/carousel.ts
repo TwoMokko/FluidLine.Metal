@@ -1,126 +1,98 @@
-namespace Common {
-    class Carousel {
-        // container                       : any;
-        // images                          : any;
-        // imageWidth                      : any;
-        // imagesToSlide                   : any;
-        //
-        // position                        : any;
-        //
-        // lastImage                       : any;
-        // lastImageOffsetLeft             : any;
-        // firstImage                      : any;
-        // firstImageOffsetLeft            : any;
-        // parent                          : any;
-        // parentOffsetLeft                : any;
-        // parentOffsetRight               : any;
+namespace Components {
 
-        constructor() {
-            // this.initElems();
+    export class Carousel {
+        $source                         : JQuery;
+        $wrap                           : JQuery;
+        $elements                       : JQuery;
+        $scroll                         : JQuery;
+        $content                        : JQuery;
+        $arrows                         : JQuery;
+        $left                           : JQuery;
+        $right                          : JQuery;
+
+        countDisplayElems               : number;
+        countScrollElems                : number;
+        lastElement                     : number | null;
+        countElements                   : number;
+        scrolling                       : boolean;
+
+        constructor($source: JQuery) {
+            this.$source                = $source;
+            this.$elements              = $source.children();
+
+            this.$source.hide();
+
+            /* Create elements */
+            this.$wrap                  = $('<div/>', {class: 'inner'});//components carousel
+            this.$scroll                = $('<div/>', {class: 'carousel-inner'});//scroll
+            this.$content               = $('<div/>', {class: 'images animated'});//content
+            this.$arrows                = $('<div/>', {class: 'arrows'});
+            this.$left                  = $('<div/>', {class: 'control left'});
+            this.$right                 = $('<div/>', {class: 'control right'});
+
+            /* Building DOM */
+            this.$wrap.append(
+                this.$scroll.append(
+                    this.$content
+                ),
+                this.$arrows.append(
+                    this.$left,
+                    this.$right
+                )
+            );
+
+            this.init($source);
+
+            /* Events */
+            this.$right.on('click', () => this.toRight());
+
+            this.$source.after(
+                this.$wrap
+            );
 
         }
 
-        // private initElems(): void {
-        //     this.container = $('.carousel-inner .images');
-        //     this.images = this.container.find('img');
-        //     this.imageWidth = this.images.width();
-        //     this.imagesToSlide = screen.width < 768 ? 2 : 3;
-        //
-        //     this.position = parseInt(this.container.css('margin-left'));
-        //
-        //     this.lastImage = this.container[0].querySelector('img:last-child');
-        //     this.lastImageOffsetLeft = this.lastImage.offsetLeft;
-        //     this.firstImage = this.container[0].querySelector('img:first-child');
-        //     this.firstImageOffsetLeft = this.firstImage.offsetLeft;
-        //     this.parent = this.container[0].parentElement;
-        //     this.parentOffsetLeft = this.parent.offsetLeft;
-        //     this.parentOffsetRight = this.parent.offsetLeft + this.parent.offsetWidth;
-        // }
-    }
-}
-//
-//
-// const index = {
-//
-//     carousel(control, interval = 0) {
-//
-//         if (control.dataset.disabled)
-//             return false;
-//
-//         if (!interval) {
-//             clearInterval(this.carouselInterval);
-//             const self = this;
-//             setTimeout(() => self.setCarouselInterval(), 6000);
-//         }
-//
-//         const container = $('.carousel-inner .images');
-//         const images = container.find('img');
-//         const imageWidth = images.width();
-//         const imagesToSlide = screen.width < 768 ? 2 : 3;
-//
-//
-//         let position = parseInt(container.css('margin-left'));
-//
-//         const lastImage = container[0].querySelector('img:last-child');
-//         const lastImageOffsetLeft = lastImage.offsetLeft;
-//         const firstImage = container[0].querySelector('img:first-child');
-//         const firstImageOffsetLeft = firstImage.offsetLeft;
-//         const parent = container[0].parentElement;
-//         const parentOffsetLeft = parent.offsetLeft;
-//         const parentOffsetRight = parent.offsetLeft + parent.offsetWidth;
-//
-//         if (firstImageOffsetLeft >= parentOffsetLeft - imageWidth && control.classList.contains('left')) {
-//             container
-//                 .css({marginLeft: (0 - this.carouselWidth) + 'px'})
-//                 .removeClass('animated')
-//                 .prepend(this.carouselImagesHTML);
-//             position = parseInt(container.css('margin-left'));
-//         } else if (lastImageOffsetLeft <= parentOffsetRight + imageWidth && control.classList.contains('right'))
-//             container
-//                 .removeClass('animated')
-//                 .append(this.carouselImagesHTML);
-//
-//         const marginLeft = (control.classList.contains('right') ? position - imageWidth * imagesToSlide : position + imageWidth * imagesToSlide) + 'px';
-//
-//         container.addClass('animated').css({marginLeft: marginLeft});
-//         control.setAttribute('data-disabled', 1);
-//         setTimeout(() => control.removeAttribute('data-disabled'), 800);
-//     },
-//
-//
-//     carouselWidth: 0,
-//     carouselImagesHTML: '',
+        private init($source: JQuery): void {
+            this.countDisplayElems = 6;
+            this.countScrollElems = 3;
+            this.lastElement = null;
+            this.countElements = this.$elements.length;
+            this.scrolling = false;
 
-//     init() {
-//
-//         const self = this;
-//         $('.carousel-control').on('click', e => self.carousel(e.target, 0));
-//         this.setCarouselInterval();
-//
-//     },
-//
-//     setCarouselInterval() {
-//         const carouselControl = document.querySelector('.carousel-control.right');
-//         const self = this;
-//         clearInterval(this.carouselInterval);
-//         this.carouselInterval = setInterval(() => self.carousel(carouselControl), 6000);
-//     },
-//
-// };
-//
-// $(document).ready(() => {
-//     $('.carousel-inner .images img').each((i, img) => index.carouselWidth += img.offsetWidth);
-//     index.carouselImagesHTML = $('.carousel-inner .images').html();
-//     index.init();
-//
-//     setTimeout(() => {
-//         let anchor = window.location.hash;
-//         if ($(anchor).length) {
-//             window.scrollTo({
-//                 top: $(anchor).offset().top - 90,
-//                 behavior: 'smooth'
-//             })
-//         }
-//     }, 200);
-//
-// });
+            let num = this.lastElement;
+            for (let i = 1; i <= this.countDisplayElems; i++) {
+                num = this.getNext(num);
+                this.append(num);
+            }
+            this.lastElement = num;
+        }
+
+        private getNext(current: number | null): number {
+            if (current === null) return 0;
+            if (current === this.countElements - 1) return 0;
+            return current + 1;
+        }
+
+        private append(num: number): void {
+            this.$content.append(
+                $(this.$elements[num]).clone()
+            )
+        }
+
+        private toRight() {
+            console.log(this);
+            if (this.scrolling) return;
+            this.scrolling = true;
+
+            let num = this.lastElement;
+            for (let i = 1; i <= this.countDisplayElems; i++) {
+                num = this.getNext(num);
+                this.append(num);
+            }
+
+            this.scrolling = false;
+        }
+
+    }
+
+}

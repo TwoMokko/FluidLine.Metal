@@ -19,11 +19,11 @@ class OptionsRequestMapper
                     'id' => $ending['id'],
                     'description' => $ending['description'],
                     'img_href' => $img_base . $ending['image'],
-                    'sizes' => new stdClass()
+                    'sizes' => []
                 );
             }
 
-            $res['types'][$type]['sizes']->$ending['id'] = $ending['size'];
+            $res['types'][$type]['sizes'][$ending['id']] = $ending['size'];
         }
         
         return $res;

@@ -1,3 +1,7 @@
+$(() => {
+    new Components.Filter();
+})
+
 document.addEventListener("DOMContentLoaded", () => {
 
 })
@@ -52,3 +56,5 @@ function createInputsPhoneAndEmail(form: HTMLFormElement): void {
     inputEmail.placeholder = 'E-mail';
     inputEmail.name = 'email';
 }
+
+

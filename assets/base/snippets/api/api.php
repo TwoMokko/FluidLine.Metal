@@ -2,14 +2,14 @@
 
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../init.php';
+//require_once __DIR__ . '/../init.php';
 require_once __DIR__ . '/OptionsRequestMapper.php';
 require_once __DIR__ . '/ProductRequestMapper.php';
 require_once __DIR__ . '/ProductLoadMoreMapper.php';
 
 $task = isset($_GET['task']) ? $_GET['task'] : '';
 if ($task=='') {
-    return;
+    return 'no-task';
 }
 
 $api_base = 'http://avy.ru:557';
@@ -103,6 +103,7 @@ switch ($task) {
             'length' => $requestParams['length'],
         );
         $res = ProductRequestMapper::map($json, $p);
+
 
         echo json_encode($res);
 

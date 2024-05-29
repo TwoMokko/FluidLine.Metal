@@ -9,6 +9,7 @@
         @include textHeader;
     }
     &-wrap {
+        position: relative;
         display: flex;
         padding: 40px 80px;
         gap: 80px;
@@ -16,6 +17,7 @@
         background-color: $colorAccentLight;
         @include textMain;
         &-item {
+            width: 50%;
             &-head {
                 height: calc(32px + 2rem);
                 display: flex;
@@ -30,10 +32,10 @@
         }
     }
     &-checkboxes {
-        > div:first-child {
+        > div:nth-child(1) {
            margin-bottom: 12px;
         }
-        > div:last-child {
+        > div:nth-child(2) {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
@@ -56,10 +58,10 @@
         }
     }
     &-radio {
-        > div:first-child {
+        > div:nth-child(1) {
             margin-bottom: 12px;
         }
-        > div:last-child {
+        > div:nth-child(2) {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
@@ -81,14 +83,14 @@
     }
 
     &-length {
-        > div:first-child {
+        > div:nth-child(1) {
             margin-bottom: 12px;
         }
-        > div:last-child {
+        > div:nth-child(2) {
             display: flex;
             align-items: end;
             gap: 24px;
-            label:first-child {
+            label:nth-child(1) {
                 background-color: white;
                 padding: 4px 12px;
                 display: inline-block;
@@ -200,6 +202,24 @@
             color: $colorDarkOpacity;
             border-radius: 0 0 8px 8px;
             box-shadow: 0 15px 59px -17px rgba(0,0,0,0.24);
+
+            overflow-y: scroll;
+            height: 308px;
+
+            &::-webkit-scrollbar {
+                width: 12px;                                            /* ширина всей полосы прокрутки */
+            }
+
+            &::-webkit-scrollbar-track {
+                background: $colorAccentLightMore;                      /* цвет зоны отслеживания */
+                border-radius: 8px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: $colorAccentLight;                    /* цвет бегунка */
+                border-radius: 20px;                                    /* округлось бегунка */
+                border: 3px solid $colorAccentLightMore;                /* отступ вокруг бегунка */
+            }
 
             &.on {
                 display: block;
