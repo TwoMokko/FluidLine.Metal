@@ -71,6 +71,106 @@ var Components;
     }
     Components.Carousel = Carousel;
 })(Components || (Components = {}));
+var Components;
+(function (Components) {
+    class Filter {
+        $loader;
+        data;
+        isLoad;
+        select1;
+        select2;
+        typeSize1 = [];
+        typeSize2 = [];
+        constructor() {
+            this.$loader = $('.loader-wrap');
+            this.isLoad = true;
+            this.setFilterOption();
+        }
+        setFilterOption() {
+            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (data) => {
+                // $( ".result" ).html( data );
+                this.data = data;
+                this.fillSelectSource();
+                this.fillSelectCustom();
+            })
+                //     .done(() => {
+                //     console.log( "second success" );
+                // })
+                //     .fail(() => {
+                //         console.log( "error" );
+                //     })
+                .always(() => {
+                this.hideLoader();
+            });
+        }
+        showLoader() {
+            this.isLoad = true;
+            this.$loader.removeClass('hide');
+        }
+        hideLoader() {
+            this.isLoad = false;
+            this.$loader.addClass('hide');
+        }
+        fillSelectSource() {
+            for (const i in this.data.types) {
+                const value = i + ' - ' + this.data.types[i].description;
+                $('.select[name="zakontsovka-1"]').append($('<option/>').text(value).attr('value', i));
+                $('.select[name="zakontsovka-2"]').append($('<option/>').text(value).attr('value', i));
+            }
+        }
+        fillSelectCustom() {
+            this.select1 = new Components.Select($('.select[name="zakontsovka-1"]'));
+            this.select2 = new Components.Select($('.select[name="zakontsovka-2"]'));
+            this.select1.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
+            this.select2.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
+        }
+        drawButtonsSize = ($select, data) => {
+            const name = $select.val() + '';
+            const sizes = this.data.types[name].sizes;
+            const $wrapBtn = $('.prod-filter-radio').find('#' + data.name);
+            this.typeSize1 = sizes;
+            this.typeSize2 = sizes;
+            $wrapBtn.empty();
+            for (let i in sizes) {
+                let id = data.id + i;
+                $wrapBtn.append($('<div/>').append($('<input/>', { id: id, type: data.type, name: data.name })
+                    .on('change', (event) => {
+                    switch (data.name) {
+                        case 'size1':
+                            this.typeSize1 = [i];
+                            break;
+                        case 'size2':
+                            this.typeSize2 = [i];
+                            break;
+                        default:
+                            this.typeSize1 = sizes;
+                            this.typeSize2 = sizes;
+                            break;
+                    }
+                    this.collectData();
+                }), $('<label/>', {
+                    for: id,
+                    text: sizes[i]
+                })));
+            }
+        };
+        collectData() {
+            const sendData = {
+                cable: $('#tros').is(':checked') ? this.data.cable_value : null,
+                length: $('#size').val(),
+                type1_size: this.typeSize1,
+                type2_size: this.typeSize2,
+                // oxygen_compatibility:
+                // mrk_show: true | false
+                // rvd_show: true | false
+            };
+            console.log(sendData);
+        }
+        changeTypeSize() {
+        }
+    }
+    Components.Filter = Filter;
+})(Components || (Components = {}));
 // (function($){
 //     $.fn.choiceBoard=function(param){
 //         var data='';
@@ -867,272 +967,94 @@ var Common;
     }
     Common.Request = Request;
 })(Common || (Common = {}));
-// $(() => {
-//
-// })
-//
-// function selectCustom(): void {
-//     $('.select').each(function() {
-//         const _this = $(this),
-//             selectOption = _this.find('option'),
-//             selectOptionLength = selectOption.length,
-//             selectedOption = selectOption.filter(':selected'),
-//             duration = 450; // длительность анимации
-//
-//         _this.hide();
-//         _this.wrap('<div class="select-wrap"></div>');
-//         $('<div>', {
-//             class: 'new-select',
-//             text: _this.children('option:disabled').text()
-//         }).insertAfter(_this);
-//
-//         const selectHead = _this.next('.new-select');
-//         $('<div>', {
-//             class: 'new-select-list'
-//         }).insertAfter(selectHead);
-//
-//         const selectList = selectHead.next('.new-select-list');
-//         for (let i = 1; i < selectOptionLength; i++) {
-//             $('<div>', {
-//                 class: 'new-select-list-item',
-//                 html: $('<span>', {
-//                     text: selectOption.eq(i).text()
-//                 })
-//             })
-//                 .attr('data-value', selectOption.eq(i).val())
-//                 .appendTo(selectList);
-//         }
-//
-//         const selectItem = selectList.find('.new-select-list-item');
-//         selectList.slideUp(0);
-//         selectHead.on('click', function() {
-//             if ( !$(this).hasClass('on') ) {
-//                 $(this).addClass('on');
-//                 selectList.slideDown(duration);
-//
-//                 selectItem.on('click', function() {
-//                     let chooseItem = $(this).data('value');
-//
-//                     _this.val(chooseItem).attr('selected', 'selected');
-//                     // $('select').val(chooseItem).attr('selected', 'selected');
-//                     selectHead.text( $(this).find('span').text() );
-//
-//                     selectList.slideUp(duration);
-//                     selectHead.removeClass('on');
-//                 });
-//
-//             } else {
-//                 $(this).removeClass('on');
-//                 selectList.slideUp(duration);
-//             }
-//         });
-//     });
-// }
-//
-// function getFilterOption(): object {
-//     let dataOption: object;
-//
-//     $.post( "/assets/base/snippets/api/api.php?task=filterOptions", function( data: object ) {
-//         // $( ".result" ).html( data );
-//         dataOption = data;
-//         // console.log(dataOption);
-//
-//     }) .done(function() {
-//         console.log( "second success" );
-//     })
-//         .fail(function() {
-//             console.log( "error" );
-//         })
-//         .always(function() {
-//             console.log( "finished" );
-//             return dataOption;
-//         });
-//
-//
-// }
-//
-// function fillFilterData(): void {
-//     console.log('fill filter')
-// }
 var Components;
 (function (Components) {
-    class Filter {
-        data;
-        load;
-        selectArray;
-        constructor() {
-            this.selectArray = {
-                '1': {
-                    'select': $('select[name="zakontsovka-1"]'),
-                },
-                '2': {
-                    'select': $('select[name="zakontsovka-2"]'),
-                },
-            };
-            this.load = false;
-            this.setFilterOption();
-        }
-        setFilterOption() {
-            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (data) => {
-                // $( ".result" ).html( data );
-                this.data = data;
-                console.log('data1', this.data);
-                this.fillFilterData();
-                this.selectCustom();
-                this.drawSizeBtn('A');
-                $('.loader-wrap').addClass('hide');
-            })
-                //     .done(() => {
-                //     console.log( "second success" );
-                //     console.log('data1', this.data);
-                // })
-                //     .fail(() => {
-                //         console.log( "error" );
-                //     })
-                .always(() => {
-                this.load = true;
+    class Select {
+        $sourceSelect;
+        $sourceOptions;
+        $header;
+        $list;
+        isOpen; // флаг, состояние: открыт или закрыт селект
+        duration; // анимация
+        constructor($sourceSelect) {
+            this.isOpen = false;
+            this.duration = 450;
+            this.$sourceSelect = $sourceSelect;
+            this.$sourceOptions = $sourceSelect.children('option');
+            $sourceSelect.hide();
+            /* Create Elements */
+            const $wrap = $('<div/>', { class: 'select-wrap' });
+            this.$header = $('<div>', {
+                class: 'new-select',
+                text: this.$sourceOptions.filter(':selected').text()
             });
-        }
-        fillFilterData() {
-            for (const i in this.data.types) {
-                const value = i + ' - ' + this.data.types[i].description;
-                this.selectArray['1'].select.append($('<option/>').text(value).attr('data-option', i));
-                this.selectArray['2'].select.append($('<option/>').text(value));
-            }
-        }
-        drawSizeBtn(name) {
-            for (let i in this.data.types[name].sizes) {
-                $('.prod-filter-radio').find('#size1').append($('<div/>').append($('<input/>', { id: 'sz1-' + this.data.types[name].sizes[i], type: 'radio', name: 'size1' }), $('<label/>', { for: 'sz1-' + this.data.types[name].sizes[i], text: this.data.types[name].sizes[i] })));
-            }
-            // $.post( "/assets/base/snippets/api/api.php?task=getProducts", ( data: filterOptions ): void => {
-            //     // $( ".result" ).html( data );
-            //
-            // })
-            //     //     .done(() => {
-            //     //     console.log( "second success" );
-            //     //     console.log('data1', this.data);
-            //     // })
-            //     //     .fail(() => {
-            //     //         console.log( "error" );
-            //     //     })
-            //     .always(() => {
-            //
-            //     });
-        }
-        // private selectCustom(): void {
-        //     const duration: number = 450; // длительность анимации
-        //     for(let i in this.selectArray) {
-        //         console.log('sel: ', i);
-        //         console.log('proverka: ', this.selectArray[i].select);
-        //
-        //
-        //         this.selectArray[i]['selectOption'] = this.selectArray[i].select.find('option');
-        //         const selectOptionLength: number = this.selectArray[i]['selectOption'].length;
-        //         const selectedOption: JQuery<HTMLElement> = this.selectArray[i]['selectOption'].filter(':selected');
-        //
-        //         this.selectArray[i].select.hide();
-        //         this.selectArray[i].select.wrap('<div class="select-wrap"></div>');
-        //
-        //         $('<div>', {
-        //             class: 'new-select',
-        //             text: this.selectArray[i].select.children('option:disabled').text()
-        //         }).insertAfter(this.selectArray[i].select);
-        //
-        //         this.selectArray[i]['selectHead'] = this.selectArray[i].select.next('.new-select');
-        //         $('<div>', {
-        //             class: 'new-select-list'
-        //         }).insertAfter(this.selectArray[i]['selectHead']);
-        //
-        //         this.selectArray[i]['selectList'] = this.selectArray[i]['selectHead'].next('.new-select-list');
-        //
-        //         for (let j = 1; j < selectOptionLength; j++) {
-        //             $('<div>', {
-        //                 class: 'new-select-list-item',
-        //                 html: $('<span>', {
-        //                     text: this.selectArray[i]['selectOption'].eq(j).text()
-        //                 })
-        //             })
-        //                 .attr('data-value', this.selectArray[i]['selectOption'].eq(j).val())
-        //                 .attr('data-option', this.selectArray[i]['selectOption'].eq(j).data('option'))
-        //                 .appendTo(this.selectArray[i]['selectList']);
-        //
-        //
-        //
-        //             this.selectArray[i]['selectItem'] = this.selectArray[i]['selectList'].find('.new-select-list-item');
-        //             this.selectArray[i]['selectList'].slideUp(0);
-        //             this.selectArray[i]['selectHead'].on('click', () => {
-        //                 if ( !this.selectArray[i].select.hasClass('on') ) {
-        //                     this.selectArray[i].select.addClass('on');
-        //                     this.selectArray[i]['selectList'].slideDown(duration);
-        //
-        //                     this.selectArray[i]['selectItem'].on('click', () => {
-        //                         let chooseItem = this.selectArray[i].select.data('value');
-        //
-        //                         this.selectArray[i].select.val(chooseItem).attr('selected', 'selected');
-        //                         // $('select').val(chooseItem).attr('selected', 'selected');
-        //                         this.selectArray[i]['selectHead'].text( this.selectArray[i].select.find('span').text() );
-        //
-        //                         this.selectArray[i]['selectList'].slideUp(duration);
-        //                         this.selectArray[i]['selectHead'].removeClass('on');
-        //                     });
-        //
-        //                 } else {
-        //                     this.selectArray[i].select.removeClass('on');
-        //                     this.selectArray[i]['selectList'].slideUp(duration);
-        //                 }
-        //             });
-        //         }
-        //     }
-        // }
-        selectCustom() {
-            $('.select').each(function () {
-                const _this = $(this), selectOption = _this.find('option'), selectOptionLength = selectOption.length, selectedOption = selectOption.filter(':selected'), duration = 450; // длительность анимации
-                _this.hide();
-                _this.wrap('<div class="select-wrap"></div>');
-                $('<div>', {
-                    class: 'new-select',
-                    text: _this.children('option:disabled').text()
-                }).insertAfter(_this);
-                const selectHead = _this.next('.new-select');
-                $('<div>', {
-                    class: 'new-select-list'
-                }).insertAfter(selectHead);
-                const selectList = selectHead.next('.new-select-list');
-                for (let i = 1; i < selectOptionLength; i++) {
-                    $('<div>', {
-                        class: 'new-select-list-item',
-                        html: $('<span>', {
-                            text: selectOption.eq(i).text()
-                        })
-                    })
-                        .attr('data-value', selectOption.eq(i).val())
-                        .attr('data-option', selectOption.eq(i).data('option'))
-                        .appendTo(selectList);
-                }
-                const selectItem = selectList.find('.new-select-list-item');
-                selectList.slideUp(0);
-                selectHead.on('click', function () {
-                    if (!$(this).hasClass('on')) {
-                        $(this).addClass('on');
-                        selectList.slideDown(duration);
-                        selectItem.on('click', function () {
-                            let chooseItem = $(this).data('value');
-                            _this.val(chooseItem).attr('selected', 'selected');
-                            // $('select').val(chooseItem).attr('selected', 'selected');
-                            selectHead.text($(this).find('span').text());
-                            /* ПЕРЕПИСАТЬ! */
-                            selectList.slideUp(duration);
-                            selectHead.removeClass('on');
-                        });
-                    }
-                    else {
-                        $(this).removeClass('on');
-                        selectList.slideUp(duration);
-                    }
-                });
+            this.$list = $('<div>', {
+                class: 'new-select-list'
             });
+            /* Building DOM */
+            $wrap.append(this.$header, this.$list.append(this.getOptions()));
+            /* Events */
+            this.$header.on('click', () => { this.switchSelect(); });
+            $sourceSelect.after($wrap);
+            this.$list.slideUp(0);
+        }
+        static factory($sourceSelect) {
+            let $out = [];
+            for (let i = 0; i < $sourceSelect.length; i++) {
+                let select = new Select($sourceSelect.eq(Number(i)));
+                $out.push(select);
+            }
+            return $out;
+        }
+        getOptions() {
+            let $options = [];
+            for (let i = 1; i < this.$sourceSelect.children('option').length; i++) {
+                $options.push(this.getOption(this.$sourceOptions.eq(i)));
+            }
+            return $options;
+        }
+        getOption($sourceOption) {
+            let text = $sourceOption.text();
+            let $option = $('<div>', {
+                class: 'new-select-list-item',
+                html: $('<span>', {
+                    text: text
+                }),
+            });
+            $option.on('click', () => {
+                this.$sourceOptions.filter(':selected').removeAttr('selected');
+                $sourceOption.attr('selected', 'selected');
+                $sourceOption.trigger('change');
+                this.$header.text(text);
+                this.close();
+            });
+            return $option;
+        }
+        switchSelect() {
+            this.isOpen ? this.close() : this.open();
+        }
+        open() {
+            this.isOpen = true;
+            this.$header.addClass('on');
+            this.$list.slideDown(this.duration);
+        }
+        close() {
+            this.isOpen = false;
+            this.$header.removeClass('on');
+            this.$list.slideUp(this.duration);
+        }
+        /* Навешивание события: при изменении селекта срабатывает переданная процедура */
+        on(event, func, data = {}) {
+            switch (event) {
+                case 'change':
+                    this.$sourceSelect.on('change', () => { func(this.$sourceSelect, data); });
+                    break;
+                default:
+                    console.warn('Event not found');
+                    break;
+            }
         }
     }
-    Components.Filter = Filter;
+    Components.Select = Select;
 })(Components || (Components = {}));
 //# sourceMappingURL=main.js.map
