@@ -1,27 +1,22 @@
+<div class="head container">Металлорукава и РВД</div>
 <form id="rbfrm" class="prod-filter container">
-    <div class="prod-filter-head">Металлорукава</div>
-<!--    <div class="prod-filter-switcher">-->
-<!--        <div></div>-->
-<!--        <div>-->
-<!--            <div>-->
-<!--                <input class="lpxs" name="mrk" id="vvvv1" type="checkbox" value="on">-->
-<!--                <label class="mr_min" for="vvvv1" data-h="1">Металлорукав</label>-->
-<!--            </div>-->
-<!--            <div>-->
-<!--                <input class="lpxs" name="rvd" id="vvvv2" type="checkbox" data-h="2" value="on">-->
-<!--                <label class="mr_min" for="vvvv2">Рукав высокого давления</label>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
+    <div class="loader-filter">
+        <div class="loader"></div>
+        <div class="loader-text">Загрузка</div>
+    </div>
 
-
+    <div class="prod-filter-switcher">
+        <label class="prod-filter-checkbox">
+            <input type="checkbox" id="mrk" name="mrk" checked>
+            <label for="mrk">Металлорукав</label>
+        </label>
+        <label class="prod-filter-checkbox">
+            <input type="checkbox" id="rvd" name="rvd" checked>
+            <label for="rvd">Рукав высокого давления</label>
+        </label>
+    </div>
 
     <div class="prod-filter-wrap">
-        <div class="loader-wrap">
-            <div class="loader"></div>
-            <div class="loader-text">Загрузка</div>
-        </div>
-
         <div class="prod-filter-wrap-item">
             <div>
                 <div class="prod-filter-wrap-item-head">Тип первой законцовки</div>
@@ -32,6 +27,7 @@
             <div class="prod-filter-radio">
                 <div>Размер первой законцовки</div>
                 <div class="panel" id="size1"></div>
+                <div class="forload">Выберите тип первой законцовки</div>
             </div>
             <div class="prod-filter-radio">
                 <div>Газовая среда</div>
@@ -58,9 +54,8 @@
                     <div>Тип второй законцовки</div>
                     <div class="filter-analog">
                         <label class="prod-filter-checkbox">
-                            <input type="checkbox" value="">
-                            <div></div>
-                            <span>Аналогично первой</span>
+                            <input type="checkbox" id="analog" name="analog">
+                            <label for="analog">Аналогично первой</label>
                         </label>
                     </div>
                 </div>
@@ -72,18 +67,18 @@
             <div class="prod-filter-radio">
                 <div>Размер первой законцовки</div>
                 <div class="panel" id="size2"></div>
+                <div class="forload">Выберите тип второй законцовки</div>
             </div>
             <div class="prod-filter-length">
                 <div>Длина (L)</div>
                 <div>
                     <label>
-                        <input name="length" id="size" type="number" class="inptop" min="50" max="100000" step="any">
+                        <input name="length" id="size" type="number" min="50" max="100000" step="any" value="1000">
                         <span>мм</span>
                     </label>
                     <label class="prod-filter-checkbox">
-                        <input type="checkbox" id="tros" class="chgtip ilp" data-for="tros1" name="tros">
-                        <div></div>
-                        <label for="tros" class="tipselect">Трос</label>
+                        <input type="checkbox" id="tros" name="tros">
+                        <label for="tros">Трос</label>
                     </label>
                 </div>
             </div>

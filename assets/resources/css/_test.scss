@@ -148,7 +148,14 @@
     border-bottom .2s;
 }
 
-.loader-wrap {
+.prod-result-head {
+    color: $colorTextAccent;
+    font-size: 32px;
+    line-height: 40px;
+    margin-bottom: 48px;
+}
+
+.loader-filter {
     position: absolute;
     z-index: 10;
     left: 0;
@@ -161,35 +168,72 @@
     align-items: center;
     border-radius: 24px;
     background-color: #00000080;
-}
-.loader-text {
-    color: $colorTextLight;
-}
-.loader{
-    display: block;
-    position: relative;
-    height: 32px;
-    border: 2px solid #fff;
-    width: 120px;
-    background: #fff;
-    box-sizing: border-box;
-    margin-bottom: 24px;
-}
-.loader:before{
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0px;
-    width: 28px;
-    height: 28px;
-    background: $colorBackgroundAccent;
-    animation: ballbns 1s ease-in-out infinite alternate;
+    .loader-text {
+        color: $colorTextLight;
+    }
+    .loader{
+        display: block;
+        position: relative;
+        height: 32px;
+        border: 2px solid #fff;
+        width: 120px;
+        background: #fff;
+        box-sizing: border-box;
+        margin-bottom: 24px;
+    }
+    .loader:before{
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0px;
+        width: 28px;
+        height: 28px;
+        background: $colorBackgroundAccent;
+        animation: ballbns 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes ballbns {
+        0% {  left: 0; transform: translateX(0%); }
+        100% {  left: 100%; transform: translateX(-100%); }
+    }
 }
 
-@keyframes ballbns {
-    0% {  left: 0; transform: translateX(0%); }
-    100% {  left: 100%; transform: translateX(-100%); }
+.loader-table {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 24px;
+    .loader-text {
+        color: $colorTextDark;
+    }
+    .loader{
+        display: block;
+        position: relative;
+        height: 32px;
+        border: 2px solid $colorBackgroundAccent;
+        width: 120px;
+        background: $colorBackgroundLight;
+        box-sizing: border-box;
+        margin-bottom: 24px;
+    }
+    .loader:before{
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0px;
+        width: 28px;
+        height: 28px;
+        background: $colorBackgroundAccent;
+        animation: ballbns 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes ballbns {
+        0% {  left: 0; transform: translateX(0%); }
+        100% {  left: 100%; transform: translateX(-100%); }
+    }
 }
+
 
 
 

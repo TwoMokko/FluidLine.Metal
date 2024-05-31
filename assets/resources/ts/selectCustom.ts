@@ -7,9 +7,11 @@ namespace Components {
         private $list                           : JQuery;
 
         private isOpen                          : boolean;  // флаг, состояние: открыт или закрыт селект
+        private isSelect                        : boolean;  // флаг, состояние: выбрано что-то или нет
         private readonly duration               : number;   // анимация
 
         public constructor($sourceSelect: JQuery) {
+            this.isSelect = false;
             this.isOpen = false;
             this.duration = 450;
 
@@ -75,6 +77,7 @@ namespace Components {
             $option.on('click', (): void => {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 $sourceOption.attr('selected', 'selected');
+                this.isSelect = true;
                 $sourceOption.trigger('change');
                 this.$header.text(text);
 
@@ -98,6 +101,10 @@ namespace Components {
             this.isOpen = false;
             this.$header.removeClass('on');
             this.$list.slideUp(this.duration);
+        }
+
+        public getIsSelect(): boolean {
+            return this.isSelect;
         }
 
         /* Навешивание события: при изменении селекта срабатывает переданная процедура */

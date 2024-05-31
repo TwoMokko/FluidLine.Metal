@@ -35,10 +35,38 @@ type filterOptions = {
     oxygen_compatibility_value: string;
     cable_value: string;
 };
+interface itemProducts {
+    pagetitle: string;
+    price: string;
+    stock_count: string;
+    ending1: string;
+    ending2: string;
+    numberOfBraids: string;
+    dn: string;
+    cable: string;
+    protectiveSpiral: string;
+    thermalInsulation: string;
+    degreasing: string;
+    outerCoating: string;
+    bending_radius: string;
+    max_pressure: string;
+    os_compatibility: string;
+    _length: string;
+    prettyPagetitle: string;
+}
+interface itemDataProducts {
+    products: itemProducts[];
+    count_all: number;
+    table_id: number;
+}
+type dataProducts = {
+    [key: string]: itemDataProducts;
+};
 declare namespace Components {
     class Filter {
-        $loader: JQuery;
-        data: filterOptions;
+        $loaderFilter: JQuery;
+        dataOptions: filterOptions;
+        dataProducts: any;
         isLoad: boolean;
         select1: Select;
         select2: Select;
@@ -52,7 +80,9 @@ declare namespace Components {
         private fillSelectCustom;
         private drawButtonsSize;
         private collectData;
-        private changeTypeSize;
+        private drawTable;
+        private addEvent;
+        private sendData;
     }
 }
 declare function createElement(tagName: string, className: string | null, textContent: string | null, container: HTMLElement | null): any;
@@ -116,6 +146,7 @@ declare namespace Components {
         private readonly $header;
         private $list;
         private isOpen;
+        private isSelect;
         private readonly duration;
         constructor($sourceSelect: JQuery);
         static factory($sourceSelect: JQuery): Select[];
@@ -124,6 +155,7 @@ declare namespace Components {
         private switchSelect;
         private open;
         private close;
+        getIsSelect(): boolean;
         on(event: string, func: Function, data?: {
             [key: string]: any;
         }): void;

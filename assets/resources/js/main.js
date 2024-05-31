@@ -74,22 +74,24 @@ var Components;
 var Components;
 (function (Components) {
     class Filter {
-        $loader;
-        data;
+        $loaderFilter;
+        dataOptions;
+        dataProducts;
         isLoad;
         select1;
         select2;
         typeSize1 = [];
         typeSize2 = [];
         constructor() {
-            this.$loader = $('.loader-wrap');
+            this.$loaderFilter = $('.loader-filter');
             this.isLoad = true;
             this.setFilterOption();
+            this.addEvent();
         }
         setFilterOption() {
-            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (data) => {
+            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions) => {
                 // $( ".result" ).html( data );
-                this.data = data;
+                this.dataOptions = dataOptions;
                 this.fillSelectSource();
                 this.fillSelectCustom();
             })
@@ -105,15 +107,15 @@ var Components;
         }
         showLoader() {
             this.isLoad = true;
-            this.$loader.removeClass('hide');
+            this.$loaderFilter.removeClass('hide');
         }
         hideLoader() {
             this.isLoad = false;
-            this.$loader.addClass('hide');
+            this.$loaderFilter.addClass('hide');
         }
         fillSelectSource() {
-            for (const i in this.data.types) {
-                const value = i + ' - ' + this.data.types[i].description;
+            for (const i in this.dataOptions.types) {
+                const value = i + ' - ' + this.dataOptions.types[i].description;
                 $('.select[name="zakontsovka-1"]').append($('<option/>').text(value).attr('value', i));
                 $('.select[name="zakontsovka-2"]').append($('<option/>').text(value).attr('value', i));
             }
@@ -121,15 +123,33 @@ var Components;
         fillSelectCustom() {
             this.select1 = new Components.Select($('.select[name="zakontsovka-1"]'));
             this.select2 = new Components.Select($('.select[name="zakontsovka-2"]'));
+            $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
             this.select1.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
             this.select2.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
         }
         drawButtonsSize = ($select, data) => {
-            const name = $select.val() + '';
-            const sizes = this.data.types[name].sizes;
+            const select2 = $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select');
+            if (select2.hasClass('not-active'))
+                select2.removeClass('not-active');
             const $wrapBtn = $('.prod-filter-radio').find('#' + data.name);
-            this.typeSize1 = sizes;
-            this.typeSize2 = sizes;
+            const name = $select.val() + '';
+            const sizes = this.dataOptions.types[name].sizes;
+            let sizesId = [];
+            for (let key of Object.keys(this.dataOptions.types[name].sizes)) {
+                sizesId.push(key);
+            }
+            switch (data.name) {
+                case 'size1':
+                    this.typeSize1 = sizesId;
+                    break;
+                case 'size2':
+                    this.typeSize2 = sizesId;
+                    break;
+                default:
+                    this.typeSize1 = [];
+                    this.typeSize2 = [];
+                    break;
+            }
             $wrapBtn.empty();
             for (let i in sizes) {
                 let id = data.id + i;
@@ -153,20 +173,66 @@ var Components;
                     text: sizes[i]
                 })));
             }
+            this.collectData();
         };
         collectData() {
+            if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
+                || (!this.select1.getIsSelect() && !this.select2.getIsSelect()))
+                console.log('размеры законцовки не выбраны');
             const sendData = {
-                cable: $('#tros').is(':checked') ? this.data.cable_value : null,
+                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
                 length: $('#size').val(),
                 type1_size: this.typeSize1,
                 type2_size: this.typeSize2,
-                // oxygen_compatibility:
-                // mrk_show: true | false
-                // rvd_show: true | false
+                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
+                mrk_show: $('#mrk').is(':checked'),
+                rvd_show: $('#rvd').is(':checked')
             };
-            console.log(sendData);
+            $('.prod-result').addClass('hide');
+            $('.loader-table').removeClass('hide');
+            this.sendData(JSON.stringify(sendData));
         }
-        changeTypeSize() {
+        drawTable() {
+            const products = this.dataProducts['mrk'].products;
+            const headList = $('.prettyPagetitle');
+            const prodList = $('.prodList');
+            headList.empty();
+            prodList.empty();
+            for (const key in products) {
+                headList.append($('<tr/>').append($('<td/>').text(products[key].prettyPagetitle)));
+                prodList.append($('<tr/>').append($('<td/>').text(products[key].numberOfBraids), $('<td/>').text(products[key]._length), $('<td/>').text(products[key].max_pressure), $('<td/>').text(products[key].dn), $('<td/>').text(products[key].ending1), $('<td/>').text(products[key].ending2), $('<td/>').text(products[key].protectiveSpiral), $('<td/>').text(products[key].os_compatibility), $('<td/>').text(products[key].cable), $('<td/>').text(products[key].thermalInsulation), $('<td/>').text(products[key].price)));
+            }
+            $('.loader-table').addClass('hide');
+            $('.prod-result').removeClass('hide');
+        }
+        addEvent() {
+            $('#tros').on('click', () => { this.collectData(); });
+            $('#size').on('change', () => { this.collectData(); });
+            $('#mrk').on('click', () => { this.collectData(); });
+            $('#rvd').on('click', () => { this.collectData(); });
+            $('#o21').on('click', () => { this.collectData(); });
+            $('#o21_2').on('click', () => { this.collectData(); });
+            $('#analog').on('click', () => {
+                console.log('новые данные для второй законцовки');
+                this.collectData();
+            });
+        }
+        sendData(sendData) {
+            $.ajax({
+                type: 'POST',
+                url: "/assets/base/snippets/api/api.php?task=getProducts",
+                data: sendData,
+                dataType: "json",
+                success: (dataProducts) => {
+                    console.log("SUCCESS:");
+                    this.dataProducts = dataProducts;
+                    this.drawTable();
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.log("ERROR: " + textStatus + ", " + errorThrown);
+                    console.log(jqXHR);
+                }
+            });
         }
     }
     Components.Filter = Filter;
@@ -975,8 +1041,10 @@ var Components;
         $header;
         $list;
         isOpen; // флаг, состояние: открыт или закрыт селект
+        isSelect; // флаг, состояние: выбрано что-то или нет
         duration; // анимация
         constructor($sourceSelect) {
+            this.isSelect = false;
             this.isOpen = false;
             this.duration = 450;
             this.$sourceSelect = $sourceSelect;
@@ -1024,6 +1092,7 @@ var Components;
             $option.on('click', () => {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 $sourceOption.attr('selected', 'selected');
+                this.isSelect = true;
                 $sourceOption.trigger('change');
                 this.$header.text(text);
                 this.close();
@@ -1042,6 +1111,9 @@ var Components;
             this.isOpen = false;
             this.$header.removeClass('on');
             this.$list.slideUp(this.duration);
+        }
+        getIsSelect() {
+            return this.isSelect;
         }
         /* Навешивание события: при изменении селекта срабатывает переданная процедура */
         on(event, func, data = {}) {

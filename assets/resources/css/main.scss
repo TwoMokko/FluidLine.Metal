@@ -54,8 +54,8 @@ a {
 }
 
 .container {
-    padding-left: 14%;
-    padding-right: 14%;
+    margin-left: 14%;
+    margin-right: 14%;
 }
 
 .btn {
@@ -86,6 +86,11 @@ input, textarea {
 
 .hide {
     display: none;
+}
+
+.head {
+    margin-bottom: 20px;
+    @include textHeader;
 }
 
 
