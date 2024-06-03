@@ -114,6 +114,8 @@ namespace Components {
 
 
         private drawButtonsSize = ($select: JQuery, data: {id: string, type: string, name: string}): void => {
+            const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
+            if (!$notFound.hasClass('hide')) $notFound.addClass('hide');
             const select2 = $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select');
             if (select2.hasClass('not-active')) select2.removeClass('not-active');
 
@@ -175,27 +177,55 @@ namespace Components {
 
             }
 
+
+
             $('.prod-result').addClass('hide');
             $('.loader-table').removeClass('hide');
             this.sendData(JSON.stringify(sendData));
         }
 
-        private drawTable(): void {
-            const products = this.dataProducts['mrk'].products;
-            const headList: JQuery<HTMLElement> = $('.prettyPagetitle');
-            const prodList: JQuery<HTMLElement> = $('.prodList');
+        private prepareDrawTable(): void {
+            console.log('data', this.dataProducts);
+            const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
 
-            headList.empty();
-            prodList.empty();
+            const productsMrk = this.dataProducts['mrk'].products;
+            const productsRvd = this.dataProducts['rkv'].products;
+
+            $('.loader-table').addClass('hide');
+
+            if (productsMrk.length === 0 && productsRvd.length === 0) {
+                $notFound.removeClass('hide')
+            }
+
+            if (productsMrk.length > 0 && $('#mrk').is(':checked')) {
+                const $resultMrk = $('#result_mrk');
+                this.drawImage($resultMrk);
+                this.drawTable(productsMrk, $resultMrk);
+            }
+            if (productsRvd.length > 0 && $('#rvd').is(':checked')) {
+                const $resultRvd = $('#result_rvd');
+                this.drawImage($resultRvd);
+                this.drawTable(productsRvd, $resultRvd);
+            }
+
+        }
+
+        private drawTable(products: object, $resultWrap: JQuery<HTMLElement>): void {
+
+            const $headList: JQuery<HTMLElement> = $resultWrap.find('.prettyPagetitle');
+            const $prodList: JQuery<HTMLElement> = $resultWrap.find('.prodList');
+
+            $headList.empty();
+            $prodList.empty();
 
             for (const key in products) {
-                headList.append(
+                $headList.append(
                     $('<tr/>').append(
                         $('<td/>').text(products[key].prettyPagetitle)
                     )
                 );
 
-                prodList.append(
+                $prodList.append(
                     $('<tr/>').append(
                         $('<td/>').text(products[key].numberOfBraids),
                         $('<td/>').text(products[key]._length),
@@ -212,9 +242,33 @@ namespace Components {
                 );
             }
 
-            $('.loader-table').addClass('hide');
-            $('.prod-result').removeClass('hide');
+            $resultWrap.removeClass('hide');
 
+        }
+
+        private drawImage($wrapImg: JQuery<HTMLElement>): void {
+            const selectLeft: string = 'A';
+            const selectRight: string = 'A';
+
+            const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
+            const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
+
+            const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
+
+            const cutimgLeft: string = path + selectLeft + '_left_cut.png';
+            const bigimgLeft: string = path + 'big/' + selectLeft + '_left_cut.png';
+            const cutimgRight: string = path + selectRight + '_right_cut.png';
+            const bigimgRight: string = path + 'big/' + selectRight + '_right_cut.png';
+
+            const imgCenter = $wrapImg.find('.cccc');
+
+            $platformLeft.find('.cutimg > img').attr('src',cutimgLeft);
+            $platformLeft.find('.bigimg > img').attr('src',bigimgLeft);
+            $platformRight.find('.cutimg > img').attr('src',cutimgRight);
+            $platformRight.find('.bigimg > img').attr('src',bigimgRight);
+
+            imgCenter.find('> img:nth-child(1)').attr('src',path + selectLeft + '_left.png');
+            imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + 'A_right.png');
         }
 
         private addEvent(): void {
@@ -225,6 +279,20 @@ namespace Components {
             $('#o21').on('click', () => { this.collectData(); })
             $('#o21_2').on('click', () => { this.collectData(); })
             $('#analog').on('click', () => {
+
+                // for (const key in this.select2.$sourceOptions) {
+                //
+                //     if (this.select2.$sourceOptions[key].innerText === this.select1.$header[0].textContent) {
+                //         this.select2.$header.text(this.select1.$header[0].textContent);
+                //         let a = $(this.select2.$sourceOptions[key]);
+                //         console.log(a);
+                //         // $(this.select2.$sourceOptions[key]).trigger('click');
+                //         // $(this.select2).trigger('change');
+                //     }
+                // }
+
+                // this.select2.$sourceOption.trigger('change');
+                // this.select2.$header.text(this.select1.$header[0].textContent);
                 console.log('новые данные для второй законцовки')
                 this.collectData();
             })
@@ -240,7 +308,7 @@ namespace Components {
                 success: (dataProducts: dataProducts): void => {
                     console.log("SUCCESS:");
                     this.dataProducts = dataProducts;
-                    this.drawTable();
+                    this.prepareDrawTable();
                 },
                 error: (jqXHR, textStatus, errorThrown): void => {
                     console.log("ERROR: " + textStatus + ", " + errorThrown);

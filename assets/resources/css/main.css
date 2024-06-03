@@ -393,6 +393,14 @@
   background-color: #ecf4ff;
 }
 
+.prod-not-found {
+  text-align: center;
+  padding: 40px;
+  border-radius: 24px;
+  border: 1px solid #D9EAFF;
+  margin-bottom: 70px;
+}
+
 /* Colors */
 /* Sizes */
 .prod-table {
@@ -983,6 +991,7 @@
   justify-content: center;
   align-items: center;
   border-radius: 24px;
+  margin-bottom: 70px;
 }
 .loader-table .loader-text {
   color: #000;

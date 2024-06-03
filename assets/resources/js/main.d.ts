@@ -80,7 +80,9 @@ declare namespace Components {
         private fillSelectCustom;
         private drawButtonsSize;
         private collectData;
+        private prepareDrawTable;
         private drawTable;
+        private drawImage;
         private addEvent;
         private sendData;
     }
