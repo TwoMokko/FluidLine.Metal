@@ -143,8 +143,8 @@ declare namespace Common {
 }
 declare namespace Components {
     class Select {
-        private readonly $sourceSelect;
-        private $sourceOptions;
+        $sourceSelect: JQuery;
+        $sourceOptions: JQuery;
         private readonly $header;
         private $list;
         private isOpen;

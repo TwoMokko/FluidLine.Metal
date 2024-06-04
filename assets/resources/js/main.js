@@ -116,8 +116,8 @@ var Components;
         fillSelectSource() {
             for (const i in this.dataOptions.types) {
                 const value = i + ' - ' + this.dataOptions.types[i].description;
-                $('.select[name="zakontsovka-1"]').append($('<option/>').text(value).attr('value', i));
-                $('.select[name="zakontsovka-2"]').append($('<option/>').text(value).attr('value', i));
+                $('.select[name="zakontsovka-1"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
+                $('.select[name="zakontsovka-2"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
             }
         }
         fillSelectCustom() {
@@ -128,15 +128,17 @@ var Components;
             this.select2.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
         }
         drawButtonsSize = ($select, data) => {
+            const $wrap = $('.prod-filter-radio');
             const $notFound = $('.prod-not-found');
             if (!$notFound.hasClass('hide'))
                 $notFound.addClass('hide');
             const select2 = $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select');
             if (select2.hasClass('not-active'))
                 select2.removeClass('not-active');
-            const $wrapBtn = $('.prod-filter-radio').find('#' + data.name);
+            const $wrapBtn = $wrap.find('#' + data.name);
             const name = $select.val() + '';
             const sizes = this.dataOptions.types[name].sizes;
+            const $forLoad = $wrapBtn.find('+ .forload');
             let sizesId = [];
             for (let key of Object.keys(this.dataOptions.types[name].sizes)) {
                 sizesId.push(key);
@@ -154,6 +156,7 @@ var Components;
                     break;
             }
             $wrapBtn.empty();
+            $forLoad.addClass('hide');
             for (let i in sizes) {
                 let id = data.id + i;
                 $wrapBtn.append($('<div/>').append($('<input/>', { id: id, type: data.type, name: data.name })
@@ -196,7 +199,6 @@ var Components;
             this.sendData(JSON.stringify(sendData));
         }
         prepareDrawTable() {
-            console.log('data', this.dataProducts);
             const $notFound = $('.prod-not-found');
             const productsMrk = this.dataProducts['mrk'].products;
             const productsRvd = this.dataProducts['rkv'].products;
@@ -227,8 +229,10 @@ var Components;
             $resultWrap.removeClass('hide');
         }
         drawImage($wrapImg) {
-            const selectLeft = 'A';
-            const selectRight = 'A';
+            const selectLeft = this.select1.$sourceSelect.find('option:checked').attr('value');
+            const textLeft = this.select1.$sourceSelect.find('option:checked').attr('text');
+            const selectRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
+            const textRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
             const $platformLeft = $wrapImg.find('.platform-left');
             const $platformRight = $wrapImg.find('.platform-right');
             const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
@@ -242,7 +246,12 @@ var Components;
             $platformRight.find('.cutimg > img').attr('src', cutimgRight);
             $platformRight.find('.bigimg > img').attr('src', bigimgRight);
             imgCenter.find('> img:nth-child(1)').attr('src', path + selectLeft + '_left.png');
-            imgCenter.find('> img:nth-child(3)').attr('src', path + selectRight + 'A_right.png');
+            imgCenter.find('> img:nth-child(3)').attr('src', path + selectRight + '_right.png');
+            console.log(selectLeft, textLeft, selectRight, textRight);
+            $('.big_txt_left').text(selectLeft);
+            $('.large_text_left').text(textLeft);
+            $('.big_txt_right').text(selectRight);
+            $('.large_text_right').text(textRight);
         }
         addEvent() {
             $('#tros').on('click', () => { this.collectData(); });
@@ -265,7 +274,8 @@ var Components;
                 // this.select2.$sourceOption.trigger('change');
                 // this.select2.$header.text(this.select1.$header[0].textContent);
                 console.log('новые данные для второй законцовки');
-                this.collectData();
+                if ($('#analog').is(':checked'))
+                    this.collectData();
             });
         }
         sendData(sendData) {

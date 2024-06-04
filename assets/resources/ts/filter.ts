@@ -88,40 +88,48 @@ namespace Components {
             this.$loaderFilter.addClass('hide');
         }
 
+        /* Заполнеие <select> данными */
         private fillSelectSource(): void {
             for (const i in this.dataOptions.types) {
                 const value = i + ' - ' + this.dataOptions.types[i].description;
 
                 $('.select[name="zakontsovka-1"]').append(
-                    $('<option/>').text(value).attr('value', i)
+                    $('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description),
                 );
 
                 $('.select[name="zakontsovka-2"]').append(
-                    $('<option/>').text(value).attr('value', i)
+                    $('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description)
                 );
             }
         }
 
+        /* Замена <select> на кастомный */
         private fillSelectCustom(): void {
             this.select1 = new Select($('.select[name="zakontsovka-1"]'));
             this.select2 = new Select($('.select[name="zakontsovka-2"]'));
 
+            // пока не выбран первый селект, второй не активен
             $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
 
+            // навешивание событий на кастомный селект
             this.select1.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
             this.select2.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
         }
 
 
+        /* Отрисовка кнопок с размерами */
         private drawButtonsSize = ($select: JQuery, data: {id: string, type: string, name: string}): void => {
+            const $wrap = $('.prod-filter-radio');
             const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
             if (!$notFound.hasClass('hide')) $notFound.addClass('hide');
             const select2 = $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select');
             if (select2.hasClass('not-active')) select2.removeClass('not-active');
 
-            const $wrapBtn: JQuery<HTMLElement> = $('.prod-filter-radio').find('#' + data.name);
+            const $wrapBtn: JQuery<HTMLElement> = $wrap.find('#' + data.name);
             const name: string = $select.val() + '';
             const sizes = this.dataOptions.types[name].sizes;
+
+            const $forLoad = $wrapBtn.find('+ .forload');
 
             let sizesId = [];
             for (let key of Object.keys(this.dataOptions.types[name].sizes)) {
@@ -135,6 +143,7 @@ namespace Components {
             }
 
             $wrapBtn.empty();
+            $forLoad.addClass('hide');
 
             for (let i in sizes) {
                 let id: string = data.id + i;
@@ -148,7 +157,7 @@ namespace Components {
                                 default: this.typeSize1 = sizes; this.typeSize2 = sizes; break;
                             }
 
-                            this.collectData();
+                            this.prepareSendData();
                         }),
                         $('<label/>', {
                             for: id,
@@ -158,11 +167,12 @@ namespace Components {
                 )
             }
 
-            this.collectData();
+            this.prepareSendData();
         }
 
 
-        private collectData(): void {
+        /* Подготовка, сбор данных для отправки */
+        private prepareSendData(): void {
             if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
                 || (!this.select1.getIsSelect() && !this.select2.getIsSelect()) ) console.log('размеры законцовки не выбраны');
 
@@ -185,7 +195,6 @@ namespace Components {
         }
 
         private prepareDrawTable(): void {
-            console.log('data', this.dataProducts);
             const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
 
             const productsMrk = this.dataProducts['mrk'].products;
@@ -247,8 +256,10 @@ namespace Components {
         }
 
         private drawImage($wrapImg: JQuery<HTMLElement>): void {
-            const selectLeft: string = 'A';
-            const selectRight: string = 'A';
+            const selectLeft: string = this.select1.$sourceSelect.find('option:checked').attr('value');
+            const textLeft: string = this.select1.$sourceSelect.find('option:checked').attr('text');
+            const selectRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
+            const textRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
 
             const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
             const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
@@ -268,16 +279,23 @@ namespace Components {
             $platformRight.find('.bigimg > img').attr('src',bigimgRight);
 
             imgCenter.find('> img:nth-child(1)').attr('src',path + selectLeft + '_left.png');
-            imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + 'A_right.png');
+            imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + '_right.png');
+
+
+            console.log(selectLeft, textLeft, selectRight, textRight);
+            $('.big_txt_left').text(selectLeft);
+            $('.large_text_left').text(textLeft);
+            $('.big_txt_right').text(selectRight);
+            $('.large_text_right').text(textRight);
         }
 
         private addEvent(): void {
-            $('#tros').on('click', () => { this.collectData(); })
-            $('#size').on('change', () => { this.collectData(); })
-            $('#mrk').on('click', () => { this.collectData(); })
-            $('#rvd').on('click', () => { this.collectData(); })
-            $('#o21').on('click', () => { this.collectData(); })
-            $('#o21_2').on('click', () => { this.collectData(); })
+            $('#tros').on('click', () => { this.prepareSendData(); })
+            $('#size').on('change', () => { this.prepareSendData(); })
+            $('#mrk').on('click', () => { this.prepareSendData(); })
+            $('#rvd').on('click', () => { this.prepareSendData(); })
+            $('#o21').on('click', () => { this.prepareSendData(); })
+            $('#o21_2').on('click', () => { this.prepareSendData(); })
             $('#analog').on('click', () => {
 
                 // for (const key in this.select2.$sourceOptions) {
@@ -294,7 +312,7 @@ namespace Components {
                 // this.select2.$sourceOption.trigger('change');
                 // this.select2.$header.text(this.select1.$header[0].textContent);
                 console.log('новые данные для второй законцовки')
-                this.collectData();
+                if ($('#analog').is(':checked')) this.prepareSendData();
             })
         }
 

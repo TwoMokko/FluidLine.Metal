@@ -1,7 +1,7 @@
 namespace Components {
     export class Select {
-        private readonly $sourceSelect          : JQuery;
-        private $sourceOptions                  : JQuery;
+        public $sourceSelect                    : JQuery;
+        public $sourceOptions                   : JQuery;
 
         private readonly $header                : JQuery;
         private $list                           : JQuery;
