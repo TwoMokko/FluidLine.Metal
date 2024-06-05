@@ -40,7 +40,7 @@ interface itemDataProducts {
 type dataProducts = { [key: string]: itemDataProducts }
 
 namespace Components {
-    export class Filter {
+    export class FilterOLD {
         $loaderFilter               : JQuery;
 
         dataOptions                 : filterOptions;

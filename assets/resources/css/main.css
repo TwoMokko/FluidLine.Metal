@@ -798,65 +798,27 @@
   margin: 30px auto;
 }
 
-.zk {
-  vertical-align: top;
-}
-
-.imgbc {
-  margin-left: -3px;
-  margin-right: -3px;
-  vertical-align: bottom;
-}
-
 .topw {
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
-
-.topw2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+.topw .platform {
+  position: relative;
 }
-
-.topw2 div {
-  padding: 10px;
+.topw .platform:hover .bigimg {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  /* transform: translateY(0px) scale(1); */
 }
-
-.big_txt {
-  display: inline-block;
-  line-height: initial;
-  font-size: 25px;
-  vertical-align: bottom;
-}
-
-.cutimg {
+.topw .platform .cutimg {
   border-radius: 50%;
   border: 1px solid #3F80D0;
   overflow: hidden;
   padding: 10px;
 }
-
-.large_text {
-  font-size: 12px;
-  line-height: 30px;
-}
-
-.large_text2 {
-  font-size: 20px;
-}
-
-.blue {
-  color: #3F80D0;
-}
-
-.platform {
-  position: relative;
-}
-
-.bigimg {
+.topw .platform .bigimg {
   /* visibility: hidden; */
   opacity: 0;
   position: absolute;
@@ -875,15 +837,7 @@
   overflow: hidden;
   z-index: 5;
 }
-
-.platform:hover .bigimg {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-  /* transform: translateY(0px) scale(1); */
-}
-
-.bigimg:after {
+.topw .platform .bigimg:after {
   /*content: "";*/
   width: 10px;
   height: 10px;
@@ -895,39 +849,48 @@
   margin-top: -3px;
   margin-left: -5px;
 }
-
-.cccc {
+.topw .cccc {
   position: relative;
 }
-
-.cccc:after {
+.topw .cccc:after {
   content: "TL";
   position: absolute;
   bottom: 12px;
   left: calc(50% - 3px);
 }
-
-.cccc:before {
+.topw .cccc:before {
   content: "L";
   position: absolute;
   bottom: 32px;
   left: 50%;
 }
-
-.fixheight {
-  max-height: 26px;
-  overflow: hidden;
-  transition: max-height 0.8s ease-out, border-bottom 0.4s;
-  position: relative;
-  text-align: left;
-  padding: 3px;
-  border-bottom: 1px dotted #7e7e7e;
+.topw .cccc .zk {
+  vertical-align: top;
+}
+.topw .cccc .imgbc {
+  margin-left: -3px;
+  margin-right: -3px;
+  vertical-align: bottom;
 }
 
-.fixheight:hover {
-  max-height: 200px;
-  border-bottom: 1px dotted rgba(0, 0, 0, 0);
-  transition: max-height 3s ease-out, border-bottom 0.2s;
+.topw2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.topw2 div {
+  padding: 10px;
+}
+.topw2 div .big_txt {
+  display: inline-block;
+  line-height: initial;
+  font-size: 25px;
+  vertical-align: bottom;
+}
+.topw2 div .large_text {
+  font-size: 12px;
+  line-height: 30px;
 }
 
 .prod-result-head {
