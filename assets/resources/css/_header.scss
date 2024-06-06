@@ -2,31 +2,42 @@
 @use "variable" as *;
 
 .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 16px;
-    padding-bottom: 16px;
-    a {
-        cursor: pointer;
-        &:hover {
-            color: $colorTextAccent;
+    @mixin Header($params: null) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 16px;
+        padding-bottom: 16px;
+        a {
+            cursor: pointer;
+            &:hover {
+                color: $colorTextAccent;
+            }
         }
-    }
-    &-logo {
+        &-logo {
 
-    }
-    &-menu {
-        display: flex;
-        gap: 44px;
-        > a {
-            padding: 8px;
-            color: $colorTextDark;
+        }
+        &-menu {
+            display: flex;
+            gap: 44px;
+            > a {
+                padding: 8px;
+                color: $colorTextDark;
+                &:nth-child(2) {
+                    display: GetParam($params, contacts_page_display, null);
+                }
+            }
+        }
+        &-contacts {
+            display: flex;
+            flex-direction: column;
+            align-items: end;
         }
     }
-    &-contacts {
-        display: flex;
-        flex-direction: column;
-        align-items: end;
-    }
+
+    @include MixScreen(null, $size5XL) { @include Header((
+            contacts_page_display: none,
+
+    )); }
+    @include MixScreen($size5XL) { @include Header(()); }
 }

@@ -8,11 +8,11 @@ namespace Components {
             this.isLoad = true;
         }
 
-        public showLoader(): void {
+        public show(): void {
             this.isLoad = true;
             this.$loaderFilter.removeClass('hide');
         }
-        public hideLoader(): void {
+        public hide(): void {
             this.isLoad = false;
             this.$loaderFilter.addClass('hide');
         }
