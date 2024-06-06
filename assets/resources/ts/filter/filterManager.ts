@@ -3,7 +3,14 @@ namespace Components {
         dataOptions                 : filterOptions;
         dataProducts                : dataProducts;
         constructor() {
+            new Filter(this.redraw);
+            new Table();
+            new Table();
+            new NotFound();
+        }
 
+        private redraw(dataProducts: dataProducts) {
+            //рендер, условия в зависимости какие пришли данные
         }
 
         private setFilterOption(): void {
@@ -38,27 +45,27 @@ namespace Components {
             }
         }
 
-        private prepareSendData(): void {
-            if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
-                || (!this.select1.getIsSelect() && !this.select2.getIsSelect()) ) console.log('размеры законцовки не выбраны');
-
-            const sendData = {
-                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
-                length: $('#size').val(),
-                type1_size: this.typeSize1,
-                type2_size: this.typeSize2,
-                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
-                mrk_show: $('#mrk').is(':checked'),
-                rvd_show: $('#rvd').is(':checked')
-
-            }
-
-
-
-            $('.prod-result').addClass('hide');
-            $('.loader-table').removeClass('hide');
-            this.sendData(JSON.stringify(sendData));
-        }
+        // private prepareSendData(): void {
+        //     if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
+        //         || (!this.select1.getIsSelect() && !this.select2.getIsSelect()) ) console.log('размеры законцовки не выбраны');
+        //
+        //     const sendData = {
+        //         cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
+        //         length: $('#size').val(),
+        //         type1_size: this.typeSize1,
+        //         type2_size: this.typeSize2,
+        //         oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
+        //         mrk_show: $('#mrk').is(':checked'),
+        //         rvd_show: $('#rvd').is(':checked')
+        //
+        //     }
+        //
+        //
+        //
+        //     $('.prod-result').addClass('hide');
+        //     $('.loader-table').removeClass('hide');
+        //     this.sendData(JSON.stringify(sendData));
+        // }
 
         private sendData(sendData: any) {
             $.ajax({

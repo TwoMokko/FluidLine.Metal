@@ -107,6 +107,10 @@ namespace Components {
             return this.isSelect;
         }
 
+        public getValue(): string {
+            return (this.$sourceOptions.filter(':selected').val() as string);
+        }
+
         /* Навешивание события: при изменении селекта срабатывает переданная процедура */
         public on(event: string, func: Function, data: {[key: string]: any} = {}): void {
             switch (event) {

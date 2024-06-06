@@ -1,15 +1,19 @@
 namespace Components {
-    class Filter {
+    export class Filter {
         typeEndFirst                        : Select;
         typeEndSecond                       : Select;
-        groupRadioFirst                     : Select;
-        groupRadioSecond                    : Select;
-        constructor() {
+        sizeRadioFirst                      : GroupRadio;
+        sizeRadioSecond                     : GroupRadio;
+        callback                            : Function;
+        constructor(callback: Function) {
+            this.callback = callback;
+
+
             this.typeEndFirst               = new Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond              = new Select($('.select[name="zakontsovka-2"]'));
 
-            this.groupRadioFirst            = new GroupRadio(this.dataOptions.types[this.typeEndFirst.getVal()].sizes);
-            this.groupRadioSecond           = new GroupRadio();
+            this.sizeRadioFirst            = new GroupRadio($(), this.dataOptions.types[this.typeEndFirst.getVal()].sizes, {name: 'size1'});
+            this.sizeRadioSecond           = new GroupRadio($(), this.dataOptions.types[this.typeEndSecond.getVal()].sizes, {name: 'size2'});
         }
 
         private redraw(): void {
@@ -29,6 +33,11 @@ namespace Components {
         }
 
         private addEvent(): void {
+            this.typeEndFirst.on('change', (select: Select) => {
+                this.sizeRadioFirst.restructure(this.dataOptions.types[select.getValue()].sizes);
+                this.prepareSendData();
+            })
+
             $('#tros').on('click', () => { this.prepareSendData(); })
             $('#size').on('change', () => { this.prepareSendData(); })
             $('#mrk').on('click', () => { this.prepareSendData(); })
@@ -54,5 +63,51 @@ namespace Components {
                 if ($('#analog').is(':checked')) this.prepareSendData();
             })
         }
+
+        private prepareSendData(): void {
+
+        //     if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
+        //         || (!this.select1.getIsSelect() && !this.select2.getIsSelect()) ) console.log('размеры законцовки не выбраны');
+        //
+            let type1_size = [this.sizeRadioFirst.getValue()];
+            if (type1_size[0] === null) type1_size = this.sizeRadioFirst.getValuesFromData();
+
+
+            const sendData = {
+                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
+                length: $('#size').val(),
+                type1_size: type1_size,
+                type2_size: this.typeSize2,
+                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
+                mrk_show: $('#mrk').is(':checked'),
+                rvd_show: $('#rvd').is(':checked')
+
+            }
+        //
+        //
+        //
+        //     $('.prod-result').addClass('hide');
+        //     $('.loader-table').removeClass('hide');
+            this.sendData(JSON.stringify(sendData));
+        }
+
+        private sendData(sendData: any) {
+            $.ajax({
+                type: 'POST',
+                url: "/assets/base/snippets/api/api.php?task=getProducts",
+                data: sendData,
+                dataType: "json",
+                success: (dataProducts: dataProducts): void => {
+                    this.callback(dataProducts);
+
+                    console.log("SUCCESS:");
+                },
+                error: (jqXHR, textStatus, errorThrown): void => {
+                    console.log("ERROR: " + textStatus + ", " + errorThrown);
+                    console.log(jqXHR);
+                }
+            });
+        }
+
     }
 }
