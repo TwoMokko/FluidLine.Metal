@@ -21,11 +21,11 @@ namespace Components {
         }
 
         private fillSelectCustom(): void {
-            this.select1 = new Select($('.select[name="zakontsovka-1"]'));
-            this.select2 = new Select($('.select[name="zakontsovka-2"]'));
+            // this.select1 = new Select($('.select[name="zakontsovka-1"]'));
+            // this.select2 = new Select($('.select[name="zakontsovka-2"]'));
 
             // пока не выбран первый селект, второй не активен
-            $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
+            // $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
 
             // навешивание событий на кастомный селект
             this.select1.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
@@ -72,12 +72,15 @@ namespace Components {
             let type1_size = [this.sizeRadioFirst.getValue()];
             if (type1_size[0] === null) type1_size = this.sizeRadioFirst.getValuesFromData();
 
+            let type2_size = [this.sizeRadioSecond.getValue()];
+            if (type2_size[0] === null) type2_size = this.sizeRadioSecond.getValuesFromData();
+
 
             const sendData = {
                 cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
                 length: $('#size').val(),
                 type1_size: type1_size,
-                type2_size: this.typeSize2,
+                type2_size: type2_size,
                 oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
                 mrk_show: $('#mrk').is(':checked'),
                 rvd_show: $('#rvd').is(':checked')

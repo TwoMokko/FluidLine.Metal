@@ -1,24 +1,25 @@
 namespace Components {
-    export class Table {
-        dataProducts                                : itemProducts[];
+    export class Products {
+        private dataProducts                                : itemProducts[];
 
-        $wrap                                       : JQuery;
-        $headList                                   : JQuery;
-        $prodList                                   : JQuery;
+        private $wrap                                       : JQuery;
+        private $headList                                   : JQuery;
+        private $prodList                                   : JQuery;
 
-        constructor(dataProducts: itemProducts[], $wrap: JQuery, head: string) {
-            this.dataProducts                       = dataProducts;
-            this.$wrap                              = $wrap; // #result_mrk or #result_rvd
+        constructor() {
+
+        }
+
+        public drawProducts(dataProducts: itemProducts[], $wrap: JQuery, head: string): void {
+            this.dataProducts = dataProducts;
+            this.$wrap = $wrap;
+
+            this.$wrap.empty();
 
             this.$wrap.append($('<div/>', { class: 'prod-result-head', text: head }));
 
-           this.$headList                           = $('<tbody/>', { class: 'product-list head prettyPagetitle' });
-           this.$prodList                           = $('<tbody/>', { class: 'product-list body prodList' });
-
-            this.prepareDrawTable();
-        }
-
-        private prepareDrawTable(): void {
+            this.$headList = $('<tbody/>', { class: 'product-list head prettyPagetitle' });
+            this.$prodList = $('<tbody/>', { class: 'product-list body prodList' });
             /* логика с notfound и loader */
 
 
@@ -33,11 +34,13 @@ namespace Components {
             //     $notFound.removeClass('hide')
             // }
 
-            if (this.dataProducts.length /* && $('#mrk').is(':checked')*/) {
-                // const $resultMrk = $('#result_mrk');
-                this.drawImage();
-                this.drawTable();
-            }
+            // if (this.dataProducts.length /* && $('#mrk').is(':checked')*/) {
+            //     const $resultMrk = $('#result_mrk');
+            //     this.drawImage();
+            //     this.drawTable();
+            // }
+            this.drawImage();
+            this.drawTable();
 
         }
 

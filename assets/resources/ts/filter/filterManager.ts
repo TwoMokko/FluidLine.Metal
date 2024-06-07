@@ -1,16 +1,37 @@
 namespace Components {
     class FilterManager {
-        dataOptions                 : filterOptions;
-        dataProducts                : dataProducts;
+        private dataOptions                 : filterOptions;
+        private dataProducts                : dataProducts;
+
+        private filter                      : Filter;
+        private notFound                    : NotFound;
+        private productsMrk                 : Products;
+        private productsRvd                 : Products;
+        private loaderFilter                : Loader;
+        private loaderProducts              : Loader;
+
+        private $wrapProducts               : JQuery;
+
         constructor() {
-            new Filter(this.redraw);
-            new Table();
-            new Table();
-            new NotFound();
+            this.$wrapProducts              = $();
+            this.loaderFilter               = new Loader($('.wrap-filter'), 'loader-wrap loader-filter');
+            this.loaderProducts             = new Loader($('.wrap-prod'), 'loader-wrap loader-table');
+            this.filter                     = new Filter(this.redraw);
+            this.productsMrk                = new Products();
+            this.productsRvd                = new Products();
+            this.notFound                   = new NotFound(this.$wrapProducts);
         }
 
         private redraw(dataProducts: dataProducts) {
             //рендер, условия в зависимости какие пришли данные
+            this.notFound.hide();
+
+            if (!dataProducts['mrk'].products && !dataProducts['rkv'].products) {
+                this.notFound.show();
+                return;
+            }
+            if (dataProducts['mrk'].products) this.productsMrk.drawProducts(dataProducts['mrk'].products, this.$wrapProducts, 'Металлорукава');
+            if (dataProducts['rkv'].products) this.productsRvd.drawProducts(dataProducts['mrk'].products, this.$wrapProducts, 'Рукава высокого давления');
         }
 
         private setFilterOption(): void {
@@ -27,7 +48,7 @@ namespace Components {
                 //         console.log( "error" );
                 //     })
                 .always(() => {
-                    this.hideLoader();
+                    this.loader.hide();
                 });
         }
 
@@ -67,22 +88,22 @@ namespace Components {
         //     this.sendData(JSON.stringify(sendData));
         // }
 
-        private sendData(sendData: any) {
-            $.ajax({
-                type: 'POST',
-                url: "/assets/base/snippets/api/api.php?task=getProducts",
-                data: sendData,
-                dataType: "json",
-                success: (dataProducts: dataProducts): void => {
-                    console.log("SUCCESS:");
-                    this.dataProducts = dataProducts;
-                    this.prepareDrawTable();
-                },
-                error: (jqXHR, textStatus, errorThrown): void => {
-                    console.log("ERROR: " + textStatus + ", " + errorThrown);
-                    console.log(jqXHR);
-                }
-            });
-        }
+        // private sendData(sendData: any) {
+        //     $.ajax({
+        //         type: 'POST',
+        //         url: "/assets/base/snippets/api/api.php?task=getProducts",
+        //         data: sendData,
+        //         dataType: "json",
+        //         success: (dataProducts: dataProducts): void => {
+        //             console.log("SUCCESS:");
+        //             this.dataProducts = dataProducts;
+        //             this.prepareDrawTable();
+        //         },
+        //         error: (jqXHR, textStatus, errorThrown): void => {
+        //             console.log("ERROR: " + textStatus + ", " + errorThrown);
+        //             console.log(jqXHR);
+        //         }
+        //     });
+        // }
     }
 }

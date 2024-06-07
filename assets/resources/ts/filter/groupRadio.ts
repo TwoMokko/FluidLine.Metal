@@ -7,12 +7,11 @@ namespace Components {
         private options         : GroupRadioOptions;
         private data            : GroupRadioData;
 
-        $wrap                   : JQuery;
+        private  $wrap          : JQuery;
 
         constructor($wrap: JQuery, data: GroupRadioData, options: GroupRadioOptions) {
-            this.options = options;
-
-            this.$wrap = $wrap;
+            this.options        = options;
+            this.$wrap          = $wrap;
 
             this.restructure(data);
         }
