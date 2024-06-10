@@ -45,40 +45,40 @@ namespace Components {
         }
 
         private drawImage(): void {
-            const $wrapImg: JQuery = $('<div/>', { class: 'prod-images' });
-            this.$wrap.append($wrapImg);
-
-            const selectLeft: string = this.select1.$sourceSelect.find('option:checked').attr('value');
-            const textLeft: string = this.select1.$sourceSelect.find('option:checked').attr('text');
-            const selectRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
-            const textRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
-
-            const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
-            const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
-
-            const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
-
-            const cutimgLeft: string = path + selectLeft + '_left_cut.png';
-            const bigimgLeft: string = path + 'big/' + selectLeft + '_left_cut.png';
-            const cutimgRight: string = path + selectRight + '_right_cut.png';
-            const bigimgRight: string = path + 'big/' + selectRight + '_right_cut.png';
-
-            const imgCenter = $wrapImg.find('.cccc');
-
-            $platformLeft.find('.cutimg > img').attr('src',cutimgLeft);
-            $platformLeft.find('.bigimg > img').attr('src',bigimgLeft);
-            $platformRight.find('.cutimg > img').attr('src',cutimgRight);
-            $platformRight.find('.bigimg > img').attr('src',bigimgRight);
-
-            imgCenter.find('> img:nth-child(1)').attr('src',path + selectLeft + '_left.png');
-            imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + '_right.png');
-
-
-            console.log(selectLeft, textLeft, selectRight, textRight);
-            $('.big_txt_left').text(selectLeft);
-            $('.large_text_left').text(textLeft);
-            $('.big_txt_right').text(selectRight);
-            $('.large_text_right').text(textRight);
+            // const $wrapImg: JQuery = $('<div/>', { class: 'prod-images' });
+            // this.$wrap.append($wrapImg);
+            //
+            // const selectLeft: string = this.select1.$sourceSelect.find('option:checked').attr('value');
+            // const textLeft: string = this.select1.$sourceSelect.find('option:checked').attr('text');
+            // const selectRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
+            // const textRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
+            //
+            // const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
+            // const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
+            //
+            // const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
+            //
+            // const cutimgLeft: string = path + selectLeft + '_left_cut.png';
+            // const bigimgLeft: string = path + 'big/' + selectLeft + '_left_cut.png';
+            // const cutimgRight: string = path + selectRight + '_right_cut.png';
+            // const bigimgRight: string = path + 'big/' + selectRight + '_right_cut.png';
+            //
+            // const imgCenter = $wrapImg.find('.cccc');
+            //
+            // $platformLeft.find('.cutimg > img').attr('src',cutimgLeft);
+            // $platformLeft.find('.bigimg > img').attr('src',bigimgLeft);
+            // $platformRight.find('.cutimg > img').attr('src',cutimgRight);
+            // $platformRight.find('.bigimg > img').attr('src',bigimgRight);
+            //
+            // imgCenter.find('> img:nth-child(1)').attr('src',path + selectLeft + '_left.png');
+            // imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + '_right.png');
+            //
+            //
+            // console.log(selectLeft, textLeft, selectRight, textRight);
+            // $('.big_txt_left').text(selectLeft);
+            // $('.large_text_left').text(textLeft);
+            // $('.big_txt_right').text(selectRight);
+            // $('.large_text_right').text(textRight);
         }
 
 

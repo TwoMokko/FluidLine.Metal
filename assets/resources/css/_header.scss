@@ -10,9 +10,13 @@
         padding-bottom: 16px;
         a {
             cursor: pointer;
+            &:visited {
+                color: $colorTextDark;
+            }
             &:hover {
                 color: $colorTextAccent;
             }
+
         }
         &-logo {
 
@@ -23,21 +27,44 @@
             > a {
                 padding: 8px;
                 color: $colorTextDark;
+                &:nth-child(1) {
+                    display: GetParam($params, mrk_rvd_page_display, null);
+                }
                 &:nth-child(2) {
                     display: GetParam($params, contacts_page_display, null);
                 }
             }
         }
         &-contacts {
-            display: flex;
+            display: GetParam($params, contacts_display, flex);;
             flex-direction: column;
             align-items: end;
         }
+        &-btn {
+            display: GetParam($params, btn_display, null);
+        }
+        &-burger {
+            display: GetParam($params, burger_display, null);
+            cursor: pointer;
+        }
     }
 
-    @include MixScreen(null, $size5XL) { @include Header((
+    @include MixScreen(null, $sizeM) { @include Header((
             contacts_page_display: none,
-
+            contacts_display: none,
+            btn_display: none,
+            mrk_rvd_page_display: none,
     )); }
-    @include MixScreen($size5XL) { @include Header(()); }
+    @include MixScreen($sizeM, $size3XL) { @include Header((
+            contacts_page_display: none,
+            contacts_display: none,
+            btn_display: none,
+    )); }
+    @include MixScreen($size3XL, $size5XL) { @include Header((
+            contacts_page_display: none,
+            burger_display: none
+    )); }
+    @include MixScreen($size5XL) { @include Header((
+            burger_display: none
+    )); }
 }

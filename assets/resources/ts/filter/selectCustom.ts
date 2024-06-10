@@ -16,7 +16,7 @@ namespace Components {
             this.duration = 450;
 
             this.$sourceSelect = $sourceSelect;
-            this.$sourceOptions = $sourceSelect.children('option');
+            this.$sourceOptions = $sourceSelect.children('option') as JQuery;
 
             $sourceSelect.hide();
 
@@ -58,8 +58,9 @@ namespace Components {
 
         private getOptions(): JQuery[] {
             let $options: JQuery[]= [];
-            for (let i: number = 1; i < this.$sourceSelect.children('option').length; i++) {
-                $options.push(this.getOption(this.$sourceOptions.eq(i)));
+            let sourceOptions = this.$sourceSelect.children('option');
+            for (let i: number = 0; i < sourceOptions.length; i++) {
+                $options.push(this.getOption($(sourceOptions[i])));
             }
             return $options;
         }
@@ -109,6 +110,26 @@ namespace Components {
 
         public getValue(): string {
             return (this.$sourceOptions.filter(':selected').val() as string);
+        }
+
+        public restructure(data: {[key: string]: string}): void {
+            this.$list.slideUp(0);
+
+            this.$sourceSelect.empty();
+
+            for (const i in data) {
+                this.$sourceSelect.append(
+                    $('<option/>').text(data[i]).val(i)//.attr('text', this.dataOptions.types[i].description)
+                );
+            }
+
+            this.$sourceOptions = this.$sourceSelect.children('option');
+
+            this.$header.text(this.$sourceOptions.filter(':selected').text());
+
+            this.$list.append(
+                this.getOptions()
+            );
         }
 
         /* Навешивание события: при изменении селекта срабатывает переданная процедура */

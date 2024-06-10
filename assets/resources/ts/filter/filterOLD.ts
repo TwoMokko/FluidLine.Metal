@@ -1,44 +1,44 @@
-interface itemFilterOptions {
-    id                                  : number,
-    description                         : string,
-    img_href                            : string,
-    sizes                               : {[key: string]: string}
-}
-
-type filterOptions = {
-    types                               : {[key: string]: itemFilterOptions},
-    oxygen_compatibility_value          : string,
-    cable_value                         : string,
-}
-
-interface itemProducts {
-    pagetitle                           : string,
-    price                               : string,
-    stock_count                         : string,
-    ending1                             : string,
-    ending2                             : string,
-    numberOfBraids                      : string,
-    dn                                  : string,
-    cable                               : string,
-    protectiveSpiral                    : string,
-    thermalInsulation                   : string,
-    degreasing                          : string,
-    outerCoating                        : string,
-    bending_radius                      : string,
-    max_pressure                        : string,
-    os_compatibility                    : string,
-    _length                             : string,
-    prettyPagetitle                     : string,
-}
-
-interface itemDataProducts {
-    products                            : itemProducts[],
-    count_all                           : number,
-    table_id                            : number
-}
-
-type dataProducts = { [key: string]: itemDataProducts }
-
+// interface itemFilterOptions {
+//     id                                  : number,
+//     description                         : string,
+//     img_href                            : string,
+//     sizes                               : {[key: string]: string}
+// }
+//
+// type filterOptions = {
+//     types                               : {[key: string]: itemFilterOptions},
+//     oxygen_compatibility_value          : string,
+//     cable_value                         : string,
+// }
+//
+// interface itemProducts {
+//     pagetitle                           : string,
+//     price                               : string,
+//     stock_count                         : string,
+//     ending1                             : string,
+//     ending2                             : string,
+//     numberOfBraids                      : string,
+//     dn                                  : string,
+//     cable                               : string,
+//     protectiveSpiral                    : string,
+//     thermalInsulation                   : string,
+//     degreasing                          : string,
+//     outerCoating                        : string,
+//     bending_radius                      : string,
+//     max_pressure                        : string,
+//     os_compatibility                    : string,
+//     _length                             : string,
+//     prettyPagetitle                     : string,
+// }
+//
+// interface itemDataProducts {
+//     products                            : itemProducts[],
+//     count_all                           : number,
+//     table_id                            : number
+// }
+//
+// type dataProducts = { [key: string]: itemDataProducts }
+//
 namespace Components {
     export class FilterOLD {
         $loaderFilter               : JQuery;

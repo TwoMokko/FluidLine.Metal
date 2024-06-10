@@ -97,8 +97,25 @@ input, textarea {
 }
 
 .head {
-    margin-bottom: 20px;
-    @include textHeader;
+    @mixin Head($params: null) {
+        margin-bottom: 20px;
+        font-size: GetParam($params, font_size, 48px);
+        line-height: GetParam($params, line_height, 58px);
+        font-weight: 700;
+    }
+    @include MixScreen(null, $sizeM) { @include Head((
+            line_height: 36px,
+            font_size: 30px,
+    )); }
+    @include MixScreen($sizeM, $size2XL) { @include Head((
+            line_height: 36px,
+            font_size: 30px,
+    )); }
+    @include MixScreen($size2XL, $size5XL) { @include Head((
+            line_height: 48px,
+            font_size: 36px,
+    )); }
+    @include MixScreen($size5XL) { @include Head(()); }
 }
 
 

@@ -67,7 +67,7 @@ namespace Components {
         }
 
 
-        // private drawButtonsSize = ($select: JQuery, data: {id: string, type: string, name: string}): void => {
+        // public redraw = ($select: JQuery, data: {id: string, type: string, name: string}): void => {
         //     // const $wrap = $('.prod-filter-radio');
         //     const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
         //     if (!$notFound.hasClass('hide')) $notFound.addClass('hide');

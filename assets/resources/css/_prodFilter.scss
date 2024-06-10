@@ -3,146 +3,166 @@
 @use "mixins" as *;
 
 .prod-filter {
-    margin-bottom: 70px;
-    position: relative;
-    padding: 40px 80px;
-    border-radius: 24px;
-    background-color: $colorAccentLight;
-    @include textMain;
-    &-switcher {
-        display: flex;
-        gap: 48px;
-        margin-bottom: 24px;
-    }
-    &-wrap {
-        display: flex;
-        gap: 80px;
-        &-item {
-            width: 50%;
-            &-head {
-                height: calc(32px + 2rem);
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-            }
-            > div {
-                &:not(:last-child) {
-                    margin-bottom: 24px;
+    @mixin ProdFilter($params: null) {
+        margin-bottom: 70px;
+        position: relative;
+        padding: GetParam($params, filter_padding, 40px 80px);
+        border-radius: 24px;
+        background-color: $colorAccentLight;
+        @include textMain;
+        &-switcher {
+            display: flex;
+            flex-direction: GetParam($params, swithcer_wrap_flex_dir, null);
+            gap: GetParam($params, swithcer_gap, 48px);
+            margin-bottom: 24px;
+        }
+        &-wrap {
+            display: flex;
+            flex-direction: GetParam($params, selects_wrap_flex_dir, null);
+            gap: GetParam($params, selects_wrap_gap, 80px);
+            &-item {
+                width: GetParam($params, selects_width, null);
+                &-head {
+                    height: calc(32px + 2rem);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                }
+                > div {
+                    &:not(:last-child) {
+                        margin-bottom: GetParam($params, margin_bottom, 24px);
+                    }
                 }
             }
         }
-    }
-    &-checkboxes {
-        > div:nth-child(1) {
-           margin-bottom: 12px;
+        &-checkboxes {
+            > div:nth-child(1) {
+                margin-bottom: 12px;
+            }
+            > div:nth-child(2) {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                > label {
+                    > input {
+                        display: none;
+                    }
+                    > span {
+                        display: inline-block;
+                        padding: 4px 8px;
+                        background-color: white;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
+                    & > input:checked + span {
+                        background-color: $colorAccentLightMore;
+                        color: $colorBackgroundAccent;
+                    }
+                }
+            }
         }
-        > div:nth-child(2) {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            > label {
-                > input {
+        &-radio {
+            > div:nth-child(1) {
+                margin-bottom: 12px;
+            }
+            > div:nth-child(2) {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                input {
                     display: none;
                 }
-                > span {
+                label {
                     display: inline-block;
                     padding: 4px 8px;
                     background-color: white;
                     border-radius: 4px;
                     cursor: pointer;
                 }
-                & > input:checked + span {
+                input:checked + label {
                     background-color: $colorAccentLightMore;
                     color: $colorBackgroundAccent;
                 }
             }
-        }
-    }
-    &-radio {
-        > div:nth-child(1) {
-            margin-bottom: 12px;
-        }
-        > div:nth-child(2) {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            input {
-                display: none;
-            }
-            label {
-                display: inline-block;
-                padding: 4px 8px;
-                background-color: white;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-            input:checked + label {
-                background-color: $colorAccentLightMore;
-                color: $colorBackgroundAccent;
+            .forload {
+                opacity: 0.5;
+                font-size: 16px;
             }
         }
-        .forload {
-            opacity: 0.5;
-            font-size: 16px;
-        }
-    }
 
-    &-length {
-        > div:nth-child(1) {
-            margin-bottom: 12px;
-        }
-        > div:nth-child(2) {
-            display: flex;
-            align-items: end;
-            gap: 24px;
-            label:nth-child(1) {
-                background-color: white;
-                padding: 4px 12px;
-                display: inline-block;
-                border-radius: 8px;
-                > input {
-                    border: none;
-                    background-color: transparent;
-                    color: $colorTextDarkOpacity;
-                    font-size: 20px;
-                    line-height: 24px;
-                    width: 100px;
+        &-length {
+            > div:nth-child(1) {
+                margin-bottom: 12px;
+            }
+            > div:nth-child(2) {
+                display: flex;
+                align-items: end;
+                gap: 24px;
+                label:nth-child(1) {
+                    background-color: white;
+                    padding: 4px 12px;
+                    display: inline-block;
+                    border-radius: 8px;
+                    > input {
+                        border: none;
+                        background-color: transparent;
+                        color: $colorTextDarkOpacity;
+                        font-size: 20px;
+                        line-height: 24px;
+                        width: 100px;
+                    }
                 }
             }
         }
-    }
 
-    &-checkbox {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        width: fit-content;
-        cursor: pointer;
-        > input {
-            display: none;
-        }
-
-        > label {
-            &:before {
-                content: "";
-                display: inline-block;
-                width: 24px;
-                height: 24px;
-                margin-right: 20px;
-                background-color: white;
-                border-radius: 4px;
-            }
-            cursor: pointer;
+        &-checkbox {
             display: flex;
-        }
-        & > input:checked + label:before {
-            color: $colorBackgroundAccent;
-            background-image: url("/assets/resources/img/check.png");
-            background-size: 80%;
-            background-position: center;
-            background-repeat: no-repeat;
+            gap: 20px;
+            align-items: center;
+            width: fit-content;
+            cursor: pointer;
+            > input {
+                display: none;
+            }
+
+            > label {
+                &:before {
+                    content: "";
+                    display: inline-block;
+                    width: 24px;
+                    height: 24px;
+                    margin-right: 20px;
+                    background-color: white;
+                    border-radius: 4px;
+                }
+                cursor: pointer;
+                display: flex;
+            }
+            & > input:checked + label:before {
+                color: $colorBackgroundAccent;
+                background-image: url("/assets/resources/img/check.png");
+                background-size: 80%;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
         }
     }
+    @include MixScreen(null, $sizeX) { @include ProdFilter((
+            selects_wrap_flex_dir: column,
+            swithcer_wrap_flex_dir: column,
+            swithcer_gap: 16px,
+            filter_padding: 30px,
+            selects_wrap_gap: 40px,
+            margin_bottom: 12px
+    ))}
+    @include MixScreen($sizeX, $size3XL) { @include ProdFilter((
+            selects_wrap_flex_dir: column,
+            selects_wrap_gap: 40px,
+            margin_bottom: 12px
+    ))}
+    @include MixScreen($size3XL) { @include ProdFilter((
+            selects_width: 50%
+    ))}
 }
 
 

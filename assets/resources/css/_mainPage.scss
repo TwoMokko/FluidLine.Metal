@@ -2,55 +2,96 @@
 @use "variable" as *;
 @use "mixins" as *;
 
-.main {
-    &-banner {
-        margin-left: 14%;
-        margin-right: 14%;
-        margin-bottom: 60px;
-        position: relative;
-        flex: auto;
-        //height: GetParam($params, img_height, null);
-        > div {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            //justify-content: center;
-            gap: 32px;
-            padding-top: 130px;
-            padding-left: 60px;
-            color: $colorTextLight;
-            //justify-content: GetParam($params, justify_content_text, null);
-            //padding: GetParam($params, padding_img, 64px 144px);
+.main-banner {
+    @mixin MainBanner($params: null) {
+            margin-left: GetParam($params, margin_container, 14%);
+            margin-right: GetParam($params, margin_container, 14%);
+            margin-bottom: 60px;
+            position: relative;
+            flex: auto;
+
+            height: GetParam($params, banner_height, null);
+            overflow: hidden;
+            border-radius: GetParam($params, border_radius, null);
+            //height: GetParam($params, img_height, null);
             > div {
-                @include textHeader;
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                //justify-content: center;
+                gap: GetParam($params, text_gap, 32px);
+                //padding-top: 130px;
+                //padding-left: 60px;
+                color: $colorTextLight;
+                justify-content: GetParam($params, justify_content_text, null);
+                padding: GetParam($params, padding_img, 130px 60px);
+                > div {
+                    font-size: GetParam($params, font_size, 48px);
+                    line-height: GetParam($params, line_height, 58px);
+                    font-weight: 700;
+                }
+                > div:first-child {
+                    //color: red;
+                }
+                > div:last-child {
+                    //color: green;
+                }
             }
-            > div:first-child {
-                //color: red;
+            > img {
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
             }
-            > div:last-child {
-                //color: green;
-            }
-        }
-        > img {
-            object-fit: cover;
-            width: 100%;
-            height: 100%;
-        }
     }
+    @include MixScreen(null, $sizeM) { @include MainBanner((
+            text_gap: 8px,
+            justify_content_text: center,
+            padding_img: 0 20px,
+            line_height: 30px,
+            font_size: 24px,
+            margin_container: 4%,
+            banner_height: 150px,
+            border_radius: 8px
+    )); }
+    @include MixScreen($sizeM, $size2XL) { @include MainBanner((
+            text_gap: 8px,
+            justify_content_text: center,
+            padding_img: 0 40px,
+            line_height: 36px,
+            font_size: 30px,
+            margin_container: 4%
+    )); }
+    @include MixScreen($size2XL, $size3XL) { @include MainBanner((
+            text_gap: 8px,
+            justify_content_text: center,
+            padding_img: 0 40px,
+            line_height: 36px,
+            font_size: 30px,
+    )); }
+    @include MixScreen($size3XL, $size5XL) { @include MainBanner((
+            text_gap: 12px,
+            justify_content_text: center,
+            padding_img: 0 60px,
+            line_height: 48px,
+            font_size: 36px,
+
+    )); }
+    @include MixScreen($size5XL) { @include MainBanner(()); }
 }
 
-.main {
-    &-about {
+.main-about {
+    @mixin MainInfo($params: null) {
         margin-bottom: 80px;
         &-head {
-            width: 65%;
-            @include textHeader;
+            width: GetParam($params, head_width, null);
+            //@include textHeader;
         }
         &-body {
             display: flex;
-            gap: 140px;
+            //flex-direction: GetParam($params, flex_dir, null);
+            gap: GetParam($params, info_gap, 140px);
             > div:first-child {
                 display: flex;
                 flex-direction: column;
@@ -62,32 +103,56 @@
                 }
             }
             &-text {
-                padding-top: 48px;
+                padding-top: GetParam($params, text_padding_top, null);
+                padding-bottom: 36px;
                 font-size: 24px;
                 line-height: 29px;
                 font-weight: 400;
             }
             &-img {
-                padding-right: 120px;
+                display: GetParam($params, img_display, null);
+                padding-right: GetParam($params, img_padding_right, null);
                 > img {
-                    width: 420px;
+                    width: GetParam($params, img_width, 420px);
                 }
             }
         }
     }
+    @include MixScreen(null, $size3XL) { @include MainInfo((
+            info_gap: 36px,
+            img_width: 240px,
+            img_display: none
+    )); }
+    @include MixScreen($size3XL, $size4XL) { @include MainInfo((
+            info_gap: 36px,
+            img_width: 360px
+            //flex_dir: column
+    )); }
+    @include MixScreen($size4XL, $size5XL) { @include MainInfo((
+            info_gap: 36px,
+    )); }
+    @include MixScreen($size5XL, $size6XL) { @include MainInfo((
+
+    )); }
+    @include MixScreen($size6XL) { @include MainInfo((
+            img_padding_right: 120px,
+            head_width: 65%,
+            text_padding_top: 48px,
+    )); }
+
 }
 
-.main {
-    &-cards {
+.main-cards {
+    @mixin MainCards($params: null) {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(GetParam($params, cards_grid, 2), 1fr);
         gap: 20px;
         margin-bottom: 80px;
         &-item {
             display: flex;
 
             flex-direction: column;
-            padding: 40px;
+            padding: GetParam($params, item_padding, 40px);
             border-radius: 24px;
             border: 2px solid $colorBackgroundAccent;
             > div {
@@ -112,4 +177,14 @@
             }
         }
     }
+    @include MixScreen(null, $size2XL) { @include MainCards((
+            cards_grid: 1,
+            item_padding: 24px
+    )); }
+    @include MixScreen($size2XL, $size4XL) { @include MainCards((
+            cards_grid: 1
+    )); }
+    @include MixScreen($size4XL) { @include MainCards((
+
+    )); }
 }

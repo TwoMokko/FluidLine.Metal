@@ -1,5 +1,60 @@
+interface itemFilterOptions {
+    id                                  : number,
+    description                         : string,
+    img_href                            : string,
+    sizes                               : {[key: string]: string}
+}
+
+type filterOptions = {
+    types                               : typesFilterOptions,
+    oxygen_compatibility_value          : string,
+    cable_value                         : string,
+}
+
+type typesFilterOptions =  {
+    [key: string]: itemFilterOptions
+}
+
+interface itemProducts {
+    pagetitle                           : string,
+    price                               : string,
+    stock_count                         : string,
+    ending1                             : string,
+    ending2                             : string,
+    numberOfBraids                      : string,
+    dn                                  : string,
+    cable                               : string,
+    protectiveSpiral                    : string,
+    thermalInsulation                   : string,
+    degreasing                          : string,
+    outerCoating                        : string,
+    bending_radius                      : string,
+    max_pressure                        : string,
+    os_compatibility                    : string,
+    _length                             : string,
+    prettyPagetitle                     : string,
+}
+
+interface itemDataProducts {
+    products                            : itemProducts[],
+    count_all                           : number,
+    table_id                            : number
+}
+
+type dataProducts = { [key: string]: itemDataProducts }
+
+type sendData = {
+    cable: string,
+    length: string | number | string[],
+    type1_size: string[],
+    type2_size: string[],
+    oxygen_compatibility: string,
+    mrk_show: boolean,
+    rvd_show: boolean
+}
+
 namespace Components {
-    class FilterManager {
+    export class FilterManager {
         private dataOptions                 : filterOptions;
         private dataProducts                : dataProducts;
 
@@ -13,12 +68,24 @@ namespace Components {
         private $wrapProducts               : JQuery;
 
         constructor() {
-            this.$wrapProducts              = $();
-            this.loaderFilter               = new Loader($('.wrap-filter'), 'loader-wrap loader-filter');
-            this.loaderProducts             = new Loader($('.wrap-prod'), 'loader-wrap loader-table');
-            this.filter                     = new Filter(this.redraw);
-            this.productsMrk                = new Products();
-            this.productsRvd                = new Products();
+            this.loaderFilter               = new Loader($('.prod-filter'), 'loader-wrap loader-filter');
+            // loader on
+            this.getFilterOption().then((data: filterOptions) => {
+                this.init(data);
+                this.loaderFilter.hide();
+                // loader off
+            })
+        }
+
+        private init(data: filterOptions): void {
+            this.dataOptions                = data;
+
+            this.$wrapProducts              = $('.prod-result-wrap');
+            // this.loaderFilter               = new Loader($('.wrap-filter'), 'loader-wrap loader-filter');
+            this.loaderProducts             = new Loader(this.$wrapProducts, 'loader-wrap loader-table');
+            this.filter                     = new Filter(this.redraw, this.dataOptions);
+            // this.productsMrk                = new Products();
+            // this.productsRvd                = new Products();
             this.notFound                   = new NotFound(this.$wrapProducts);
         }
 
@@ -34,37 +101,39 @@ namespace Components {
             if (dataProducts['rkv'].products) this.productsRvd.drawProducts(dataProducts['mrk'].products, this.$wrapProducts, 'Рукава высокого давления');
         }
 
-        private setFilterOption(): void {
-            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions: filterOptions): void => {
-                // $( ".result" ).html( data );
-                this.dataOptions = dataOptions;
-                this.fillSelectSource();
-                this.fillSelectCustom();
-            })
-                //     .done(() => {
-                //     console.log( "second success" );
-                // })
-                //     .fail(() => {
-                //         console.log( "error" );
-                //     })
-                .always(() => {
-                    this.loader.hide();
-                });
+        private async getFilterOption(): Promise<filterOptions> {
+            let response = await fetch('/assets/base/snippets/api/api.php?task=filterOptions');
+            return await response.json();
+            //     $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions: filterOptions): void => {
+            // //         // $( ".result" ).html( data );
+            // //         this.dataOptions = dataOptions;
+            // //         this.fillSelectSource();
+            // //         this.fillSelectCustom();
+            // //     })
+            // //         //     .done(() => {
+            // //         //     console.log( "second success" );
+            // //         // })
+            // //         //     .fa1il(() => {
+            // //         //         console.log( "error" );
+            // //         //     })
+            // //         .always(() => {
+            // //             this.loader.hide();
+            //         });
         }
 
-        private fillSelectSource(): void {
-            for (const i in this.dataOptions.types) {
-                const value = i + ' - ' + this.dataOptions.types[i].description;
-
-                $('.select[name="zakontsovka-1"]').append(
-                    $('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description),
-                );
-
-                $('.select[name="zakontsovka-2"]').append(
-                    $('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description)
-                );
-            }
-        }
+        // private fillSelectSource(): void {
+        //     for (const i in this.dataOptions.types) {
+        //         const value = i + ' - ' + this.dataOptions.types[i].description;
+        //
+        //         $('.select[name="zakontsovka-1"]').append(
+        //             $('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description),
+        //         );
+        //
+        //         $('.select[name="zakontsovka-2"]').append(
+        //             $('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description)
+        //         );
+        //     }
+        // }
 
         // private prepareSendData(): void {
         //     if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))

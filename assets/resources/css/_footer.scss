@@ -2,36 +2,53 @@
 @use "variable" as *;
 
 .footer {
-    background-color: $colorBackgroundDark;
-    > div {
-        display: flex;
-        justify-content: space-between;
-        align-items: end;
-        padding-top: 30px;
-        padding-bottom: 30px;
-    }
-    a {
-        padding: 6px 0;
-        color: $colorTextLight;
-        &:hover {
-            color: $colorTextAccent;
+    @mixin Footer($params: null) {
+        background-color: $colorBackgroundDark;
+        > div {
+            display: flex;
+            flex-direction: GetParam($params, flex_dir, null);
+            gap: GetParam($params, flex_gap, null);
+            align-items: GetParam($params, align_items, end);
+            justify-content: space-between;
+            padding-top: 30px;
+            padding-bottom: 30px;
+            > div:first-child {
+                text-align: GetParam($params, text_align, null);
+            }
         }
-    }
-    &-links {
-        display: flex;
-        flex-direction: column;
-        padding: 10px 0;
-    }
-    &-contacts {
-        text-align: end;
-        > div:first-child {
+        a {
+            padding: 6px 0;
+            color: $colorTextLight;
+            &:hover {
+                color: $colorTextAccent;
+            }
+        }
+        &-links {
             display: flex;
             flex-direction: column;
-            margin-bottom: 24px;
+            padding: 10px 0;
         }
-        > div:last-child {
-            width: 224px;
-            color: $colorTextLight;
+        &-contacts {
+            text-align: GetParam($params, text_align, end);
+            > div:first-child {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: GetParam($params, contacts_margin_bot, 24px);
+            }
+            > div:last-child {
+                width: 224px;
+                color: $colorTextLight;
+            }
         }
     }
+    @include MixScreen(null, $sizeM) { @include Footer((
+            flex_dir: column,
+            align_items: center,
+            flex_gap: 36px,
+            text_align: center,
+            contacts_margin_bot: 12px
+    ));}
+    @include MixScreen($sizeM) { @include Footer((
+
+    ));}
 }

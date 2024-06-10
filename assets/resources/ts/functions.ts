@@ -1,5 +1,5 @@
 $(() => {
-    new Components.Filter();
+    new Components.FilterOLD();
 })
 
 document.addEventListener("DOMContentLoaded", () => {
