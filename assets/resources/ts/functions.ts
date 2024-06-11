@@ -57,4 +57,14 @@ function createInputsPhoneAndEmail(form: HTMLFormElement): void {
     inputEmail.name = 'email';
 }
 
+function showBurger(open: boolean): void {
+    if (!open) {
+        document.querySelector('.burger-space').classList.remove('hide');
+        document.querySelector('body').style.overflow = 'hidden';
+        return;
+    }
+    document.querySelector('.burger-space').classList.add('hide');
+    document.querySelector('body').style.overflow = 'revert';
+}
+
 

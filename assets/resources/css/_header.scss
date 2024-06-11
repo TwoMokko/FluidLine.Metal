@@ -39,11 +39,14 @@
             display: GetParam($params, contacts_display, flex);;
             flex-direction: column;
             align-items: end;
+            > a {
+                color: $colorTextDark;
+            }
         }
         &-btn {
             display: GetParam($params, btn_display, null);
         }
-        &-burger {
+        .burger-open {
             display: GetParam($params, burger_display, null);
             cursor: pointer;
         }

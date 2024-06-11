@@ -71,233 +71,6 @@ var Components;
     }
     Components.Carousel = Carousel;
 })(Components || (Components = {}));
-var Components;
-(function (Components) {
-    class Filter {
-        $loaderFilter;
-        dataOptions;
-        dataProducts;
-        isLoad;
-        select1;
-        select2;
-        typeSize1 = [];
-        typeSize2 = [];
-        constructor() {
-            this.$loaderFilter = $('.loader-filter');
-            this.isLoad = true;
-            this.setFilterOption();
-            this.addEvent();
-        }
-        setFilterOption() {
-            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions) => {
-                // $( ".result" ).html( data );
-                this.dataOptions = dataOptions;
-                this.fillSelectSource();
-                this.fillSelectCustom();
-            })
-                //     .done(() => {
-                //     console.log( "second success" );
-                // })
-                //     .fail(() => {
-                //         console.log( "error" );
-                //     })
-                .always(() => {
-                this.hideLoader();
-            });
-        }
-        showLoader() {
-            this.isLoad = true;
-            this.$loaderFilter.removeClass('hide');
-        }
-        hideLoader() {
-            this.isLoad = false;
-            this.$loaderFilter.addClass('hide');
-        }
-        fillSelectSource() {
-            for (const i in this.dataOptions.types) {
-                const value = i + ' - ' + this.dataOptions.types[i].description;
-                $('.select[name="zakontsovka-1"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
-                $('.select[name="zakontsovka-2"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
-            }
-        }
-        fillSelectCustom() {
-            this.select1 = new Components.Select($('.select[name="zakontsovka-1"]'));
-            this.select2 = new Components.Select($('.select[name="zakontsovka-2"]'));
-            $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
-            this.select1.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
-            this.select2.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
-        }
-        drawButtonsSize = ($select, data) => {
-            const $wrap = $('.prod-filter-radio');
-            const $notFound = $('.prod-not-found');
-            if (!$notFound.hasClass('hide'))
-                $notFound.addClass('hide');
-            const select2 = $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select');
-            if (select2.hasClass('not-active'))
-                select2.removeClass('not-active');
-            const $wrapBtn = $wrap.find('#' + data.name);
-            const name = $select.val() + '';
-            const sizes = this.dataOptions.types[name].sizes;
-            const $forLoad = $wrapBtn.find('+ .forload');
-            let sizesId = [];
-            for (let key of Object.keys(this.dataOptions.types[name].sizes)) {
-                sizesId.push(key);
-            }
-            switch (data.name) {
-                case 'size1':
-                    this.typeSize1 = sizesId;
-                    break;
-                case 'size2':
-                    this.typeSize2 = sizesId;
-                    break;
-                default:
-                    this.typeSize1 = [];
-                    this.typeSize2 = [];
-                    break;
-            }
-            $wrapBtn.empty();
-            $forLoad.addClass('hide');
-            for (let i in sizes) {
-                let id = data.id + i;
-                $wrapBtn.append($('<div/>').append($('<input/>', { id: id, type: data.type, name: data.name })
-                    .on('change', (event) => {
-                    switch (data.name) {
-                        case 'size1':
-                            this.typeSize1 = [i];
-                            break;
-                        case 'size2':
-                            this.typeSize2 = [i];
-                            break;
-                        default:
-                            this.typeSize1 = sizes;
-                            this.typeSize2 = sizes;
-                            break;
-                    }
-                    this.collectData();
-                }), $('<label/>', {
-                    for: id,
-                    text: sizes[i]
-                })));
-            }
-            this.collectData();
-        };
-        collectData() {
-            if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
-                || (!this.select1.getIsSelect() && !this.select2.getIsSelect()))
-                console.log('размеры законцовки не выбраны');
-            const sendData = {
-                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
-                length: $('#size').val(),
-                type1_size: this.typeSize1,
-                type2_size: this.typeSize2,
-                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
-                mrk_show: $('#mrk').is(':checked'),
-                rvd_show: $('#rvd').is(':checked')
-            };
-            $('.prod-result').addClass('hide');
-            $('.loader-table').removeClass('hide');
-            this.sendData(JSON.stringify(sendData));
-        }
-        prepareDrawTable() {
-            const $notFound = $('.prod-not-found');
-            const productsMrk = this.dataProducts['mrk'].products;
-            const productsRvd = this.dataProducts['rkv'].products;
-            $('.loader-table').addClass('hide');
-            if (productsMrk.length === 0 && productsRvd.length === 0) {
-                $notFound.removeClass('hide');
-            }
-            if (productsMrk.length > 0 && $('#mrk').is(':checked')) {
-                const $resultMrk = $('#result_mrk');
-                this.drawImage($resultMrk);
-                this.drawTable(productsMrk, $resultMrk);
-            }
-            if (productsRvd.length > 0 && $('#rvd').is(':checked')) {
-                const $resultRvd = $('#result_rvd');
-                this.drawImage($resultRvd);
-                this.drawTable(productsRvd, $resultRvd);
-            }
-        }
-        drawTable(products, $resultWrap) {
-            const $headList = $resultWrap.find('.prettyPagetitle');
-            const $prodList = $resultWrap.find('.prodList');
-            $headList.empty();
-            $prodList.empty();
-            for (const key in products) {
-                $headList.append($('<tr/>').append($('<td/>').text(products[key].prettyPagetitle)));
-                $prodList.append($('<tr/>').append($('<td/>').text(products[key].numberOfBraids), $('<td/>').text(products[key]._length), $('<td/>').text(products[key].max_pressure), $('<td/>').text(products[key].dn), $('<td/>').text(products[key].ending1), $('<td/>').text(products[key].ending2), $('<td/>').text(products[key].protectiveSpiral), $('<td/>').text(products[key].os_compatibility), $('<td/>').text(products[key].cable), $('<td/>').text(products[key].thermalInsulation), $('<td/>').text(products[key].price)));
-            }
-            $resultWrap.removeClass('hide');
-        }
-        drawImage($wrapImg) {
-            const selectLeft = this.select1.$sourceSelect.find('option:checked').attr('value');
-            const textLeft = this.select1.$sourceSelect.find('option:checked').attr('text');
-            const selectRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
-            const textRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
-            const $platformLeft = $wrapImg.find('.platform-left');
-            const $platformRight = $wrapImg.find('.platform-right');
-            const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
-            const cutimgLeft = path + selectLeft + '_left_cut.png';
-            const bigimgLeft = path + 'big/' + selectLeft + '_left_cut.png';
-            const cutimgRight = path + selectRight + '_right_cut.png';
-            const bigimgRight = path + 'big/' + selectRight + '_right_cut.png';
-            const imgCenter = $wrapImg.find('.cccc');
-            $platformLeft.find('.cutimg > img').attr('src', cutimgLeft);
-            $platformLeft.find('.bigimg > img').attr('src', bigimgLeft);
-            $platformRight.find('.cutimg > img').attr('src', cutimgRight);
-            $platformRight.find('.bigimg > img').attr('src', bigimgRight);
-            imgCenter.find('> img:nth-child(1)').attr('src', path + selectLeft + '_left.png');
-            imgCenter.find('> img:nth-child(3)').attr('src', path + selectRight + '_right.png');
-            console.log(selectLeft, textLeft, selectRight, textRight);
-            $('.big_txt_left').text(selectLeft);
-            $('.large_text_left').text(textLeft);
-            $('.big_txt_right').text(selectRight);
-            $('.large_text_right').text(textRight);
-        }
-        addEvent() {
-            $('#tros').on('click', () => { this.collectData(); });
-            $('#size').on('change', () => { this.collectData(); });
-            $('#mrk').on('click', () => { this.collectData(); });
-            $('#rvd').on('click', () => { this.collectData(); });
-            $('#o21').on('click', () => { this.collectData(); });
-            $('#o21_2').on('click', () => { this.collectData(); });
-            $('#analog').on('click', () => {
-                // for (const key in this.select2.$sourceOptions) {
-                //
-                //     if (this.select2.$sourceOptions[key].innerText === this.select1.$header[0].textContent) {
-                //         this.select2.$header.text(this.select1.$header[0].textContent);
-                //         let a = $(this.select2.$sourceOptions[key]);
-                //         console.log(a);
-                //         // $(this.select2.$sourceOptions[key]).trigger('click');
-                //         // $(this.select2).trigger('change');
-                //     }
-                // }
-                // this.select2.$sourceOption.trigger('change');
-                // this.select2.$header.text(this.select1.$header[0].textContent);
-                console.log('новые данные для второй законцовки');
-                if ($('#analog').is(':checked'))
-                    this.collectData();
-            });
-        }
-        sendData(sendData) {
-            $.ajax({
-                type: 'POST',
-                url: "/assets/base/snippets/api/api.php?task=getProducts",
-                data: sendData,
-                dataType: "json",
-                success: (dataProducts) => {
-                    console.log("SUCCESS:");
-                    this.dataProducts = dataProducts;
-                    this.prepareDrawTable();
-                },
-                error: (jqXHR, textStatus, errorThrown) => {
-                    console.log("ERROR: " + textStatus + ", " + errorThrown);
-                    console.log(jqXHR);
-                }
-            });
-        }
-    }
-    Components.Filter = Filter;
-})(Components || (Components = {}));
 // (function($){
 //     $.fn.choiceBoard=function(param){
 //         var data='';
@@ -839,7 +612,7 @@ var Components;
 //     return version;
 // }
 $(() => {
-    new Components.Filter();
+    new Components.FilterOLD();
 });
 document.addEventListener("DOMContentLoaded", () => {
 });
@@ -889,6 +662,15 @@ function createInputsPhoneAndEmail(form) {
     let inputEmail = createElement('input', null, null, inputContactsWrap);
     inputEmail.placeholder = 'E-mail';
     inputEmail.name = 'email';
+}
+function showBurger(open) {
+    if (!open) {
+        document.querySelector('.burger-space').classList.remove('hide');
+        document.querySelector('body').style.overflow = 'hidden';
+        return;
+    }
+    document.querySelector('.burger-space').classList.add('hide');
+    document.querySelector('body').style.overflow = 'revert';
 }
 var Common;
 (function (Common) {
@@ -1096,6 +878,615 @@ var Common;
 })(Common || (Common = {}));
 var Components;
 (function (Components) {
+    class Filter {
+        typeEndFirst;
+        typeEndSecond;
+        sizeRadioFirst;
+        sizeRadioSecond;
+        dataOptions;
+        callback;
+        $mrkBtn;
+        $rvdBtn;
+        $analogBtn;
+        $oxygenBtn;
+        $notOxygenBtn;
+        $sizeBtn;
+        $cableBtn;
+        constructor(callback, dataOptions) {
+            this.initButtons();
+            this.callback = callback;
+            this.dataOptions = dataOptions;
+            this.typeEndFirst = new Components.Select($('.select[name="zakontsovka-1"]'));
+            this.typeEndSecond = new Components.Select($('.select[name="zakontsovka-2"]'));
+            this.restructureSelects();
+            this.sizeRadioFirst = new Components.GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, { name: 'size1' });
+            this.sizeRadioSecond = new Components.GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, { name: 'size2' });
+            this.typeEndFirst.on('change', () => { this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes); });
+            this.typeEndSecond.on('change', () => { this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes); });
+        }
+        restructureSelects() {
+            let data = {};
+            for (const i in this.dataOptions.types) {
+                data[i] = `${i} - ${this.dataOptions.types[i].description}`;
+            }
+            this.typeEndFirst.restructure(data);
+            this.typeEndSecond.restructure(data);
+        }
+        initButtons() {
+            this.$mrkBtn = $('#mrk');
+            this.$rvdBtn = $('#rvd');
+            this.$analogBtn = $('#analog');
+            this.$oxygenBtn = $('#o21');
+            this.$notOxygenBtn = $('#o21_2');
+            this.$sizeBtn = $('#size');
+            this.$cableBtn = $('#tros');
+        }
+        getFilterData() {
+            let type1_size = [this.sizeRadioFirst.getValue()];
+            if (type1_size[0] === null)
+                type1_size = this.sizeRadioFirst.getValuesFromData();
+            let type2_size = [this.sizeRadioSecond.getValue()];
+            if (type2_size[0] === null)
+                type2_size = this.sizeRadioSecond.getValuesFromData();
+            return {
+                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
+                length: $('#size').val(),
+                type1_size: type1_size,
+                type2_size: type2_size,
+                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
+                mrk_show: $('#mrk').is(':checked'),
+                rvd_show: $('#rvd').is(':checked')
+            };
+        }
+        sendData(sendData) {
+            $.ajax({
+                type: 'POST',
+                url: '/assets/base/snippets/api/api.php?task=getProducts',
+                data: sendData,
+                dataType: 'json',
+                success: (dataProducts) => {
+                    this.callback(dataProducts);
+                    console.log('SUCCESS:');
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.log('ERROR: ' + textStatus + ", " + errorThrown);
+                    console.log(jqXHR);
+                }
+            });
+        }
+    }
+    Components.Filter = Filter;
+})(Components || (Components = {}));
+var Components;
+(function (Components) {
+    class FilterManager {
+        dataOptions;
+        dataProducts;
+        filter;
+        notFound;
+        productsMrk;
+        productsRvd;
+        loaderFilter;
+        loaderProducts;
+        $wrapProducts;
+        constructor() {
+            this.loaderFilter = new Components.Loader($('.prod-filter'), 'loader-wrap loader-filter');
+            // loader on
+            this.getFilterOption().then((data) => {
+                this.init(data);
+                this.loaderFilter.hide();
+                // loader off
+            });
+        }
+        init(data) {
+            this.dataOptions = data;
+            this.$wrapProducts = $('.prod-result-wrap');
+            // this.loaderFilter               = new Loader($('.wrap-filter'), 'loader-wrap loader-filter');
+            this.loaderProducts = new Components.Loader(this.$wrapProducts, 'loader-wrap loader-table');
+            this.filter = new Components.Filter(this.redraw, this.dataOptions);
+            // this.productsMrk                = new Products();
+            // this.productsRvd                = new Products();
+            this.notFound = new Components.NotFound(this.$wrapProducts);
+        }
+        redraw(dataProducts) {
+            //рендер, условия в зависимости какие пришли данные
+            this.notFound.hide();
+            if (!dataProducts['mrk'].products && !dataProducts['rkv'].products) {
+                this.notFound.show();
+                return;
+            }
+            if (dataProducts['mrk'].products)
+                this.productsMrk.drawProducts(dataProducts['mrk'].products, this.$wrapProducts, 'Металлорукава');
+            if (dataProducts['rkv'].products)
+                this.productsRvd.drawProducts(dataProducts['mrk'].products, this.$wrapProducts, 'Рукава высокого давления');
+        }
+        async getFilterOption() {
+            let response = await fetch('/assets/base/snippets/api/api.php?task=filterOptions');
+            return await response.json();
+            //     $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions: filterOptions): void => {
+            // //         // $( ".result" ).html( data );
+            // //         this.dataOptions = dataOptions;
+            // //         this.fillSelectSource();
+            // //         this.fillSelectCustom();
+            // //     })
+            // //         //     .done(() => {
+            // //         //     console.log( "second success" );
+            // //         // })
+            // //         //     .fa1il(() => {
+            // //         //         console.log( "error" );
+            // //         //     })
+            // //         .always(() => {
+            // //             this.loader.hide();
+            //         });
+        }
+    }
+    Components.FilterManager = FilterManager;
+})(Components || (Components = {}));
+// interface itemFilterOptions {
+//     id                                  : number,
+//     description                         : string,
+//     img_href                            : string,
+//     sizes                               : {[key: string]: string}
+// }
+//
+// type filterOptions = {
+//     types                               : {[key: string]: itemFilterOptions},
+//     oxygen_compatibility_value          : string,
+//     cable_value                         : string,
+// }
+//
+// interface itemProducts {
+//     pagetitle                           : string,
+//     price                               : string,
+//     stock_count                         : string,
+//     ending1                             : string,
+//     ending2                             : string,
+//     numberOfBraids                      : string,
+//     dn                                  : string,
+//     cable                               : string,
+//     protectiveSpiral                    : string,
+//     thermalInsulation                   : string,
+//     degreasing                          : string,
+//     outerCoating                        : string,
+//     bending_radius                      : string,
+//     max_pressure                        : string,
+//     os_compatibility                    : string,
+//     _length                             : string,
+//     prettyPagetitle                     : string,
+// }
+//
+// interface itemDataProducts {
+//     products                            : itemProducts[],
+//     count_all                           : number,
+//     table_id                            : number
+// }
+//
+// type dataProducts = { [key: string]: itemDataProducts }
+//
+var Components;
+(function (Components) {
+    class FilterOLD {
+        $loaderFilter;
+        dataOptions;
+        dataProducts;
+        isLoad;
+        select1;
+        select2;
+        typeSize1 = [];
+        typeSize2 = [];
+        constructor() {
+            this.$loaderFilter = $('.loader-filter');
+            this.isLoad = true;
+            this.setFilterOption();
+            this.addEvent();
+        }
+        setFilterOption() {
+            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions) => {
+                // $( ".result" ).html( data );
+                this.dataOptions = dataOptions;
+                this.fillSelectSource();
+                this.fillSelectCustom();
+            })
+                //     .done(() => {
+                //     console.log( "second success" );
+                // })
+                //     .fail(() => {
+                //         console.log( "error" );
+                //     })
+                .always(() => {
+                this.hideLoader();
+            });
+        }
+        showLoader() {
+            this.isLoad = true;
+            this.$loaderFilter.removeClass('hide');
+        }
+        hideLoader() {
+            this.isLoad = false;
+            this.$loaderFilter.addClass('hide');
+        }
+        /* Заполнеие <select> данными */
+        fillSelectSource() {
+            for (const i in this.dataOptions.types) {
+                const value = i + ' - ' + this.dataOptions.types[i].description;
+                $('.select[name="zakontsovka-1"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
+                $('.select[name="zakontsovka-2"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
+            }
+        }
+        /* Замена <select> на кастомный */
+        fillSelectCustom() {
+            this.select1 = new Components.Select($('.select[name="zakontsovka-1"]'));
+            this.select2 = new Components.Select($('.select[name="zakontsovka-2"]'));
+            // пока не выбран первый селект, второй не активен
+            $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
+            // навешивание событий на кастомный селект
+            this.select1.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
+            this.select2.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
+        }
+        /* Отрисовка кнопок с размерами */
+        drawButtonsSize = ($select, data) => {
+            const $wrap = $('.prod-filter-radio');
+            const $notFound = $('.prod-not-found');
+            if (!$notFound.hasClass('hide'))
+                $notFound.addClass('hide');
+            const select2 = $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select');
+            if (select2.hasClass('not-active'))
+                select2.removeClass('not-active');
+            const $wrapBtn = $wrap.find('#' + data.name);
+            const name = $select.val() + '';
+            const sizes = this.dataOptions.types[name].sizes;
+            const $forLoad = $wrapBtn.find('+ .forload');
+            let sizesId = [];
+            for (let key of Object.keys(this.dataOptions.types[name].sizes)) {
+                sizesId.push(key);
+            }
+            switch (data.name) {
+                case 'size1':
+                    this.typeSize1 = sizesId;
+                    break;
+                case 'size2':
+                    this.typeSize2 = sizesId;
+                    break;
+                default:
+                    this.typeSize1 = [];
+                    this.typeSize2 = [];
+                    break;
+            }
+            $wrapBtn.empty();
+            $forLoad.addClass('hide');
+            for (let i in sizes) {
+                let id = data.id + i;
+                $wrapBtn.append($('<div/>').append($('<input/>', { id: id, type: data.type, name: data.name })
+                    .on('change', (event) => {
+                    switch (data.name) {
+                        case 'size1':
+                            this.typeSize1 = [i];
+                            break;
+                        case 'size2':
+                            this.typeSize2 = [i];
+                            break;
+                        default:
+                            this.typeSize1 = sizes;
+                            this.typeSize2 = sizes;
+                            break;
+                    }
+                    this.prepareSendData();
+                }), $('<label/>', {
+                    for: id,
+                    text: sizes[i]
+                })));
+            }
+            this.prepareSendData();
+        };
+        /* Подготовка, сбор данных для отправки */
+        prepareSendData() {
+            if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
+                || (!this.select1.getIsSelect() && !this.select2.getIsSelect()))
+                console.log('размеры законцовки не выбраны');
+            const sendData = {
+                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
+                length: $('#size').val(),
+                type1_size: this.typeSize1,
+                type2_size: this.typeSize2,
+                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
+                mrk_show: $('#mrk').is(':checked'),
+                rvd_show: $('#rvd').is(':checked')
+            };
+            $('.prod-result').addClass('hide');
+            $('.loader-table').removeClass('hide');
+            this.sendData(JSON.stringify(sendData));
+        }
+        prepareDrawTable() {
+            const $notFound = $('.prod-not-found');
+            const productsMrk = this.dataProducts['mrk'].products;
+            const productsRvd = this.dataProducts['rkv'].products;
+            $('.loader-table').addClass('hide');
+            if (productsMrk.length === 0 && productsRvd.length === 0) {
+                $notFound.removeClass('hide');
+            }
+            if (productsMrk.length > 0 && $('#mrk').is(':checked')) {
+                const $resultMrk = $('#result_mrk');
+                this.drawImage($resultMrk);
+                this.drawTable(productsMrk, $resultMrk);
+            }
+            if (productsRvd.length > 0 && $('#rvd').is(':checked')) {
+                const $resultRvd = $('#result_rvd');
+                this.drawImage($resultRvd);
+                this.drawTable(productsRvd, $resultRvd);
+            }
+        }
+        drawTable(products, $resultWrap) {
+            const $headList = $resultWrap.find('.prettyPagetitle');
+            const $prodList = $resultWrap.find('.prodList');
+            $headList.empty();
+            $prodList.empty();
+            for (const key in products) {
+                $headList.append($('<tr/>').append($('<td/>').text(products[key].prettyPagetitle)));
+                $prodList.append($('<tr/>').append($('<td/>').text(products[key].numberOfBraids), $('<td/>').text(products[key]._length), $('<td/>').text(products[key].max_pressure), $('<td/>').text(products[key].dn), $('<td/>').text(products[key].ending1), $('<td/>').text(products[key].ending2), $('<td/>').text(products[key].protectiveSpiral), $('<td/>').text(products[key].os_compatibility), $('<td/>').text(products[key].cable), $('<td/>').text(products[key].thermalInsulation), $('<td/>').text(products[key].price)));
+            }
+            $resultWrap.removeClass('hide');
+        }
+        drawImage($wrapImg) {
+            const selectLeft = this.select1.$sourceSelect.find('option:checked').attr('value');
+            const textLeft = this.select1.$sourceSelect.find('option:checked').attr('text');
+            const selectRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
+            const textRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
+            const $platformLeft = $wrapImg.find('.platform-left');
+            const $platformRight = $wrapImg.find('.platform-right');
+            const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
+            const cutimgLeft = path + selectLeft + '_left_cut.png';
+            const bigimgLeft = path + 'big/' + selectLeft + '_left_cut.png';
+            const cutimgRight = path + selectRight + '_right_cut.png';
+            const bigimgRight = path + 'big/' + selectRight + '_right_cut.png';
+            const imgCenter = $wrapImg.find('.cccc');
+            $platformLeft.find('.cutimg > img').attr('src', cutimgLeft);
+            $platformLeft.find('.bigimg > img').attr('src', bigimgLeft);
+            $platformRight.find('.cutimg > img').attr('src', cutimgRight);
+            $platformRight.find('.bigimg > img').attr('src', bigimgRight);
+            imgCenter.find('> img:nth-child(1)').attr('src', path + selectLeft + '_left.png');
+            imgCenter.find('> img:nth-child(3)').attr('src', path + selectRight + '_right.png');
+            console.log(selectLeft, textLeft, selectRight, textRight);
+            $('.big_txt_left').text(selectLeft);
+            $('.large_text_left').text(textLeft);
+            $('.big_txt_right').text(selectRight);
+            $('.large_text_right').text(textRight);
+        }
+        addEvent() {
+            $('#tros').on('click', () => { this.prepareSendData(); });
+            $('#size').on('change', () => { this.prepareSendData(); });
+            $('#mrk').on('click', () => { this.prepareSendData(); });
+            $('#rvd').on('click', () => { this.prepareSendData(); });
+            $('#o21').on('click', () => { this.prepareSendData(); });
+            $('#o21_2').on('click', () => { this.prepareSendData(); });
+            $('#analog').on('click', () => {
+                // for (const key in this.select2.$sourceOptions) {
+                //
+                //     if (this.select2.$sourceOptions[key].innerText === this.select1.$header[0].textContent) {
+                //         this.select2.$header.text(this.select1.$header[0].textContent);
+                //         let a = $(this.select2.$sourceOptions[key]);
+                //         console.log(a);
+                //         // $(this.select2.$sourceOptions[key]).trigger('click');
+                //         // $(this.select2).trigger('change');
+                //     }
+                // }
+                // this.select2.$sourceOption.trigger('change');
+                // this.select2.$header.text(this.select1.$header[0].textContent);
+                console.log('новые данные для второй законцовки');
+                if ($('#analog').is(':checked'))
+                    this.prepareSendData();
+            });
+        }
+        sendData(sendData) {
+            $.ajax({
+                type: 'POST',
+                url: "/assets/base/snippets/api/api.php?task=getProducts",
+                data: sendData,
+                dataType: "json",
+                success: (dataProducts) => {
+                    console.log("SUCCESS:");
+                    this.dataProducts = dataProducts;
+                    this.prepareDrawTable();
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.log("ERROR: " + textStatus + ", " + errorThrown);
+                    console.log(jqXHR);
+                }
+            });
+        }
+    }
+    Components.FilterOLD = FilterOLD;
+})(Components || (Components = {}));
+var Components;
+(function (Components) {
+    class GroupRadio {
+        options;
+        data;
+        $wrap;
+        constructor($wrap, data, options) {
+            this.options = options;
+            this.$wrap = $wrap;
+            this.restructure(data);
+        }
+        restructure(data) {
+            this.data = data;
+            this.$wrap.empty();
+            this.$wrap.append(this.getInputs());
+        }
+        getInputs() {
+            let $inputs = [];
+            for (const key in this.data) {
+                $inputs.push(this.getInput(key, this.data[key]));
+            }
+            return $inputs;
+        }
+        getInput(value, text) {
+            let $label = $('<label/>');
+            let $input = $('<input/>', { type: 'radio', value: value, name: this.options.name });
+            $label.append($input, $('<span/>').text(text));
+            return $label;
+        }
+        getValue() {
+            let val = this.$wrap.find('input:checked').val();
+            return (val !== undefined) ? val : null;
+        }
+        getValuesFromData() {
+            let out = [];
+            for (const key in this.data) {
+                out.push(key);
+            }
+            return out;
+        }
+        on(event, func, data = {}) {
+            switch (event) {
+                case 'change':
+                    this.$wrap.on('change', 'input', (event) => { func(event.target, data); });
+                    break;
+                default:
+                    console.warn('Event not found');
+                    break;
+            }
+        }
+    }
+    Components.GroupRadio = GroupRadio;
+})(Components || (Components = {}));
+var Components;
+(function (Components) {
+    class Loader {
+        $loaderFilter;
+        isLoad;
+        constructor($loaderWrap, className) {
+            this.$loaderFilter = $loaderWrap.append('<div/>').addClass(className);
+            this.isLoad = true;
+        }
+        show() {
+            // проверка
+            this.isLoad = true;
+            this.$loaderFilter.removeClass('hide');
+        }
+        hide() {
+            // проверка
+            this.isLoad = false;
+            this.$loaderFilter.addClass('hide');
+        }
+    }
+    Components.Loader = Loader;
+})(Components || (Components = {}));
+var Components;
+(function (Components) {
+    class NotFound {
+        notFound;
+        constructor($wrap) {
+            this.notFound = $('<div/>', { class: 'prod-not-found container hide' });
+            $wrap.append(this.notFound);
+        }
+        show() {
+            // проверка
+            this.notFound.removeClass('hide');
+        }
+        hide() {
+            // проверка
+            this.notFound.addClass('hide');
+        }
+    }
+    Components.NotFound = NotFound;
+})(Components || (Components = {}));
+var Components;
+(function (Components) {
+    class Products {
+        dataProducts;
+        $wrap;
+        $headList;
+        $prodList;
+        constructor() {
+        }
+        drawProducts(dataProducts, $wrap, head) {
+            this.dataProducts = dataProducts;
+            this.$wrap = $wrap;
+            this.$wrap.empty();
+            this.$wrap.append($('<div/>', { class: 'prod-result-head', text: head }));
+            this.$headList = $('<tbody/>', { class: 'product-list head prettyPagetitle' });
+            this.$prodList = $('<tbody/>', { class: 'product-list body prodList' });
+            /* логика с notfound и loader */
+            // const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
+            //
+            // const productsMrk = this.dataProducts['mrk'].products;
+            // const productsRvd = this.dataProducts['rkv'].products;
+            // $('.loader-table').addClass('hide');
+            //
+            // if (!this.dataProducts.length) {
+            //     $notFound.removeClass('hide')
+            // }
+            // if (this.dataProducts.length /* && $('#mrk').is(':checked')*/) {
+            //     const $resultMrk = $('#result_mrk');
+            //     this.drawImage();
+            //     this.drawTable();
+            // }
+            this.drawImage();
+            this.drawTable();
+        }
+        drawImage() {
+            // const $wrapImg: JQuery = $('<div/>', { class: 'prod-images' });
+            // this.$wrap.append($wrapImg);
+            //
+            // const selectLeft: string = this.select1.$sourceSelect.find('option:checked').attr('value');
+            // const textLeft: string = this.select1.$sourceSelect.find('option:checked').attr('text');
+            // const selectRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
+            // const textRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
+            //
+            // const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
+            // const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
+            //
+            // const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
+            //
+            // const cutimgLeft: string = path + selectLeft + '_left_cut.png';
+            // const bigimgLeft: string = path + 'big/' + selectLeft + '_left_cut.png';
+            // const cutimgRight: string = path + selectRight + '_right_cut.png';
+            // const bigimgRight: string = path + 'big/' + selectRight + '_right_cut.png';
+            //
+            // const imgCenter = $wrapImg.find('.cccc');
+            //
+            // $platformLeft.find('.cutimg > img').attr('src',cutimgLeft);
+            // $platformLeft.find('.bigimg > img').attr('src',bigimgLeft);
+            // $platformRight.find('.cutimg > img').attr('src',cutimgRight);
+            // $platformRight.find('.bigimg > img').attr('src',bigimgRight);
+            //
+            // imgCenter.find('> img:nth-child(1)').attr('src',path + selectLeft + '_left.png');
+            // imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + '_right.png');
+            //
+            //
+            // console.log(selectLeft, textLeft, selectRight, textRight);
+            // $('.big_txt_left').text(selectLeft);
+            // $('.large_text_left').text(textLeft);
+            // $('.big_txt_right').text(selectRight);
+            // $('.large_text_right').text(textRight);
+        }
+        drawTable() {
+            this.createTableTemplate();
+            this.cleanTable();
+            this.fillTable();
+            /* Вынести показать скрыть в отдельный метод */
+            // this.$wrap.removeClass('hide');
+        }
+        createTableTemplate() {
+            const $wrapTable = $('<div/>', { class: 'prod-table' });
+            this.$wrap.append($wrapTable.append($('<table/>', { class: 'table' }).append($('<thead/>').append($('<tr/>', { class: 'table-head' }).append($('<th/>', { text: 'Кодировка' }))), this.$headList), $('<div/>').append($('<table/>', { class: 'table' }).append($('<thead/>').append($('<tr/>', { class: 'table-head' }).append($('<th/>', { text: 'Количество оплеток' }), $('<th/>', { text: 'Длина L' }), $('<th/>', { text: 'Давление' }), $('<th/>', { text: 'ДУ' }), $('<th/>', { colspan: 2 }).append($('<div/>', { text: 'Подсоединение' }), $('<div/>', { class: 'table-colspan' }).append($('<div/>', { text: '1' }), $('<div/>', { text: '2' }))), $('<th/>', { text: 'Спиральная защитная' }), $('<th/>', { text: 'Совместимость с кислородом' }), $('<th/>', { text: 'Трос' }), $('<th/>', { text: 'Тепло-изоляция' }), $('<th/>', { text: 'Цена' }))), this.$prodList))));
+        }
+        cleanTable() {
+            this.$headList.empty();
+            this.$prodList.empty();
+        }
+        fillTable() {
+            for (const key in this.dataProducts) {
+                const prod = this.dataProducts[key];
+                this.$headList.append($('<tr/>').append($('<td/>').text(prod.prettyPagetitle)));
+                this.$prodList.append($('<tr/>').append($('<td/>').text(prod.numberOfBraids), $('<td/>').text(prod._length), $('<td/>').text(prod.max_pressure), $('<td/>').text(prod.dn), $('<td/>').text(prod.ending1), $('<td/>').text(prod.ending2), $('<td/>').text(prod.protectiveSpiral), $('<td/>').text(prod.os_compatibility), $('<td/>').text(prod.cable), $('<td/>').text(prod.thermalInsulation), $('<td/>').text(prod.price)));
+            }
+        }
+    }
+    Components.Products = Products;
+})(Components || (Components = {}));
+var Components;
+(function (Components) {
     class Select {
         $sourceSelect;
         $sourceOptions;
@@ -1137,8 +1528,9 @@ var Components;
         }
         getOptions() {
             let $options = [];
-            for (let i = 1; i < this.$sourceSelect.children('option').length; i++) {
-                $options.push(this.getOption(this.$sourceOptions.eq(i)));
+            let sourceOptions = this.$sourceSelect.children('option');
+            for (let i = 0; i < sourceOptions.length; i++) {
+                $options.push(this.getOption($(sourceOptions[i])));
             }
             return $options;
         }
@@ -1175,6 +1567,20 @@ var Components;
         }
         getIsSelect() {
             return this.isSelect;
+        }
+        getValue() {
+            return this.$sourceOptions.filter(':selected').val();
+        }
+        restructure(data) {
+            this.$list.slideUp(0);
+            this.$sourceSelect.empty();
+            for (const i in data) {
+                this.$sourceSelect.append($('<option/>').text(data[i]).val(i) //.attr('text', this.dataOptions.types[i].description)
+                );
+            }
+            this.$sourceOptions = this.$sourceSelect.children('option');
+            this.$header.text(this.$sourceOptions.filter(':selected').text());
+            this.$list.append(this.getOptions());
         }
         /* Навешивание события: при изменении селекта срабатывает переданная процедура */
         on(event, func, data = {}) {
