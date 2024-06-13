@@ -43,7 +43,7 @@
                 > div {
                 }
 
-                .head {
+                .head-popup {
                     background-color: $colorBackgroundAccent;
                     color: $colorTextLight;
                     display: flex;
@@ -69,7 +69,7 @@
                 //    background-color: $colorWhite; display: flex; justify-content: end;
                 //    .close { background-image: url("pic/crossGreen.svg"); background-size: cover; height: 2rem; width: 2rem;  margin: 0.6rem 2rem; cursor: pointer; }
                 //}
-                .container {
+                .container-popup {
                     background-color: $colorBackgroundLight;
                     overflow: hidden;
                     overflow-y: auto;

@@ -14,7 +14,8 @@ namespace Components {
             this.dataProducts = dataProducts;
             this.$wrap = $wrap;
 
-            this.$wrap.empty();
+            // this.$wrap.empty();
+
 
             this.$wrap.append($('<div/>', { class: 'prod-result-head', text: head }));
 
@@ -85,7 +86,7 @@ namespace Components {
 
         private drawTable(): void {
             this.createTableTemplate();
-            this.cleanTable();
+            // this.cleanTable();
             this.fillTable();
 
             /* Вынести показать скрыть в отдельный метод */

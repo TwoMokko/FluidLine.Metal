@@ -81,6 +81,7 @@ declare namespace Components {
         typeEndSecond: Select;
         sizeRadioFirst: GroupRadio;
         sizeRadioSecond: GroupRadio;
+        analog: boolean;
         dataOptions: filterOptions;
         callback: Function;
         $mrkBtn: JQuery;
@@ -92,9 +93,17 @@ declare namespace Components {
         $cableBtn: JQuery;
         constructor(callback: Function, dataOptions: filterOptions);
         private restructureSelects;
-        private initButtons;
+        private setAnalog;
+        private useAnalog;
+        private useAnalogForGroupRadio;
         private getFilterData;
         private sendData;
+        private prepareSendData;
+        private createElements;
+        private createSwitcher;
+        private createSelectEndGroupRadio;
+        private createOxygenLengthCable;
+        private createButtons;
     }
 }
 interface itemFilterOptions {
@@ -160,35 +169,12 @@ declare namespace Components {
         private loaderFilter;
         private loaderProducts;
         private $wrapProducts;
+        private $wrapProductsMrk;
+        private $wrapProductsRvd;
         constructor();
         private init;
         private redraw;
         private getFilterOption;
-    }
-}
-declare namespace Components {
-    class FilterOLD {
-        $loaderFilter: JQuery;
-        dataOptions: filterOptions;
-        dataProducts: any;
-        isLoad: boolean;
-        select1: Select;
-        select2: Select;
-        typeSize1: object;
-        typeSize2: object;
-        constructor();
-        private setFilterOption;
-        private showLoader;
-        private hideLoader;
-        private fillSelectSource;
-        private fillSelectCustom;
-        private drawButtonsSize;
-        private prepareSendData;
-        private prepareDrawTable;
-        private drawTable;
-        private drawImage;
-        private addEvent;
-        private sendData;
     }
 }
 declare namespace Components {
@@ -201,13 +187,17 @@ declare namespace Components {
     export class GroupRadio {
         private options;
         private data;
+        private $container;
         private $wrap;
-        constructor($wrap: JQuery, data: GroupRadioData, options: GroupRadioOptions);
+        constructor($container: JQuery, data: GroupRadioData, options: GroupRadioOptions);
         restructure(data: GroupRadioData): void;
         private getInputs;
         private getInput;
         getValue(): string | null;
+        setValue(value: string | null, event?: boolean): void;
         getValuesFromData(): any[];
+        addDisabled(): void;
+        removeDisabled(): void;
         on(event: string, func: Function, data?: {
             [key: string]: any;
         }): void;
@@ -217,8 +207,7 @@ declare namespace Components {
 declare namespace Components {
     class Loader {
         $loaderFilter: JQuery;
-        isLoad: boolean;
-        constructor($loaderWrap: JQuery<HTMLElement>, className: string);
+        constructor($loaderWrap: JQuery<HTMLElement>, className: string, show?: boolean);
         show(): void;
         hide(): void;
     }
@@ -264,9 +253,12 @@ declare namespace Components {
         private close;
         getIsSelect(): boolean;
         getValue(): string;
+        setValue(value: string, event?: boolean): void;
         restructure(data: {
             [key: string]: string;
         }): void;
+        addDisabled(): void;
+        removeDisabled(): void;
         on(event: string, func: Function, data?: {
             [key: string]: any;
         }): void;

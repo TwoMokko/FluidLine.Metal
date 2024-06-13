@@ -7,13 +7,17 @@ namespace Components {
         private options         : GroupRadioOptions;
         private data            : GroupRadioData;
 
+        private  $container     : JQuery;
         private  $wrap          : JQuery;
 
-        constructor($wrap: JQuery, data: GroupRadioData, options: GroupRadioOptions) {
+        constructor($container: JQuery, data: GroupRadioData, options: GroupRadioOptions) {
+            this.$container     = $container;
             this.options        = options;
-            this.$wrap          = $wrap;
+            this.$wrap          = $('<div/>', {class: 'component GroupRadio'});
 
             this.restructure(data);
+
+            this.$container.append(this.$wrap);
         }
 
         public restructure(data: GroupRadioData): void {
@@ -51,6 +55,15 @@ namespace Components {
             return (val !== undefined) ? val : null;
         }
 
+        public setValue(value: string | null, event: boolean = true): void {
+            if (!event) {
+                // console.log(this.$wrap.find(`[value=${value}]`));
+                this.$wrap.find(`[value=${value}]`).attr('checked', 'checked')
+                return;
+            }
+            this.$wrap.find(`[value=${value}]`).trigger('click');
+        }
+
         public getValuesFromData() {
             let out = [];
             for (const key in this.data) {
@@ -59,9 +72,21 @@ namespace Components {
             return out;
         }
 
+        public addDisabled(): void {
+            this.$wrap.find('span').addClass('disabled');
+        }
+        public removeDisabled(): void {
+            this.$wrap.find('span').removeClass('disabled');
+        }
+
         public on(event: string, func: Function, data: {[key: string]: any} = {}): void {
             switch (event) {
-                case 'change': this.$wrap.on('change', 'input', (event) => { func(event.target, data); }); break;
+                case 'change': this.$wrap.on('change', 'input', (event) => {
+                    if (event.target.hasClass('disabled')) {
+                        return;
+                    }
+                    func(event.target, data);
+                }); break;
                 default: console.warn('Event not found'); break;
             }
         }

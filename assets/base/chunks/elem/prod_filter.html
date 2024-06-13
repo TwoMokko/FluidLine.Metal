@@ -1,87 +1,91 @@
 
-<form id="rbfrm" class="prod-filter container">
-    <div class="loader-filter">
-        <div class="loader"></div>
-        <div class="loader-text">Загрузка</div>
-    </div>
+<!--<form class="prod-filter container">-->
+<!--    <div class="loader-filter">-->
+<!--        <div class="loader"></div>-->
+<!--        <div class="loader-text">Загрузка</div>-->
+<!--    </div>-->
 
-    <div class="prod-filter-switcher">
-        <label class="prod-filter-checkbox">
-            <input type="checkbox" id="mrk" name="mrk" checked>
-            <label for="mrk">Металлорукав</label>
-        </label>
-        <label class="prod-filter-checkbox">
-            <input type="checkbox" id="rvd" name="rvd" checked>
-            <label for="rvd">Рукав высокого давления</label>
-        </label>
-    </div>
+<!--    <div class="prod-filter-switcher">-->
+<!--        <label class="prod-filter-checkbox">-->
+<!--            <input type="checkbox" id="mrk" name="mrk" checked>-->
+<!--            <label for="mrk">Металлорукав</label>-->
+<!--        </label>-->
+<!--        <label class="prod-filter-checkbox">-->
+<!--            <input type="checkbox" id="rvd" name="rvd" checked>-->
+<!--            <label for="rvd">Рукав высокого давления</label>-->
+<!--        </label>-->
+<!--    </div>-->
 
-    <div class="prod-filter-wrap">
-        <div class="prod-filter-wrap-item">
-            <div>
-                <div class="prod-filter-wrap-item-head">Тип первой законцовки</div>
-                <select class="select hide" name="zakontsovka-1">
-                    <option disabled selected>Выбрать</option>
-                </select>
-            </div>
-            <div class="prod-filter-radio">
-                <div>Размер первой законцовки</div>
-                <div class="panel" id="size1"></div>
-                <div class="forload">Выберите тип первой законцовки</div>
-            </div>
-            <div class="prod-filter-radio">
-                <div>Газовая среда</div>
-                <div>
-                    <div>
-                        <input type="radio" name="oxygen" value="on" id="o21" class="oxygen" checked>
-                        <label class="mrtp w80" for="o21">Кислород</label>
-<!--                        <input name="gas-sreda" type="radio" value="" id="gas-sreda-1" checked>-->
-<!--                        <label for="gas-sreda-1">кислород</label>-->
-                    </div>
-                    <div>
-                        <input type="radio" name="oxygen" value="off" id="o21_2" class="oxygen">
-                        <label class="mrtp w80" for="o21_2">Не кислород</label>
-<!--                        <input name="gas-sreda" type="radio" value="" id="gas-sreda-2">-->
-<!--                        <label for="gas-sreda-2">не кислород</label>-->
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--    <div class="prod-filter-wrap">-->
+<!--        <div class="prod-filter-wrap-item">-->
+<!--            <div>-->
+<!--                <div class="prod-filter-wrap-item-head">Тип первой законцовки</div>-->
+<!--                <select class="select hide" name="zakontsovka-1">-->
+<!--&lt;!&ndash;                    <option disabled selected>Выбрать</option>&ndash;&gt;-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="prod-filter-radio">-->
+<!--                <div>Размер первой законцовки</div>-->
+<!--                <div class="panel" id="size1"></div>-->
+<!--                <div class="forload hide">Выберите тип первой законцовки</div>-->
+<!--            </div>-->
 
-        <div class="prod-filter-wrap-item">
-            <div>
-                <div class="prod-filter-wrap-item-head">
-                    <div>Тип второй законцовки</div>
-                    <div class="filter-analog">
-                        <label class="prod-filter-checkbox">
-                            <input type="checkbox" id="analog" name="analog">
-                            <label for="analog">Аналогично первой</label>
-                        </label>
-                    </div>
-                </div>
+<!--        </div>-->
 
-                <select class="select hide" name="zakontsovka-2">
-                    <option disabled selected>Выбрать</option>
-                </select>
-            </div>
-            <div class="prod-filter-radio">
-                <div>Размер первой законцовки</div>
-                <div class="panel" id="size2"></div>
-                <div class="forload">Выберите тип второй законцовки</div>
-            </div>
-            <div class="prod-filter-length">
-                <div>Длина (L)</div>
-                <div>
-                    <label>
-                        <input name="length" id="size" type="number" min="50" max="100000" step="any" value="1000">
-                        <span>мм</span>
-                    </label>
-                    <label class="prod-filter-checkbox">
-                        <input type="checkbox" id="tros" name="tros">
-                        <label for="tros">Трос</label>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
+<!--        <div class="prod-filter-wrap-item">-->
+<!--            <div>-->
+<!--                <div class="prod-filter-wrap-item-head">-->
+<!--                    <div>Тип второй законцовки</div>-->
+<!--                    <div class="filter-analog">-->
+<!--                        <label class="prod-filter-checkbox">-->
+<!--                            <input type="checkbox" id="analog" name="analog" checked>-->
+<!--                            <label for="analog">Аналогично первой</label>-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <select class="select hide" name="zakontsovka-2">-->
+<!--&lt;!&ndash;                    <option disabled selected>Выбрать</option>&ndash;&gt;-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="prod-filter-radio">-->
+<!--                <div>Размер первой законцовки</div>-->
+<!--                <div class="panel" id="size2"></div>-->
+<!--                <div class="forload hide">Выберите тип второй законцовки</div>-->
+<!--            </div>-->
+
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="prod-filter-buttons">-->
+<!--        <div class="prod-filter-radio">-->
+<!--            <div>Газовая среда</div>-->
+<!--            <div>-->
+<!--                <label>-->
+<!--                    <input id="oxygen" type="radio" name="oxygen" value="on" checked>-->
+<!--                    <span>Кислород</span>-->
+<!--                    &lt;!&ndash;                        <input name="gas-sreda" type="radio" value="" id="gas-sreda-1" checked>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                        <label for="gas-sreda-1">кислород</label>&ndash;&gt;-->
+<!--                </label>-->
+<!--                <label>-->
+<!--                    <input id="notOxygen" type="radio" name="notOxygen" value="off">-->
+<!--                    <span>Не кислород</span>-->
+<!--                    &lt;!&ndash;                        <input name="gas-sreda" type="radio" value="" id="gas-sreda-2">&ndash;&gt;-->
+<!--                    &lt;!&ndash;                        <label for="gas-sreda-2">не кислород</label>&ndash;&gt;-->
+<!--                </label>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="prod-filter-length">-->
+<!--            <div>Длина (L)</div>-->
+<!--            <div>-->
+<!--                <label>-->
+<!--                    <input name="length" id="size" type="number" min="50" max="100000" step="any" value="1000">-->
+<!--                    <span>мм</span>-->
+<!--                </label>-->
+<!--                <label class="prod-filter-checkbox">-->
+<!--                    <input type="checkbox" id="cable" name="cable">-->
+<!--                    <label for="cable">Трос</label>-->
+<!--                </label>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</form>-->

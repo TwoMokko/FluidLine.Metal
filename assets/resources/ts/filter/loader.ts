@@ -1,21 +1,23 @@
 namespace Components {
     export class Loader {
         $loaderFilter                   : JQuery;
-        isLoad                          : boolean;
 
-        constructor($loaderWrap: JQuery<HTMLElement>, className: string) {
-            this.$loaderFilter          = $loaderWrap.append('<div/>').addClass(className);
-            this.isLoad                 = true;
+        constructor($loaderWrap: JQuery<HTMLElement>, className: string, show: boolean = true) {
+            this.$loaderFilter = $('<div/>', {class: className}).append(
+                $('<div/>', {class: 'loader'}),
+                $('<div/>', {class: 'loader-text', text: 'Загрузка...'})
+            );
+
+            if (!show) this.hide();
+
+            $loaderWrap.append(this.$loaderFilter);
         }
 
         public show(): void {
-            // проверка
-            this.isLoad = true;
             this.$loaderFilter.removeClass('hide');
         }
+
         public hide(): void {
-            // проверка
-            this.isLoad = false;
             this.$loaderFilter.addClass('hide');
         }
     }

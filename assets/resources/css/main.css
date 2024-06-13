@@ -685,6 +685,7 @@
     display: flex;
     flex-direction: column;
     gap: 40px;
+    margin-bottom: 24px;
   }
   .prod-filter-wrap-item-head {
     height: calc(32px + 2rem);
@@ -728,14 +729,14 @@
   .prod-filter-radio > div:nth-child(2) input {
     display: none;
   }
-  .prod-filter-radio > div:nth-child(2) label {
+  .prod-filter-radio > div:nth-child(2) span {
     display: inline-block;
     padding: 4px 8px;
     background-color: white;
     border-radius: 4px;
     cursor: pointer;
   }
-  .prod-filter-radio > div:nth-child(2) input:checked + label {
+  .prod-filter-radio > div:nth-child(2) input:checked + span {
     background-color: #ecf4ff;
     color: #3F80D0;
   }
@@ -794,6 +795,11 @@
     background-size: 80%;
     background-position: center;
     background-repeat: no-repeat;
+  }
+  .prod-filter-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
   }
 }
 @media (min-width: 761px) and (max-width: 1080px) {
@@ -816,6 +822,7 @@
     display: flex;
     flex-direction: column;
     gap: 40px;
+    margin-bottom: 24px;
   }
   .prod-filter-wrap-item-head {
     height: calc(32px + 2rem);
@@ -859,14 +866,14 @@
   .prod-filter-radio > div:nth-child(2) input {
     display: none;
   }
-  .prod-filter-radio > div:nth-child(2) label {
+  .prod-filter-radio > div:nth-child(2) span {
     display: inline-block;
     padding: 4px 8px;
     background-color: white;
     border-radius: 4px;
     cursor: pointer;
   }
-  .prod-filter-radio > div:nth-child(2) input:checked + label {
+  .prod-filter-radio > div:nth-child(2) input:checked + span {
     background-color: #ecf4ff;
     color: #3F80D0;
   }
@@ -926,6 +933,11 @@
     background-position: center;
     background-repeat: no-repeat;
   }
+  .prod-filter-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
 }
 @media (min-width: 1081px) {
   .prod-filter {
@@ -946,6 +958,7 @@
   .prod-filter-wrap {
     display: flex;
     gap: 80px;
+    margin-bottom: 24px;
   }
   .prod-filter-wrap-item {
     width: 50%;
@@ -992,14 +1005,14 @@
   .prod-filter-radio > div:nth-child(2) input {
     display: none;
   }
-  .prod-filter-radio > div:nth-child(2) label {
+  .prod-filter-radio > div:nth-child(2) span {
     display: inline-block;
     padding: 4px 8px;
     background-color: white;
     border-radius: 4px;
     cursor: pointer;
   }
-  .prod-filter-radio > div:nth-child(2) input:checked + label {
+  .prod-filter-radio > div:nth-child(2) input:checked + span {
     background-color: #ecf4ff;
     color: #3F80D0;
   }
@@ -1058,6 +1071,13 @@
     background-size: 80%;
     background-position: center;
     background-repeat: no-repeat;
+  }
+  .prod-filter-buttons {
+    display: flex;
+    gap: 80px;
+  }
+  .prod-filter-buttons > div {
+    width: 50%;
   }
 }
 
@@ -1152,6 +1172,26 @@
 }
 .select-wrap .new-select-list-item span:hover {
   background-color: #ecf4ff;
+}
+
+.component.GroupRadio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.component.GroupRadio input {
+  display: none;
+}
+.component.GroupRadio span {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.component.GroupRadio input:checked + span {
+  background-color: #ecf4ff;
+  color: #3F80D0;
 }
 
 .prod-not-found {
@@ -1376,18 +1416,18 @@
     display: flex;
     flex-direction: column;
   }
-  .windows .instance .window .head {
+  .windows .instance .window .head-popup {
     background-color: #3F80D0;
     color: #FFF;
     display: flex;
     justify-content: end;
     align-items: center;
   }
-  .windows .instance .window .head .title {
+  .windows .instance .window .head-popup .title {
     padding: 1rem 2rem;
     flex: auto;
   }
-  .windows .instance .window .head .close {
+  .windows .instance .window .head-popup .close {
     background-image: url("../img/crossWhite.svg");
     background-size: cover;
     height: 2rem;
@@ -1395,47 +1435,47 @@
     margin-right: 2rem;
     cursor: pointer;
   }
-  .windows .instance .window .container {
+  .windows .instance .window .container-popup {
     background-color: #FFF;
     overflow: hidden;
     overflow-y: auto;
     padding: 1.5rem 2.5rem 2rem;
   }
-  .windows .instance .window .container > form {
+  .windows .instance .window .container-popup > form {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
   }
-  .windows .instance .window .container > form > div.text-wrap {
+  .windows .instance .window .container-popup > form > div.text-wrap {
     background-color: #D9EAFF;
     padding: 0.5rem;
     border: none;
     border-radius: 6px;
     min-height: 100px;
   }
-  .windows .instance .window .container > form > div.text-wrap > textarea {
+  .windows .instance .window .container-popup > form > div.text-wrap > textarea {
     width: 100%;
     height: 100%;
     background-color: transparent;
     border: none;
     resize: none;
   }
-  .windows .instance .window .container > form > div.input-wrap {
+  .windows .instance .window .container-popup > form > div.input-wrap {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 24px;
   }
-  .windows .instance .window .container > form > div.input-wrap.contacts {
+  .windows .instance .window .container-popup > form > div.input-wrap.contacts {
     margin-top: 24px;
   }
-  .windows .instance .window .container > form > div.input-wrap > input {
+  .windows .instance .window .container-popup > form > div.input-wrap > input {
     background-color: #D9EAFF;
     padding: 0.5rem;
     border: none;
     border-radius: 6px;
   }
-  .windows .instance .window .container > form .btn {
+  .windows .instance .window .container-popup > form .btn {
     max-width: revert;
   }
   .windows .instance .window .container_null_title {
@@ -1479,18 +1519,18 @@
     display: flex;
     flex-direction: column;
   }
-  .windows .instance .window .head {
+  .windows .instance .window .head-popup {
     background-color: #3F80D0;
     color: #FFF;
     display: flex;
     justify-content: end;
     align-items: center;
   }
-  .windows .instance .window .head .title {
+  .windows .instance .window .head-popup .title {
     padding: 1rem 2rem;
     flex: auto;
   }
-  .windows .instance .window .head .close {
+  .windows .instance .window .head-popup .close {
     background-image: url("../img/crossWhite.svg");
     background-size: cover;
     height: 2rem;
@@ -1498,46 +1538,46 @@
     margin-right: 2rem;
     cursor: pointer;
   }
-  .windows .instance .window .container {
+  .windows .instance .window .container-popup {
     background-color: #FFF;
     overflow: hidden;
     overflow-y: auto;
     padding: 1.5rem 2.5rem 2rem;
   }
-  .windows .instance .window .container > form {
+  .windows .instance .window .container-popup > form {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
   }
-  .windows .instance .window .container > form > div.text-wrap {
+  .windows .instance .window .container-popup > form > div.text-wrap {
     background-color: #D9EAFF;
     padding: 0.5rem;
     border: none;
     border-radius: 6px;
     min-height: 100px;
   }
-  .windows .instance .window .container > form > div.text-wrap > textarea {
+  .windows .instance .window .container-popup > form > div.text-wrap > textarea {
     width: 100%;
     height: 100%;
     background-color: transparent;
     border: none;
     resize: none;
   }
-  .windows .instance .window .container > form > div.input-wrap {
+  .windows .instance .window .container-popup > form > div.input-wrap {
     display: flex;
     gap: 1rem;
     margin-bottom: 24px;
   }
-  .windows .instance .window .container > form > div.input-wrap.contacts {
+  .windows .instance .window .container-popup > form > div.input-wrap.contacts {
     margin-top: 24px;
   }
-  .windows .instance .window .container > form > div.input-wrap > input {
+  .windows .instance .window .container-popup > form > div.input-wrap > input {
     background-color: #D9EAFF;
     padding: 0.5rem;
     border: none;
     border-radius: 6px;
   }
-  .windows .instance .window .container > form .btn {
+  .windows .instance .window .container-popup > form .btn {
     max-width: revert;
   }
   .windows .instance .window .container_null_title {
@@ -1962,6 +2002,11 @@ body::-webkit-scrollbar-thumb {
   background-color: #D9EAFF; /* цвет бегунка */
   border-radius: 20px; /* округлось бегунка */
   border: 3px solid #ecf4ff; /* отступ вокруг бегунка */
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: default !important;
 }
 
 /*# sourceMappingURL=main.css.map */

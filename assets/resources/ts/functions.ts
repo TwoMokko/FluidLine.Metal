@@ -1,6 +1,6 @@
-$(() => {
-    new Components.FilterOLD();
-})
+// $(() => {
+//     new Components.FilterManager();
+// })
 
 document.addEventListener("DOMContentLoaded", () => {
 

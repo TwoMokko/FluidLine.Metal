@@ -18,7 +18,7 @@ namespace Components {
             this.$sourceSelect = $sourceSelect;
             this.$sourceOptions = $sourceSelect.children('option') as JQuery;
 
-            $sourceSelect.hide();
+            // $sourceSelect.hide();
 
             /* Create Elements */
             const $wrap = $('<div/>', {class: 'select-wrap'});
@@ -40,7 +40,12 @@ namespace Components {
             );
 
             /* Events */
-            this.$header.on('click', () => { this.switchSelect(); });
+            this.$header.on('click', () => {
+                if (this.$header.hasClass('disabled')) {
+                    return;
+                }
+                this.switchSelect();
+            });
 
             $sourceSelect.after($wrap);
 
@@ -67,12 +72,14 @@ namespace Components {
 
         private getOption($sourceOption: JQuery): JQuery {
             let text: string = $sourceOption.text();
+            let value: string = $sourceOption.val() as string;
 
             let $option: JQuery<HTMLElement> = $('<div>', {
                 class: 'new-select-list-item',
                 html: $('<span>', {
                     text: text
                 }),
+                'data-value': value
             });
 
             $option.on('click', (): void => {
@@ -112,6 +119,19 @@ namespace Components {
             return (this.$sourceOptions.filter(':selected').val() as string);
         }
 
+        public setValue(value: string, event: boolean = true): void {
+            console.log('event', event);
+            if (!event) {
+                this.$sourceOptions.filter(':selected').removeAttr('selected');
+                let $option = this.$sourceOptions.filter(`[value=${value}]`);
+                $option.attr('selected', 'selected');
+                this.$header.text($option.text());
+                console.log('opt: ', $option);
+                return;
+            }
+            this.$list.children(`[data-value=${value}]`).trigger('click');
+        }
+
         public restructure(data: {[key: string]: string}): void {
             this.$list.slideUp(0);
 
@@ -130,6 +150,13 @@ namespace Components {
             this.$list.append(
                 this.getOptions()
             );
+        }
+
+        public addDisabled(): void {
+            this.$header.addClass('disabled');
+        }
+        public removeDisabled(): void {
+            this.$header.removeClass('disabled');
         }
 
         /* Навешивание события: при изменении селекта срабатывает переданная процедура */

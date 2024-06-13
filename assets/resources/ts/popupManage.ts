@@ -58,8 +58,8 @@ namespace Common {
             titleHTML.className                         = 'title';
             closeHTML.className                         = 'close';
 
-            (title !== null) ? header.className = 'head' : header.className = 'head_null_title';
-            (title !== null) ? container.className = 'container' : container.className = 'container_null_title';
+            (title !== null) ? header.className = 'head-popup' : header.className = 'head_null_title';
+            (title !== null) ? container.className = 'container-popup' : container.className = 'container_null_title';
 
             this.instance.append(space);
             this.instance.append(window);

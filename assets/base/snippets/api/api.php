@@ -12,7 +12,7 @@ if ($task=='') {
     return 'no-task';
 }
 
-$api_base = 'http://avy.ru:557';
+$api_base = 'http://fld.ru:557';
 $curlOptions = array(
     CURLOPT_URL => $api_base,
     CURLOPT_POST => true,

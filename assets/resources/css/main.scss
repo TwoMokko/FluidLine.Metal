@@ -133,3 +133,8 @@ body::-webkit-scrollbar-thumb {
     border-radius: 20px;       /* округлось бегунка */
     border: 3px solid $colorAccentLightMore;  /* отступ вокруг бегунка */
 }
+.disabled {
+    opacity: 0.5;
+    //background-color: #ecf5ff !important;
+    cursor: default !important;
+}

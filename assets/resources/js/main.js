@@ -611,9 +611,9 @@ var Components;
 //     }
 //     return version;
 // }
-$(() => {
-    new Components.FilterOLD();
-});
+// $(() => {
+//     new Components.FilterManager();
+// })
 document.addEventListener("DOMContentLoaded", () => {
 });
 function createElement(tagName, className, textContent, container) {
@@ -723,8 +723,8 @@ var Common;
             window.className = 'window';
             titleHTML.className = 'title';
             closeHTML.className = 'close';
-            (title !== null) ? header.className = 'head' : header.className = 'head_null_title';
-            (title !== null) ? container.className = 'container' : container.className = 'container_null_title';
+            (title !== null) ? header.className = 'head-popup' : header.className = 'head_null_title';
+            (title !== null) ? container.className = 'container-popup' : container.className = 'container_null_title';
             this.instance.append(space);
             this.instance.append(window);
             window.append(header);
@@ -883,6 +883,7 @@ var Components;
         typeEndSecond;
         sizeRadioFirst;
         sizeRadioSecond;
+        analog;
         dataOptions;
         callback;
         $mrkBtn;
@@ -893,7 +894,8 @@ var Components;
         $sizeBtn;
         $cableBtn;
         constructor(callback, dataOptions) {
-            this.initButtons();
+            this.analog = true;
+            this.createElements();
             this.callback = callback;
             this.dataOptions = dataOptions;
             this.typeEndFirst = new Components.Select($('.select[name="zakontsovka-1"]'));
@@ -901,8 +903,46 @@ var Components;
             this.restructureSelects();
             this.sizeRadioFirst = new Components.GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, { name: 'size1' });
             this.sizeRadioSecond = new Components.GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, { name: 'size2' });
-            this.typeEndFirst.on('change', () => { this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes); });
-            this.typeEndSecond.on('change', () => { this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes); });
+            this.typeEndSecond.addDisabled();
+            this.sizeRadioSecond.addDisabled();
+            this.prepareSendData();
+            this.typeEndFirst.on('change', () => {
+                this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes);
+                if (this.analog) {
+                    this.useAnalog();
+                }
+                this.prepareSendData();
+            });
+            this.typeEndSecond.on('change', () => {
+                this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes);
+                this.prepareSendData();
+            });
+            this.$analogBtn.on('change', (e) => {
+                this.setAnalog(e.target.checked);
+                if (this.analog) {
+                    this.useAnalog();
+                    this.prepareSendData();
+                    this.typeEndSecond.addDisabled();
+                    this.sizeRadioSecond.addDisabled();
+                }
+                else {
+                    this.typeEndSecond.removeDisabled();
+                    this.sizeRadioSecond.removeDisabled();
+                }
+            });
+            this.sizeRadioFirst.on('change', () => {
+                if (this.analog) {
+                    this.useAnalogForGroupRadio();
+                }
+                this.prepareSendData();
+            });
+            this.sizeRadioSecond.on('change', () => { this.prepareSendData(); });
+            this.$mrkBtn.on('change', () => { this.prepareSendData(); });
+            this.$rvdBtn.on('change', () => { this.prepareSendData(); });
+            this.$oxygenBtn.on('change', () => { this.prepareSendData(); });
+            this.$notOxygenBtn.on('change', () => { this.prepareSendData(); });
+            this.$sizeBtn.on('change', () => { this.prepareSendData(); });
+            this.$cableBtn.on('change', () => { this.prepareSendData(); });
         }
         restructureSelects() {
             let data = {};
@@ -912,14 +952,19 @@ var Components;
             this.typeEndFirst.restructure(data);
             this.typeEndSecond.restructure(data);
         }
-        initButtons() {
-            this.$mrkBtn = $('#mrk');
-            this.$rvdBtn = $('#rvd');
-            this.$analogBtn = $('#analog');
-            this.$oxygenBtn = $('#o21');
-            this.$notOxygenBtn = $('#o21_2');
-            this.$sizeBtn = $('#size');
-            this.$cableBtn = $('#tros');
+        setAnalog(state) {
+            this.analog = state;
+        }
+        useAnalog() {
+            let valueEndFirst = this.typeEndFirst.getValue();
+            console.log('valueEndFirst: ', valueEndFirst);
+            this.typeEndSecond.setValue(valueEndFirst, false);
+            this.useAnalogForGroupRadio();
+        }
+        useAnalogForGroupRadio() {
+            this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes);
+            let valueSizeRadioFirst = this.sizeRadioFirst.getValue();
+            this.sizeRadioSecond.setValue(valueSizeRadioFirst, false);
         }
         getFilterData() {
             let type1_size = [this.sizeRadioFirst.getValue()];
@@ -929,20 +974,20 @@ var Components;
             if (type2_size[0] === null)
                 type2_size = this.sizeRadioSecond.getValuesFromData();
             return {
-                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
-                length: $('#size').val(),
+                cable: this.$cableBtn.is(':checked') ? this.dataOptions.cable_value : null,
+                length: this.$sizeBtn.val(),
                 type1_size: type1_size,
                 type2_size: type2_size,
-                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
-                mrk_show: $('#mrk').is(':checked'),
-                rvd_show: $('#rvd').is(':checked')
+                oxygen_compatibility: this.$oxygenBtn.is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
+                mrk_show: this.$mrkBtn.is(':checked'),
+                rvd_show: this.$rvdBtn.is(':checked')
             };
         }
         sendData(sendData) {
             $.ajax({
                 type: 'POST',
                 url: '/assets/base/snippets/api/api.php?task=getProducts',
-                data: sendData,
+                data: JSON.stringify(sendData),
                 dataType: 'json',
                 success: (dataProducts) => {
                     this.callback(dataProducts);
@@ -953,6 +998,47 @@ var Components;
                     console.log(jqXHR);
                 }
             });
+        }
+        prepareSendData() {
+            const sendData = this.getFilterData();
+            console.log('send');
+            this.sendData(sendData);
+            // заменить url (история добавлять или подменять) и new URL и в конструкторе брать URL и делать запрос с новыми данными
+        }
+        createElements() {
+            const $form = $('<form/>', { class: 'prod-filter container' });
+            $('.filter-head').after($form);
+            this.createButtons();
+            const $switcher = this.createSwitcher();
+            const $wrap = $('<div/>', { class: 'prod-filter-wrap' });
+            $wrap.append(this.createSelectEndGroupRadio('первой', 'zakontsovka-1', 'size1', false), this.createSelectEndGroupRadio('второй', 'zakontsovka-2', 'size2', true));
+            $form.append($switcher, $wrap, this.createOxygenLengthCable());
+        }
+        createSwitcher() {
+            return $('<div/>', { class: 'prod-filter-switcher' }).append($('<label/>', { class: 'prod-filter-checkbox' }).append(this.$mrkBtn, $('<label/>', { for: 'mrk', text: 'Металлорукав' })), $('<label/>', { class: 'prod-filter-checkbox' }).append(this.$rvdBtn, $('<label/>', { for: 'rvd', text: 'Рукав высокого давления' })));
+        }
+        createSelectEndGroupRadio(text, selectName, radioId, analog) {
+            const $elem = $('<div/>', { class: 'prod-filter-wrap-item' }).append($('<div/>').append($('<div/>', { class: 'prod-filter-wrap-item-head' }).append($('<div/>', { text: `Тип ${text} законцовки` })), $('<select/>', { class: 'select hide', name: selectName })), $('<div/>', { class: 'prod-filter-radio' }).append($('<div/>', { text: `Размер ${text} законцовки` }), $('<div/>', { class: 'panel', id: radioId }), $('<div/>', { class: 'forload hide', text: `Выберите тип ${text} законцовки` })));
+            if (analog) {
+                const $analog = $('<div/>', { class: 'filter-analog' }).append($('<label/>', { class: 'prod-filter-checkbox' }).append(this.$analogBtn, $('<label/>', { for: 'analog', text: 'Аналогично первой' })));
+                $elem.find('.prod-filter-wrap-item-head').append($analog);
+            }
+            return $elem;
+        }
+        createOxygenLengthCable() {
+            return $('<div/>', { class: 'prod-filter-buttons' }).append($('<div/>', { class: 'prod-filter-radio' }).append($('<div/>', { text: 'Газовая среда' }), $('<div/>').append($('<label/>').append(this.$oxygenBtn, $('<span/>', { text: 'Кислород' })), $('<label/>').append(this.$notOxygenBtn, $('<span/>', { text: 'Не кислород' })))), $('<div/>', { class: 'prod-filter-length' }).append($('<div/>', { text: 'Длина (L)' }), $('<div/>').append($('<label/>').append(this.$sizeBtn, $('<span/>', { text: 'мм' })), $('<label/>', { class: 'prod-filter-checkbox' }).append(this.$cableBtn, $('<label/>', { for: 'cable', text: 'Трос' })))));
+        }
+        createButtons() {
+            this.$mrkBtn = $('<input/>', { id: 'mrk', type: 'checkbox', name: 'mrk' })
+                .prop('checked', true);
+            this.$rvdBtn = $('<input/>', { id: 'rvd', type: 'checkbox', name: 'rvd' })
+                .prop('checked', true);
+            this.$analogBtn = $('<input/>', { id: 'analog', type: 'checkbox', name: 'analog' })
+                .prop('checked', true);
+            this.$oxygenBtn = $('<input/>', { id: 'oxygen', type: 'radio', name: 'oxygen', value: 'on' }).prop('checked', true);
+            this.$notOxygenBtn = $('<input/>', { id: 'notOxygen', type: 'radio', name: 'oxygen', value: 'off' });
+            this.$sizeBtn = $('<input/>', { id: 'size', type: 'number', name: 'length', min: '50', max: '100000', step: 'any', value: '1000' });
+            this.$cableBtn = $('<input/>', { id: 'cable', type: 'checkbox', name: 'cable' });
         }
     }
     Components.Filter = Filter;
@@ -969,343 +1055,65 @@ var Components;
         loaderFilter;
         loaderProducts;
         $wrapProducts;
+        $wrapProductsMrk;
+        $wrapProductsRvd;
         constructor() {
-            this.loaderFilter = new Components.Loader($('.prod-filter'), 'loader-wrap loader-filter');
-            // loader on
+            this.loaderFilter = new Components.Loader($('main'), 'loader-wrap loader-table');
             this.getFilterOption().then((data) => {
                 this.init(data);
                 this.loaderFilter.hide();
-                // loader off
             });
         }
         init(data) {
             this.dataOptions = data;
             this.$wrapProducts = $('.prod-result-wrap');
+            this.$wrapProductsMrk = $('<div/>', { class: '.prod-result' });
+            this.$wrapProductsRvd = $('<div/>', { class: '.prod-result' });
+            this.$wrapProducts.append(this.$wrapProductsMrk, this.$wrapProductsRvd);
             // this.loaderFilter               = new Loader($('.wrap-filter'), 'loader-wrap loader-filter');
             this.loaderProducts = new Components.Loader(this.$wrapProducts, 'loader-wrap loader-table');
-            this.filter = new Components.Filter(this.redraw, this.dataOptions);
-            // this.productsMrk                = new Products();
-            // this.productsRvd                = new Products();
+            this.filter = new Components.Filter((dataProducts) => {
+                this.redraw(dataProducts);
+            }, this.dataOptions);
+            this.productsMrk = new Components.Products();
+            this.productsRvd = new Components.Products();
             this.notFound = new Components.NotFound(this.$wrapProducts);
         }
         redraw(dataProducts) {
             //рендер, условия в зависимости какие пришли данные
+            this.loaderProducts.hide();
             this.notFound.hide();
-            if (!dataProducts['mrk'].products && !dataProducts['rkv'].products) {
+            this.$wrapProductsMrk.empty();
+            this.$wrapProductsRvd.empty();
+            if (!dataProducts['mrk'].products.length && !dataProducts['rkv'].products.length) {
                 this.notFound.show();
                 return;
             }
-            if (dataProducts['mrk'].products)
-                this.productsMrk.drawProducts(dataProducts['mrk'].products, this.$wrapProducts, 'Металлорукава');
-            if (dataProducts['rkv'].products)
-                this.productsRvd.drawProducts(dataProducts['mrk'].products, this.$wrapProducts, 'Рукава высокого давления');
+            if (dataProducts['mrk'].products.length)
+                this.productsMrk.drawProducts(dataProducts['mrk'].products, this.$wrapProductsMrk, 'Металлорукава');
+            if (dataProducts['rkv'].products.length)
+                this.productsRvd.drawProducts(dataProducts['rkv'].products, this.$wrapProductsRvd, 'Рукава высокого давления');
         }
         async getFilterOption() {
             let response = await fetch('/assets/base/snippets/api/api.php?task=filterOptions');
             return await response.json();
-            //     $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions: filterOptions): void => {
-            // //         // $( ".result" ).html( data );
-            // //         this.dataOptions = dataOptions;
-            // //         this.fillSelectSource();
-            // //         this.fillSelectCustom();
-            // //     })
-            // //         //     .done(() => {
-            // //         //     console.log( "second success" );
-            // //         // })
-            // //         //     .fa1il(() => {
-            // //         //         console.log( "error" );
-            // //         //     })
-            // //         .always(() => {
-            // //             this.loader.hide();
-            //         });
         }
     }
     Components.FilterManager = FilterManager;
-})(Components || (Components = {}));
-// interface itemFilterOptions {
-//     id                                  : number,
-//     description                         : string,
-//     img_href                            : string,
-//     sizes                               : {[key: string]: string}
-// }
-//
-// type filterOptions = {
-//     types                               : {[key: string]: itemFilterOptions},
-//     oxygen_compatibility_value          : string,
-//     cable_value                         : string,
-// }
-//
-// interface itemProducts {
-//     pagetitle                           : string,
-//     price                               : string,
-//     stock_count                         : string,
-//     ending1                             : string,
-//     ending2                             : string,
-//     numberOfBraids                      : string,
-//     dn                                  : string,
-//     cable                               : string,
-//     protectiveSpiral                    : string,
-//     thermalInsulation                   : string,
-//     degreasing                          : string,
-//     outerCoating                        : string,
-//     bending_radius                      : string,
-//     max_pressure                        : string,
-//     os_compatibility                    : string,
-//     _length                             : string,
-//     prettyPagetitle                     : string,
-// }
-//
-// interface itemDataProducts {
-//     products                            : itemProducts[],
-//     count_all                           : number,
-//     table_id                            : number
-// }
-//
-// type dataProducts = { [key: string]: itemDataProducts }
-//
-var Components;
-(function (Components) {
-    class FilterOLD {
-        $loaderFilter;
-        dataOptions;
-        dataProducts;
-        isLoad;
-        select1;
-        select2;
-        typeSize1 = [];
-        typeSize2 = [];
-        constructor() {
-            this.$loaderFilter = $('.loader-filter');
-            this.isLoad = true;
-            this.setFilterOption();
-            this.addEvent();
-        }
-        setFilterOption() {
-            $.post("/assets/base/snippets/api/api.php?task=filterOptions", (dataOptions) => {
-                // $( ".result" ).html( data );
-                this.dataOptions = dataOptions;
-                this.fillSelectSource();
-                this.fillSelectCustom();
-            })
-                //     .done(() => {
-                //     console.log( "second success" );
-                // })
-                //     .fail(() => {
-                //         console.log( "error" );
-                //     })
-                .always(() => {
-                this.hideLoader();
-            });
-        }
-        showLoader() {
-            this.isLoad = true;
-            this.$loaderFilter.removeClass('hide');
-        }
-        hideLoader() {
-            this.isLoad = false;
-            this.$loaderFilter.addClass('hide');
-        }
-        /* Заполнеие <select> данными */
-        fillSelectSource() {
-            for (const i in this.dataOptions.types) {
-                const value = i + ' - ' + this.dataOptions.types[i].description;
-                $('.select[name="zakontsovka-1"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
-                $('.select[name="zakontsovka-2"]').append($('<option/>').text(value).attr('value', i).attr('text', this.dataOptions.types[i].description));
-            }
-        }
-        /* Замена <select> на кастомный */
-        fillSelectCustom() {
-            this.select1 = new Components.Select($('.select[name="zakontsovka-1"]'));
-            this.select2 = new Components.Select($('.select[name="zakontsovka-2"]'));
-            // пока не выбран первый селект, второй не активен
-            $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
-            // навешивание событий на кастомный селект
-            this.select1.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
-            this.select2.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
-        }
-        /* Отрисовка кнопок с размерами */
-        drawButtonsSize = ($select, data) => {
-            const $wrap = $('.prod-filter-radio');
-            const $notFound = $('.prod-not-found');
-            if (!$notFound.hasClass('hide'))
-                $notFound.addClass('hide');
-            const select2 = $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select');
-            if (select2.hasClass('not-active'))
-                select2.removeClass('not-active');
-            const $wrapBtn = $wrap.find('#' + data.name);
-            const name = $select.val() + '';
-            const sizes = this.dataOptions.types[name].sizes;
-            const $forLoad = $wrapBtn.find('+ .forload');
-            let sizesId = [];
-            for (let key of Object.keys(this.dataOptions.types[name].sizes)) {
-                sizesId.push(key);
-            }
-            switch (data.name) {
-                case 'size1':
-                    this.typeSize1 = sizesId;
-                    break;
-                case 'size2':
-                    this.typeSize2 = sizesId;
-                    break;
-                default:
-                    this.typeSize1 = [];
-                    this.typeSize2 = [];
-                    break;
-            }
-            $wrapBtn.empty();
-            $forLoad.addClass('hide');
-            for (let i in sizes) {
-                let id = data.id + i;
-                $wrapBtn.append($('<div/>').append($('<input/>', { id: id, type: data.type, name: data.name })
-                    .on('change', (event) => {
-                    switch (data.name) {
-                        case 'size1':
-                            this.typeSize1 = [i];
-                            break;
-                        case 'size2':
-                            this.typeSize2 = [i];
-                            break;
-                        default:
-                            this.typeSize1 = sizes;
-                            this.typeSize2 = sizes;
-                            break;
-                    }
-                    this.prepareSendData();
-                }), $('<label/>', {
-                    for: id,
-                    text: sizes[i]
-                })));
-            }
-            this.prepareSendData();
-        };
-        /* Подготовка, сбор данных для отправки */
-        prepareSendData() {
-            if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
-                || (!this.select1.getIsSelect() && !this.select2.getIsSelect()))
-                console.log('размеры законцовки не выбраны');
-            const sendData = {
-                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
-                length: $('#size').val(),
-                type1_size: this.typeSize1,
-                type2_size: this.typeSize2,
-                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
-                mrk_show: $('#mrk').is(':checked'),
-                rvd_show: $('#rvd').is(':checked')
-            };
-            $('.prod-result').addClass('hide');
-            $('.loader-table').removeClass('hide');
-            this.sendData(JSON.stringify(sendData));
-        }
-        prepareDrawTable() {
-            const $notFound = $('.prod-not-found');
-            const productsMrk = this.dataProducts['mrk'].products;
-            const productsRvd = this.dataProducts['rkv'].products;
-            $('.loader-table').addClass('hide');
-            if (productsMrk.length === 0 && productsRvd.length === 0) {
-                $notFound.removeClass('hide');
-            }
-            if (productsMrk.length > 0 && $('#mrk').is(':checked')) {
-                const $resultMrk = $('#result_mrk');
-                this.drawImage($resultMrk);
-                this.drawTable(productsMrk, $resultMrk);
-            }
-            if (productsRvd.length > 0 && $('#rvd').is(':checked')) {
-                const $resultRvd = $('#result_rvd');
-                this.drawImage($resultRvd);
-                this.drawTable(productsRvd, $resultRvd);
-            }
-        }
-        drawTable(products, $resultWrap) {
-            const $headList = $resultWrap.find('.prettyPagetitle');
-            const $prodList = $resultWrap.find('.prodList');
-            $headList.empty();
-            $prodList.empty();
-            for (const key in products) {
-                $headList.append($('<tr/>').append($('<td/>').text(products[key].prettyPagetitle)));
-                $prodList.append($('<tr/>').append($('<td/>').text(products[key].numberOfBraids), $('<td/>').text(products[key]._length), $('<td/>').text(products[key].max_pressure), $('<td/>').text(products[key].dn), $('<td/>').text(products[key].ending1), $('<td/>').text(products[key].ending2), $('<td/>').text(products[key].protectiveSpiral), $('<td/>').text(products[key].os_compatibility), $('<td/>').text(products[key].cable), $('<td/>').text(products[key].thermalInsulation), $('<td/>').text(products[key].price)));
-            }
-            $resultWrap.removeClass('hide');
-        }
-        drawImage($wrapImg) {
-            const selectLeft = this.select1.$sourceSelect.find('option:checked').attr('value');
-            const textLeft = this.select1.$sourceSelect.find('option:checked').attr('text');
-            const selectRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
-            const textRight = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
-            const $platformLeft = $wrapImg.find('.platform-left');
-            const $platformRight = $wrapImg.find('.platform-right');
-            const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
-            const cutimgLeft = path + selectLeft + '_left_cut.png';
-            const bigimgLeft = path + 'big/' + selectLeft + '_left_cut.png';
-            const cutimgRight = path + selectRight + '_right_cut.png';
-            const bigimgRight = path + 'big/' + selectRight + '_right_cut.png';
-            const imgCenter = $wrapImg.find('.cccc');
-            $platformLeft.find('.cutimg > img').attr('src', cutimgLeft);
-            $platformLeft.find('.bigimg > img').attr('src', bigimgLeft);
-            $platformRight.find('.cutimg > img').attr('src', cutimgRight);
-            $platformRight.find('.bigimg > img').attr('src', bigimgRight);
-            imgCenter.find('> img:nth-child(1)').attr('src', path + selectLeft + '_left.png');
-            imgCenter.find('> img:nth-child(3)').attr('src', path + selectRight + '_right.png');
-            console.log(selectLeft, textLeft, selectRight, textRight);
-            $('.big_txt_left').text(selectLeft);
-            $('.large_text_left').text(textLeft);
-            $('.big_txt_right').text(selectRight);
-            $('.large_text_right').text(textRight);
-        }
-        addEvent() {
-            $('#tros').on('click', () => { this.prepareSendData(); });
-            $('#size').on('change', () => { this.prepareSendData(); });
-            $('#mrk').on('click', () => { this.prepareSendData(); });
-            $('#rvd').on('click', () => { this.prepareSendData(); });
-            $('#o21').on('click', () => { this.prepareSendData(); });
-            $('#o21_2').on('click', () => { this.prepareSendData(); });
-            $('#analog').on('click', () => {
-                // for (const key in this.select2.$sourceOptions) {
-                //
-                //     if (this.select2.$sourceOptions[key].innerText === this.select1.$header[0].textContent) {
-                //         this.select2.$header.text(this.select1.$header[0].textContent);
-                //         let a = $(this.select2.$sourceOptions[key]);
-                //         console.log(a);
-                //         // $(this.select2.$sourceOptions[key]).trigger('click');
-                //         // $(this.select2).trigger('change');
-                //     }
-                // }
-                // this.select2.$sourceOption.trigger('change');
-                // this.select2.$header.text(this.select1.$header[0].textContent);
-                console.log('новые данные для второй законцовки');
-                if ($('#analog').is(':checked'))
-                    this.prepareSendData();
-            });
-        }
-        sendData(sendData) {
-            $.ajax({
-                type: 'POST',
-                url: "/assets/base/snippets/api/api.php?task=getProducts",
-                data: sendData,
-                dataType: "json",
-                success: (dataProducts) => {
-                    console.log("SUCCESS:");
-                    this.dataProducts = dataProducts;
-                    this.prepareDrawTable();
-                },
-                error: (jqXHR, textStatus, errorThrown) => {
-                    console.log("ERROR: " + textStatus + ", " + errorThrown);
-                    console.log(jqXHR);
-                }
-            });
-        }
-    }
-    Components.FilterOLD = FilterOLD;
 })(Components || (Components = {}));
 var Components;
 (function (Components) {
     class GroupRadio {
         options;
         data;
+        $container;
         $wrap;
-        constructor($wrap, data, options) {
+        constructor($container, data, options) {
+            this.$container = $container;
             this.options = options;
-            this.$wrap = $wrap;
+            this.$wrap = $('<div/>', { class: 'component GroupRadio' });
             this.restructure(data);
+            this.$container.append(this.$wrap);
         }
         restructure(data) {
             this.data = data;
@@ -1329,6 +1137,14 @@ var Components;
             let val = this.$wrap.find('input:checked').val();
             return (val !== undefined) ? val : null;
         }
+        setValue(value, event = true) {
+            if (!event) {
+                // console.log(this.$wrap.find(`[value=${value}]`));
+                this.$wrap.find(`[value=${value}]`).attr('checked', 'checked');
+                return;
+            }
+            this.$wrap.find(`[value=${value}]`).trigger('click');
+        }
         getValuesFromData() {
             let out = [];
             for (const key in this.data) {
@@ -1336,10 +1152,21 @@ var Components;
             }
             return out;
         }
+        addDisabled() {
+            this.$wrap.find('span').addClass('disabled');
+        }
+        removeDisabled() {
+            this.$wrap.find('span').removeClass('disabled');
+        }
         on(event, func, data = {}) {
             switch (event) {
                 case 'change':
-                    this.$wrap.on('change', 'input', (event) => { func(event.target, data); });
+                    this.$wrap.on('change', 'input', (event) => {
+                        if (event.target.hasClass('disabled')) {
+                            return;
+                        }
+                        func(event.target, data);
+                    });
                     break;
                 default:
                     console.warn('Event not found');
@@ -1353,19 +1180,16 @@ var Components;
 (function (Components) {
     class Loader {
         $loaderFilter;
-        isLoad;
-        constructor($loaderWrap, className) {
-            this.$loaderFilter = $loaderWrap.append('<div/>').addClass(className);
-            this.isLoad = true;
+        constructor($loaderWrap, className, show = true) {
+            this.$loaderFilter = $('<div/>', { class: className }).append($('<div/>', { class: 'loader' }), $('<div/>', { class: 'loader-text', text: 'Загрузка...' }));
+            if (!show)
+                this.hide();
+            $loaderWrap.append(this.$loaderFilter);
         }
         show() {
-            // проверка
-            this.isLoad = true;
             this.$loaderFilter.removeClass('hide');
         }
         hide() {
-            // проверка
-            this.isLoad = false;
             this.$loaderFilter.addClass('hide');
         }
     }
@@ -1376,7 +1200,7 @@ var Components;
     class NotFound {
         notFound;
         constructor($wrap) {
-            this.notFound = $('<div/>', { class: 'prod-not-found container hide' });
+            this.notFound = $('<div/>', { class: 'prod-not-found hide', text: 'ТОВАРОВ ПО ДАННОМУ ЗАПРОСУ НЕ НАЙДЕНО' });
             $wrap.append(this.notFound);
         }
         show() {
@@ -1402,7 +1226,7 @@ var Components;
         drawProducts(dataProducts, $wrap, head) {
             this.dataProducts = dataProducts;
             this.$wrap = $wrap;
-            this.$wrap.empty();
+            // this.$wrap.empty();
             this.$wrap.append($('<div/>', { class: 'prod-result-head', text: head }));
             this.$headList = $('<tbody/>', { class: 'product-list head prettyPagetitle' });
             this.$prodList = $('<tbody/>', { class: 'product-list body prodList' });
@@ -1462,7 +1286,7 @@ var Components;
         }
         drawTable() {
             this.createTableTemplate();
-            this.cleanTable();
+            // this.cleanTable();
             this.fillTable();
             /* Вынести показать скрыть в отдельный метод */
             // this.$wrap.removeClass('hide');
@@ -1501,7 +1325,7 @@ var Components;
             this.duration = 450;
             this.$sourceSelect = $sourceSelect;
             this.$sourceOptions = $sourceSelect.children('option');
-            $sourceSelect.hide();
+            // $sourceSelect.hide();
             /* Create Elements */
             const $wrap = $('<div/>', { class: 'select-wrap' });
             this.$header = $('<div>', {
@@ -1514,7 +1338,12 @@ var Components;
             /* Building DOM */
             $wrap.append(this.$header, this.$list.append(this.getOptions()));
             /* Events */
-            this.$header.on('click', () => { this.switchSelect(); });
+            this.$header.on('click', () => {
+                if (this.$header.hasClass('disabled')) {
+                    return;
+                }
+                this.switchSelect();
+            });
             $sourceSelect.after($wrap);
             this.$list.slideUp(0);
         }
@@ -1536,11 +1365,13 @@ var Components;
         }
         getOption($sourceOption) {
             let text = $sourceOption.text();
+            let value = $sourceOption.val();
             let $option = $('<div>', {
                 class: 'new-select-list-item',
                 html: $('<span>', {
                     text: text
                 }),
+                'data-value': value
             });
             $option.on('click', () => {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
@@ -1571,6 +1402,18 @@ var Components;
         getValue() {
             return this.$sourceOptions.filter(':selected').val();
         }
+        setValue(value, event = true) {
+            console.log('event', event);
+            if (!event) {
+                this.$sourceOptions.filter(':selected').removeAttr('selected');
+                let $option = this.$sourceOptions.filter(`[value=${value}]`);
+                $option.attr('selected', 'selected');
+                this.$header.text($option.text());
+                console.log('opt: ', $option);
+                return;
+            }
+            this.$list.children(`[data-value=${value}]`).trigger('click');
+        }
         restructure(data) {
             this.$list.slideUp(0);
             this.$sourceSelect.empty();
@@ -1581,6 +1424,12 @@ var Components;
             this.$sourceOptions = this.$sourceSelect.children('option');
             this.$header.text(this.$sourceOptions.filter(':selected').text());
             this.$list.append(this.getOptions());
+        }
+        addDisabled() {
+            this.$header.addClass('disabled');
+        }
+        removeDisabled() {
+            this.$header.removeClass('disabled');
         }
         /* Навешивание события: при изменении селекта срабатывает переданная процедура */
         on(event, func, data = {}) {

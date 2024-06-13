@@ -4,6 +4,7 @@ namespace Components {
         typeEndSecond                       : Select;
         sizeRadioFirst                      : GroupRadio;
         sizeRadioSecond                     : GroupRadio;
+        analog                              : boolean;
 
         dataOptions                         : filterOptions;
 
@@ -18,7 +19,8 @@ namespace Components {
         $cableBtn                           : JQuery;
 
         constructor(callback: Function, dataOptions: filterOptions) {
-            this.initButtons();
+            this.analog                     = true;
+            this.createElements();
             this.callback = callback;
 
             this.dataOptions                = dataOptions;
@@ -31,8 +33,49 @@ namespace Components {
             this.sizeRadioFirst            = new GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, {name: 'size1'});
             this.sizeRadioSecond           = new GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, {name: 'size2'});
 
-            this.typeEndFirst.on('change', () => { this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes) });
-            this.typeEndSecond.on('change', () => { this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes) });
+            this.typeEndSecond.addDisabled();
+            this.sizeRadioSecond.addDisabled();
+
+            this.prepareSendData();
+
+            this.typeEndFirst.on('change', () => {
+                this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes);
+                if (this.analog) {
+                    this.useAnalog();
+                }
+                this.prepareSendData();
+            });
+            this.typeEndSecond.on('change', () => {
+                this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes);
+                this.prepareSendData();
+            });
+            this.$analogBtn.on('change', (e: JQuery.ChangeEvent) => {
+                this.setAnalog(e.target.checked);
+                if (this.analog) {
+                    this.useAnalog();
+                    this.prepareSendData();
+                    this.typeEndSecond.addDisabled();
+                    this.sizeRadioSecond.addDisabled();
+                }
+                else {
+                    this.typeEndSecond.removeDisabled();
+                    this.sizeRadioSecond.removeDisabled();
+                }
+            });
+            this.sizeRadioFirst.on('change', () => {
+                if (this.analog) {
+                    this.useAnalogForGroupRadio();
+                }
+                this.prepareSendData();
+            });
+            this.sizeRadioSecond.on('change', () => { this.prepareSendData(); });
+
+            this.$mrkBtn.on('change', () => { this.prepareSendData(); });
+            this.$rvdBtn.on('change', () => { this.prepareSendData(); });
+            this.$oxygenBtn.on('change', () => { this.prepareSendData(); });
+            this.$notOxygenBtn.on('change', () => { this.prepareSendData(); });
+            this.$sizeBtn.on('change', () => { this.prepareSendData(); });
+            this.$cableBtn.on('change', () => { this.prepareSendData(); });
         }
 
         private restructureSelects(): void {
@@ -44,14 +87,22 @@ namespace Components {
             this.typeEndSecond.restructure(data);
         }
 
-        private initButtons(): void {
-            this.$mrkBtn                     = $('#mrk');
-            this.$rvdBtn                     = $('#rvd');
-            this.$analogBtn                  = $('#analog');
-            this.$oxygenBtn                  = $('#o21');
-            this.$notOxygenBtn               = $('#o21_2');
-            this.$sizeBtn                    = $('#size');
-            this.$cableBtn                   = $('#tros');
+        private setAnalog(state: boolean): void {
+            this.analog = state;
+        }
+
+        private useAnalog(): void {
+            let valueEndFirst = this.typeEndFirst.getValue();
+            console.log('valueEndFirst: ', valueEndFirst);
+            this.typeEndSecond.setValue(valueEndFirst, false);
+
+            this.useAnalogForGroupRadio();
+        }
+
+        private useAnalogForGroupRadio(): void {
+            this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes);
+            let valueSizeRadioFirst = this.sizeRadioFirst.getValue();
+            this.sizeRadioSecond.setValue(valueSizeRadioFirst, false);
         }
 
         private getFilterData(): sendData {
@@ -62,13 +113,13 @@ namespace Components {
             if (type2_size[0] === null) type2_size = this.sizeRadioSecond.getValuesFromData();
 
             return {
-                cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
-                length: $('#size').val(),
+                cable: this.$cableBtn.is(':checked') ? this.dataOptions.cable_value : null,
+                length: this.$sizeBtn.val(),
                 type1_size: type1_size,
                 type2_size: type2_size,
-                oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
-                mrk_show: $('#mrk').is(':checked'),
-                rvd_show: $('#rvd').is(':checked')
+                oxygen_compatibility: this.$oxygenBtn.is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
+                mrk_show: this.$mrkBtn.is(':checked'),
+                rvd_show: this.$rvdBtn.is(':checked')
             }
         }
 
@@ -76,7 +127,7 @@ namespace Components {
             $.ajax({
                 type: 'POST',
                 url: '/assets/base/snippets/api/api.php?task=getProducts',
-                data: sendData,
+                data: JSON.stringify(sendData),
                 dataType: 'json',
                 success: (dataProducts: dataProducts): void => {
                     this.callback(dataProducts);
@@ -90,97 +141,120 @@ namespace Components {
             });
         }
 
-        // private fillSelectCustom(): void {
-        //     // this.select1 = new Select($('.select[name="zakontsovka-1"]'));
-        //     // this.select2 = new Select($('.select[name="zakontsovka-2"]'));
-        //
-        //     // пока не выбран первый селект, второй не активен
-        //     // $('.select[name="zakontsovka-2"] + .select-wrap').find('.new-select').addClass('not-active');
-        //
-        //     // навешивание событий на кастомный селект
-        //     this.typeEndFirst.on('change', this.drawButtonsSize, { id: 'sz1-', type: 'radio', name: 'size1' });
-        //     this.typeEndSecond.on('change', this.drawButtonsSize, { id: 'sz2-', type: 'radio', name: 'size2' });
-        // }
+        private prepareSendData(): void {
+            const sendData: sendData = this.getFilterData();
+            console.log('send');
+            this.sendData(sendData);
+            // заменить url (история добавлять или подменять) и new URL и в конструкторе брать URL и делать запрос с новыми данными
+        }
 
-        // private addEvent(): void {
-        //     this.typeEndFirst.on('change', (select: Select) => {
-        //         this.sizeRadioFirst.restructure(this.dataOptions.types[select.getValue()].sizes);
-        //         this.prepareSendData();
-        //     })
-        //
-        //     $('#tros').on('click', () => { this.prepareSendData(); })
-        //     $('#size').on('change', () => { this.prepareSendData(); })
-        //     $('#mrk').on('click', () => { this.prepareSendData(); })
-        //     $('#rvd').on('click', () => { this.prepareSendData(); })
-        //     $('#o21').on('click', () => { this.prepareSendData(); })
-        //     $('#o21_2').on('click', () => { this.prepareSendData(); })
-        //     $('#analog').on('click', () => {
-        //
-        //         // for (const key in this.select2.$sourceOptions) {
-        //         //
-        //         //     if (this.select2.$sourceOptions[key].innerText === this.select1.$header[0].textContent) {
-        //         //         this.select2.$header.text(this.select1.$header[0].textContent);
-        //         //         let a = $(this.select2.$sourceOptions[key]);
-        //         //         console.log(a);
-        //         //         // $(this.select2.$sourceOptions[key]).trigger('click');
-        //         //         // $(this.select2).trigger('change');
-        //         //     }
-        //         // }
-        //
-        //         // this.select2.$sourceOption.trigger('change');
-        //         // this.select2.$header.text(this.select1.$header[0].textContent);
-        //         console.log('новые данные для второй законцовки')
-        //         if ($('#analog').is(':checked')) this.prepareSendData();
-        //     })
-        // }
 
-        // private prepareSendData(): void {
-        //
-        // //     if ((!this.select1.getIsSelect() && !$('#analog').is(':checked'))
-        // //         || (!this.select1.getIsSelect() && !this.select2.getIsSelect()) ) console.log('размеры законцовки не выбраны');
-        // //
-        //     let type1_size = [this.sizeRadioFirst.getValue()];
-        //     if (type1_size[0] === null) type1_size = this.sizeRadioFirst.getValuesFromData();
-        //
-        //     let type2_size = [this.sizeRadioSecond.getValue()];
-        //     if (type2_size[0] === null) type2_size = this.sizeRadioSecond.getValuesFromData();
-        //
-        //
-        //     const sendData = {
-        //         cable: $('#tros').is(':checked') ? this.dataOptions.cable_value : null,
-        //         length: $('#size').val(),
-        //         type1_size: type1_size,
-        //         type2_size: type2_size,
-        //         oxygen_compatibility: $('#o21').is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
-        //         mrk_show: $('#mrk').is(':checked'),
-        //         rvd_show: $('#rvd').is(':checked')
-        //
-        //     }
-        // //
-        // //
-        // //
-        // //     $('.prod-result').addClass('hide');
-        // //     $('.loader-table').removeClass('hide');
-        //     this.sendData(JSON.stringify(sendData));
-        // }
 
-        // private sendData(sendData: any) {
-        //     $.ajax({
-        //         type: 'POST',
-        //         url: "/assets/base/snippets/api/api.php?task=getProducts",
-        //         data: sendData,
-        //         dataType: "json",
-        //         success: (dataProducts: dataProducts): void => {
-        //             this.callback(dataProducts);
-        //
-        //             console.log("SUCCESS:");
-        //         },
-        //         error: (jqXHR, textStatus, errorThrown): void => {
-        //             console.log("ERROR: " + textStatus + ", " + errorThrown);
-        //             console.log(jqXHR);
-        //         }
-        //     });
-        // }
+        private createElements(): void {
+            const $form: JQuery = $('<form/>', { class: 'prod-filter container' });
+            $('.filter-head').after($form);
 
+            this.createButtons();
+            const $switcher = this.createSwitcher();
+
+            const $wrap = $('<div/>', { class: 'prod-filter-wrap' });
+            $wrap.append(
+                this.createSelectEndGroupRadio('первой', 'zakontsovka-1', 'size1', false),
+                this.createSelectEndGroupRadio('второй', 'zakontsovka-2', 'size2', true),
+            );
+
+            $form.append(
+                $switcher,
+                $wrap,
+                this.createOxygenLengthCable()
+            );
+        }
+
+        private createSwitcher(): JQuery {
+            return  $('<div/>', { class: 'prod-filter-switcher' }).append(
+                $('<label/>', { class: 'prod-filter-checkbox' }).append(
+                    this.$mrkBtn,
+                    $('<label/>', { for: 'mrk', text: 'Металлорукав' })
+                ),
+                $('<label/>', { class: 'prod-filter-checkbox' }).append(
+                    this.$rvdBtn,
+                    $('<label/>', { for: 'rvd', text: 'Рукав высокого давления' })
+                )
+            );
+        }
+
+        private createSelectEndGroupRadio(text: string, selectName: string, radioId: string, analog: boolean): JQuery {
+
+            const $elem: JQuery =  $('<div/>', { class: 'prod-filter-wrap-item' }).append(
+                $('<div/>').append(
+                    $('<div/>', { class: 'prod-filter-wrap-item-head' }).append(
+                        $('<div/>', { text: `Тип ${text} законцовки` })
+                    ),
+                    $('<select/>', { class: 'select hide', name: selectName })
+                ),
+                $('<div/>', { class: 'prod-filter-radio' }).append(
+                    $('<div/>', { text: `Размер ${text} законцовки` }),
+                    $('<div/>', { class: 'panel', id: radioId }),
+                    $('<div/>', { class: 'forload hide', text: `Выберите тип ${text} законцовки` }),
+                )
+            );
+
+            if (analog) {
+                const $analog: JQuery = $('<div/>', { class: 'filter-analog' }).append(
+                    $('<label/>', { class: 'prod-filter-checkbox' }).append(
+                        this.$analogBtn,
+                        $('<label/>', { for: 'analog', text: 'Аналогично первой' })
+                    )
+                );
+                $elem.find('.prod-filter-wrap-item-head').append($analog);
+            }
+
+            return $elem;
+        }
+
+        private createOxygenLengthCable(): JQuery {
+            return $('<div/>', { class: 'prod-filter-buttons' }).append(
+                $('<div/>', { class: 'prod-filter-radio' }).append(
+                    $('<div/>', { text: 'Газовая среда' }),
+                    $('<div/>').append(
+                        $('<label/>').append(
+                            this.$oxygenBtn,
+                            $('<span/>', { text: 'Кислород' })
+                        ),
+                        $('<label/>').append(
+                            this.$notOxygenBtn,
+                            $('<span/>', { text: 'Не кислород' })
+                        )
+                    ),
+                ),
+                $('<div/>', { class: 'prod-filter-length' }).append(
+                    $('<div/>', { text: 'Длина (L)' }),
+                    $('<div/>').append(
+                        $('<label/>').append(
+                            this.$sizeBtn,
+                            $('<span/>', { text: 'мм' })
+                        ),
+                        $('<label/>', { class: 'prod-filter-checkbox' }).append(
+                            this.$cableBtn,
+                            $('<label/>', { for: 'cable', text: 'Трос' })
+                        )
+                    ),
+                ),
+            )
+        }
+
+        private createButtons(): void {
+            this.$mrkBtn                     = $('<input/>', { id: 'mrk', type: 'checkbox', name: 'mrk' })
+                .prop('checked', true);
+            this.$rvdBtn                     = $('<input/>', { id: 'rvd', type: 'checkbox', name: 'rvd' })
+                .prop('checked', true);
+            this.$analogBtn                  = $('<input/>', { id: 'analog', type: 'checkbox', name: 'analog' })
+                .prop('checked', true);
+
+            this.$oxygenBtn                  = $('<input/>', { id: 'oxygen', type: 'radio', name: 'oxygen', value: 'on' }).prop('checked', true);
+            this.$notOxygenBtn               = $('<input/>', { id: 'notOxygen', type: 'radio', name: 'oxygen', value: 'off' });
+            this.$sizeBtn                    = $('<input/>', { id: 'size', type: 'number', name: 'length', min: '50', max: '100000', step: 'any', value: '1000' });
+            this.$cableBtn                   = $('<input/>', { id: 'cable', type: 'checkbox', name: 'cable' });
+        }
     }
 }
