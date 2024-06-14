@@ -612,7 +612,7 @@ var Components;
 //     return version;
 // }
 // $(() => {
-//     new Components.FilterManager();
+//     new Components.FilterManager($('main'));
 // })
 document.addEventListener("DOMContentLoaded", () => {
 });
@@ -884,8 +884,11 @@ var Components;
         sizeRadioFirst;
         sizeRadioSecond;
         analog;
+        pathData = '/assets/base/snippets/api/api.php?task=getProducts';
+        // pathData                            : string = '/pdata.php';
         dataOptions;
-        callback;
+        callBeforeSend;
+        callAfterSend;
         $mrkBtn;
         $rvdBtn;
         $analogBtn;
@@ -893,11 +896,12 @@ var Components;
         $notOxygenBtn;
         $sizeBtn;
         $cableBtn;
-        constructor(callback, dataOptions) {
+        constructor(callBeforeSend, callAfterSend, dataOptions) {
             this.analog = true;
-            this.createElements();
-            this.callback = callback;
+            this.callBeforeSend = callBeforeSend;
+            this.callAfterSend = callAfterSend;
             this.dataOptions = dataOptions;
+            this.createElements();
             this.typeEndFirst = new Components.Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond = new Components.Select($('.select[name="zakontsovka-2"]'));
             this.restructureSelects();
@@ -957,7 +961,6 @@ var Components;
         }
         useAnalog() {
             let valueEndFirst = this.typeEndFirst.getValue();
-            console.log('valueEndFirst: ', valueEndFirst);
             this.typeEndSecond.setValue(valueEndFirst, false);
             this.useAnalogForGroupRadio();
         }
@@ -986,11 +989,11 @@ var Components;
         sendData(sendData) {
             $.ajax({
                 type: 'POST',
-                url: '/assets/base/snippets/api/api.php?task=getProducts',
+                url: this.pathData,
                 data: JSON.stringify(sendData),
                 dataType: 'json',
                 success: (dataProducts) => {
-                    this.callback(dataProducts);
+                    this.callAfterSend(dataProducts);
                     console.log('SUCCESS:');
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
@@ -1000,13 +1003,14 @@ var Components;
             });
         }
         prepareSendData() {
+            this.callBeforeSend();
             const sendData = this.getFilterData();
             console.log('send');
             this.sendData(sendData);
             // заменить url (история добавлять или подменять) и new URL и в конструкторе брать URL и делать запрос с новыми данными
         }
         createElements() {
-            const $form = $('<form/>', { class: 'prod-filter container' });
+            const $form = $('<form/>', { class: 'prod-filter' });
             $('.filter-head').after($form);
             this.createButtons();
             const $switcher = this.createSwitcher();
@@ -1040,6 +1044,14 @@ var Components;
             this.$sizeBtn = $('<input/>', { id: 'size', type: 'number', name: 'length', min: '50', max: '100000', step: 'any', value: '1000' });
             this.$cableBtn = $('<input/>', { id: 'cable', type: 'checkbox', name: 'cable' });
         }
+        getSymbols() {
+            return {
+                symbolLeft: this.typeEndFirst.getValue(),
+                textLeft: this.typeEndFirst.getText().split(' - ')[1],
+                symbolRight: this.typeEndSecond.getValue(),
+                textRight: this.typeEndSecond.getText().split(' - ')[1],
+            };
+        }
     }
     Components.Filter = Filter;
 })(Components || (Components = {}));
@@ -1053,49 +1065,61 @@ var Components;
         productsMrk;
         productsRvd;
         loaderFilter;
+        pathData = '/assets/base/snippets/api/api.php?task=filterOptions';
+        // private pathData                    : string = '/data.php';
         loaderProducts;
         $wrapProducts;
-        $wrapProductsMrk;
-        $wrapProductsRvd;
-        constructor() {
-            this.loaderFilter = new Components.Loader($('main'), 'loader-wrap loader-table');
+        constructor($container) {
+            this.loaderFilter = new Components.Loader($container, 'loader-wrap loader-table');
             this.getFilterOption().then((data) => {
-                this.init(data);
+                this.init($container, data);
                 this.loaderFilter.hide();
             });
         }
-        init(data) {
+        init($container, data) {
             this.dataOptions = data;
-            this.$wrapProducts = $('.prod-result-wrap');
-            this.$wrapProductsMrk = $('<div/>', { class: '.prod-result' });
-            this.$wrapProductsRvd = $('<div/>', { class: '.prod-result' });
-            this.$wrapProducts.append(this.$wrapProductsMrk, this.$wrapProductsRvd);
-            // this.loaderFilter               = new Loader($('.wrap-filter'), 'loader-wrap loader-filter');
-            this.loaderProducts = new Components.Loader(this.$wrapProducts, 'loader-wrap loader-table');
-            this.filter = new Components.Filter((dataProducts) => {
+            this.$wrapProducts = $('<div/>', { class: 'prod-result-wrap' });
+            this.loaderProducts = new Components.Loader($container, 'loader-wrap loader-table', false);
+            this.filter = new Components.Filter(() => {
+                this.$wrapProducts.addClass('hide');
+                this.loaderProducts.show();
+            }, (dataProducts) => {
+                this.$wrapProducts.removeClass('hide');
+                this.loaderProducts.hide();
                 this.redraw(dataProducts);
             }, this.dataOptions);
-            this.productsMrk = new Components.Products();
-            this.productsRvd = new Components.Products();
+            this.productsMrk = new Components.Products(this.$wrapProducts, 'Металлорукав', 'https://fluid-line.ru/assets/snippets/product/rkv/img/mr_main.png');
+            this.productsRvd = new Components.Products(this.$wrapProducts, 'Рукав высокого давления', 'https://fluid-line.ru/assets/snippets/product/rkv/img/rkv_main.png');
             this.notFound = new Components.NotFound(this.$wrapProducts);
+            $container.append(this.$wrapProducts);
         }
         redraw(dataProducts) {
-            //рендер, условия в зависимости какие пришли данные
-            this.loaderProducts.hide();
+            dataProducts['mrk'].products.length || dataProducts['rkv'].products.length ? this.showProducts(dataProducts) : this.hideProducts();
+        }
+        showProducts(dataProducts) {
             this.notFound.hide();
-            this.$wrapProductsMrk.empty();
-            this.$wrapProductsRvd.empty();
-            if (!dataProducts['mrk'].products.length && !dataProducts['rkv'].products.length) {
-                this.notFound.show();
-                return;
+            this.productsMrk.hide();
+            this.productsRvd.hide();
+            const dataSymbols = this.filter.getSymbols();
+            console.log(dataProducts);
+            if (dataProducts['mrk'].products.length) {
+                console.log('mrk');
+                this.productsMrk.redraw(dataProducts['mrk'].products, dataSymbols);
+                this.productsMrk.show();
             }
-            if (dataProducts['mrk'].products.length)
-                this.productsMrk.drawProducts(dataProducts['mrk'].products, this.$wrapProductsMrk, 'Металлорукава');
-            if (dataProducts['rkv'].products.length)
-                this.productsRvd.drawProducts(dataProducts['rkv'].products, this.$wrapProductsRvd, 'Рукава высокого давления');
+            if (dataProducts['rkv'].products.length) {
+                console.log('rvd');
+                this.productsRvd.redraw(dataProducts['rkv'].products, dataSymbols);
+                this.productsRvd.show();
+            }
+        }
+        hideProducts() {
+            this.productsMrk.hide();
+            this.productsRvd.hide();
+            this.notFound.show();
         }
         async getFilterOption() {
-            let response = await fetch('/assets/base/snippets/api/api.php?task=filterOptions');
+            let response = await fetch(this.pathData);
             return await response.json();
         }
     }
@@ -1106,6 +1130,7 @@ var Components;
     class GroupRadio {
         options;
         data;
+        disabled;
         $container;
         $wrap;
         constructor($container, data, options) {
@@ -1114,6 +1139,8 @@ var Components;
             this.$wrap = $('<div/>', { class: 'component GroupRadio' });
             this.restructure(data);
             this.$container.append(this.$wrap);
+            this.$wrap.on('click', 'input', () => { if (this.disabled)
+                return false; });
         }
         restructure(data) {
             this.data = data;
@@ -1139,7 +1166,6 @@ var Components;
         }
         setValue(value, event = true) {
             if (!event) {
-                // console.log(this.$wrap.find(`[value=${value}]`));
                 this.$wrap.find(`[value=${value}]`).attr('checked', 'checked');
                 return;
             }
@@ -1153,18 +1179,17 @@ var Components;
             return out;
         }
         addDisabled() {
-            this.$wrap.find('span').addClass('disabled');
+            this.disabled = true;
+            this.$wrap.addClass('disabled');
         }
         removeDisabled() {
-            this.$wrap.find('span').removeClass('disabled');
+            this.disabled = false;
+            this.$wrap.removeClass('disabled');
         }
         on(event, func, data = {}) {
             switch (event) {
                 case 'change':
                     this.$wrap.on('change', 'input', (event) => {
-                        if (event.target.hasClass('disabled')) {
-                            return;
-                        }
                         func(event.target, data);
                     });
                     break;
@@ -1187,9 +1212,11 @@ var Components;
             $loaderWrap.append(this.$loaderFilter);
         }
         show() {
+            // console.log('s')
             this.$loaderFilter.removeClass('hide');
         }
         hide() {
+            // console.log('h')
             this.$loaderFilter.addClass('hide');
         }
     }
@@ -1217,46 +1244,67 @@ var Components;
 var Components;
 (function (Components) {
     class Products {
-        dataProducts;
+        path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
         $wrap;
+        $head;
+        $imgLeftCut;
+        $imgLeftBig;
+        $imgRightCut;
+        $imgRightBig;
+        $imgLeft;
+        $imgRight;
+        $symbolLeft;
+        $textLeft;
+        $symbolRight;
+        $textRight;
         $headList;
         $prodList;
-        constructor() {
+        constructor($container, title, hoseImage) {
+            this.$wrap = $('<div/>', { class: '.prod-result' });
+            this.initImage($container, title, hoseImage);
+            this.initTables();
         }
-        drawProducts(dataProducts, $wrap, head) {
-            this.dataProducts = dataProducts;
-            this.$wrap = $wrap;
-            // this.$wrap.empty();
-            this.$wrap.append($('<div/>', { class: 'prod-result-head', text: head }));
+        initImage($container, title, hoseImage) {
+            this.$head = $('<div/>', { class: 'prod-result-head', text: title });
+            this.$imgLeftCut = $('<img/>');
+            this.$imgLeftBig = $('<img/>');
+            this.$imgRightCut = $('<img/>');
+            this.$imgRightBig = $('<img/>');
+            this.$imgLeft = $('<img/>', { class: 'zk' });
+            this.$imgRight = $('<img/>', { class: 'zk' });
+            this.$symbolLeft = $('<span/>', { class: 'big_txt big_txt_left' });
+            this.$textLeft = $('<span/>', { class: 'large_text large_text_left' });
+            this.$symbolRight = $('<span/>', { class: 'big_txt big_txt_right' });
+            this.$textRight = $('<span/>', { class: 'large_text large_text_right' });
+            $container.append(this.$wrap.append(this.$head, $('<div/>', { class: 'prod-images' }).append($('<div/>', { class: 'topw' }).append($('<div/>', { class: 'platform platform-left' }).append($('<div/>', { class: 'cutimg' }).append(this.$imgLeftCut), $('<div/>', { class: 'bigimg' }).append(this.$imgLeftBig)), $('<div/>', { class: 'cv_cns c' }).append($('<div/>', { class: 'cccc' }).append(this.$imgLeft, $('<img/>', { class: 'imgbc', src: hoseImage }), this.$imgRight)), $('<div/>', { class: 'platform platform-right' }).append($('<div/>', { class: 'cutimg' }).append(this.$imgRightCut), $('<div/>', { class: 'bigimg' }).append(this.$imgRightBig))), $('<div/>', { class: 'topw2' }).append($('<div/>').append(this.$symbolLeft, this.$textLeft), $('<div/>').append(this.$symbolRight, this.$textRight)))));
+        }
+        initTables() {
             this.$headList = $('<tbody/>', { class: 'product-list head prettyPagetitle' });
             this.$prodList = $('<tbody/>', { class: 'product-list body prodList' });
-            /* логика с notfound и loader */
-            // const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
-            //
-            // const productsMrk = this.dataProducts['mrk'].products;
-            // const productsRvd = this.dataProducts['rkv'].products;
-            // $('.loader-table').addClass('hide');
-            //
-            // if (!this.dataProducts.length) {
-            //     $notFound.removeClass('hide')
-            // }
-            // if (this.dataProducts.length /* && $('#mrk').is(':checked')*/) {
-            //     const $resultMrk = $('#result_mrk');
-            //     this.drawImage();
-            //     this.drawTable();
-            // }
-            this.drawImage();
-            this.drawTable();
+            this.$wrap.append($('<div/>', { class: 'prod-table' }).append($('<table/>', { class: 'table' }).append($('<thead/>').append($('<tr/>', { class: 'table-head' }).append($('<th/>', { text: 'Кодировка' }))), this.$headList), $('<div/>').append($('<table/>', { class: 'table' }).append($('<thead/>').append($('<tr/>', { class: 'table-head' }).append($('<th/>', { text: 'Количество оплеток' }), $('<th/>', { text: 'Длина L' }), $('<th/>', { text: 'Давление' }), $('<th/>', { text: 'ДУ' }), $('<th/>', { colspan: 2 }).append($('<div/>', { text: 'Подсоединение' }), $('<div/>', { class: 'table-colspan' }).append($('<div/>', { text: '1' }), $('<div/>', { text: '2' }))), $('<th/>', { text: 'Спиральная защитная' }), $('<th/>', { text: 'Совместимость с кислородом' }), $('<th/>', { text: 'Трос' }), $('<th/>', { text: 'Тепло-изоляция' }), $('<th/>', { text: 'Цена' }))), this.$prodList))));
         }
-        drawImage() {
+        redraw(data, dataSymbols) {
+            this.redrawTable(data);
+            this.redrawImage(dataSymbols);
+        }
+        redrawImage(data) {
+            this.$imgLeftCut.attr('src', `${this.path}${data.symbolLeft}_left_cut.png`);
+            this.$imgLeftBig.attr('src', `${this.path}big/${data.symbolLeft}_left_cut.png`);
+            this.$imgRightCut.attr('src', `${this.path}${data.symbolRight}_right_cut.png`);
+            this.$imgRightBig.attr('src', `${this.path}big/${data.symbolRight}_right_cut.png`);
+            this.$imgLeft.attr('src', `${this.path}${data.symbolLeft}_left.png`);
+            this.$imgRight.attr('src', `${this.path}${data.symbolRight}_right.png`);
+            this.$symbolLeft.text(data.symbolLeft);
+            this.$textLeft.text(data.textLeft);
+            this.$symbolRight.text(data.symbolRight);
+            this.$textRight.text(data.textRight);
             // const $wrapImg: JQuery = $('<div/>', { class: 'prod-images' });
-            // this.$wrap.append($wrapImg);
+            // this.$wrap1.append($wrapImg);
             //
             // const selectLeft: string = this.select1.$sourceSelect.find('option:checked').attr('value');
             // const textLeft: string = this.select1.$sourceSelect.find('option:checked').attr('text');
             // const selectRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
             // const textRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
-            //
             // const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
             // const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
             //
@@ -1266,7 +1314,6 @@ var Components;
             // const bigimgLeft: string = path + 'big/' + selectLeft + '_left_cut.png';
             // const cutimgRight: string = path + selectRight + '_right_cut.png';
             // const bigimgRight: string = path + 'big/' + selectRight + '_right_cut.png';
-            //
             // const imgCenter = $wrapImg.find('.cccc');
             //
             // $platformLeft.find('.cutimg > img').attr('src',cutimgLeft);
@@ -1284,27 +1331,20 @@ var Components;
             // $('.big_txt_right').text(selectRight);
             // $('.large_text_right').text(textRight);
         }
-        drawTable() {
-            this.createTableTemplate();
-            // this.cleanTable();
-            this.fillTable();
-            /* Вынести показать скрыть в отдельный метод */
-            // this.$wrap.removeClass('hide');
-        }
-        createTableTemplate() {
-            const $wrapTable = $('<div/>', { class: 'prod-table' });
-            this.$wrap.append($wrapTable.append($('<table/>', { class: 'table' }).append($('<thead/>').append($('<tr/>', { class: 'table-head' }).append($('<th/>', { text: 'Кодировка' }))), this.$headList), $('<div/>').append($('<table/>', { class: 'table' }).append($('<thead/>').append($('<tr/>', { class: 'table-head' }).append($('<th/>', { text: 'Количество оплеток' }), $('<th/>', { text: 'Длина L' }), $('<th/>', { text: 'Давление' }), $('<th/>', { text: 'ДУ' }), $('<th/>', { colspan: 2 }).append($('<div/>', { text: 'Подсоединение' }), $('<div/>', { class: 'table-colspan' }).append($('<div/>', { text: '1' }), $('<div/>', { text: '2' }))), $('<th/>', { text: 'Спиральная защитная' }), $('<th/>', { text: 'Совместимость с кислородом' }), $('<th/>', { text: 'Трос' }), $('<th/>', { text: 'Тепло-изоляция' }), $('<th/>', { text: 'Цена' }))), this.$prodList))));
-        }
-        cleanTable() {
+        redrawTable(data) {
             this.$headList.empty();
             this.$prodList.empty();
-        }
-        fillTable() {
-            for (const key in this.dataProducts) {
-                const prod = this.dataProducts[key];
+            for (const key in data) {
+                const prod = data[key];
                 this.$headList.append($('<tr/>').append($('<td/>').text(prod.prettyPagetitle)));
                 this.$prodList.append($('<tr/>').append($('<td/>').text(prod.numberOfBraids), $('<td/>').text(prod._length), $('<td/>').text(prod.max_pressure), $('<td/>').text(prod.dn), $('<td/>').text(prod.ending1), $('<td/>').text(prod.ending2), $('<td/>').text(prod.protectiveSpiral), $('<td/>').text(prod.os_compatibility), $('<td/>').text(prod.cable), $('<td/>').text(prod.thermalInsulation), $('<td/>').text(prod.price)));
             }
+        }
+        hide() {
+            this.$wrap.addClass('hide');
+        }
+        show() {
+            this.$wrap.removeClass('hide');
         }
     }
     Components.Products = Products;
@@ -1402,14 +1442,15 @@ var Components;
         getValue() {
             return this.$sourceOptions.filter(':selected').val();
         }
+        getText() {
+            return this.$sourceOptions.filter(':selected').text();
+        }
         setValue(value, event = true) {
-            console.log('event', event);
             if (!event) {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 let $option = this.$sourceOptions.filter(`[value=${value}]`);
                 $option.attr('selected', 'selected');
                 this.$header.text($option.text());
-                console.log('opt: ', $option);
                 return;
             }
             this.$list.children(`[data-value=${value}]`).trigger('click');
@@ -1418,8 +1459,7 @@ var Components;
             this.$list.slideUp(0);
             this.$sourceSelect.empty();
             for (const i in data) {
-                this.$sourceSelect.append($('<option/>').text(data[i]).val(i) //.attr('text', this.dataOptions.types[i].description)
-                );
+                this.$sourceSelect.append($('<option/>').text(data[i]).val(i));
             }
             this.$sourceOptions = this.$sourceSelect.children('option');
             this.$header.text(this.$sourceOptions.filter(':selected').text());

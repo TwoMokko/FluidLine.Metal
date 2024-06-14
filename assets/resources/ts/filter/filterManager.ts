@@ -9,11 +9,18 @@ type filterOptions = {
     types                               : typesFilterOptions,
     oxygen_compatibility_value          : string,
     cable_value                         : string,
-}
+};
 
 type typesFilterOptions =  {
     [key: string]: itemFilterOptions
-}
+};
+
+type typeDataSymbols = {
+    symbolLeft: string,
+    textLeft: string,
+    symbolRight: string,
+    textRight: string
+};
 
 interface itemProducts {
     pagetitle                           : string,
@@ -63,60 +70,75 @@ namespace Components {
         private productsMrk                 : Products;
         private productsRvd                 : Products;
         private loaderFilter                : Loader;
+        private pathData                    : string = '/assets/base/snippets/api/api.php?task=filterOptions';
+        // private pathData                    : string = '/data.php';
+
         private loaderProducts              : Loader;
-
         private $wrapProducts               : JQuery;
-        private $wrapProductsMrk               : JQuery;
-        private $wrapProductsRvd               : JQuery;
 
-        constructor() {
-            this.loaderFilter               = new Loader($('main'), 'loader-wrap loader-table');
+        constructor($container: JQuery) {
+            this.loaderFilter               = new Loader($container, 'loader-wrap loader-table');
             this.getFilterOption().then((data: filterOptions) => {
-                this.init(data);
+                this.init($container, data);
                 this.loaderFilter.hide();
             });
         }
 
-        private init(data: filterOptions): void {
+        private init($container: JQuery, data: filterOptions): void {
             this.dataOptions                = data;
 
-            this.$wrapProducts              = $('.prod-result-wrap');
-            this.$wrapProductsMrk           = $('<div/>', { class: '.prod-result' });
-            this.$wrapProductsRvd           = $('<div/>', { class: '.prod-result' });
+            this.$wrapProducts              = $('<div/>', {class: 'prod-result-wrap'});
 
-            this.$wrapProducts.append(
-                this.$wrapProductsMrk,
-                this.$wrapProductsRvd
-            )
-            // this.loaderFilter               = new Loader($('.wrap-filter'), 'loader-wrap loader-filter');
-            this.loaderProducts             = new Loader(this.$wrapProducts, 'loader-wrap loader-table');
-            this.filter                     = new Filter((dataProducts: dataProducts) => {
+            this.loaderProducts             = new Loader($container, 'loader-wrap loader-table', false);
+            this.filter                     = new Filter(() => {
+                this.$wrapProducts.addClass('hide');
+                this.loaderProducts.show();
+            }, (dataProducts: dataProducts) => {
+                this.$wrapProducts.removeClass('hide');
+                this.loaderProducts.hide();
                 this.redraw(dataProducts);
             }, this.dataOptions);
-            this.productsMrk                = new Products();
-            this.productsRvd                = new Products();
+            this.productsMrk                = new Products(this.$wrapProducts, 'Металлорукав', 'https://fluid-line.ru/assets/snippets/product/rkv/img/mr_main.png');
+            this.productsRvd                = new Products(this.$wrapProducts, 'Рукав высокого давления', 'https://fluid-line.ru/assets/snippets/product/rkv/img/rkv_main.png');
             this.notFound                   = new NotFound(this.$wrapProducts);
+
+            $container.append(this.$wrapProducts);
         }
 
         private redraw(dataProducts: dataProducts) {
-            //рендер, условия в зависимости какие пришли данные
+            dataProducts['mrk'].products.length || dataProducts['rkv'].products.length ? this.showProducts(dataProducts) : this.hideProducts();
+        }
 
-            this.loaderProducts.hide();
+        private showProducts(dataProducts: dataProducts) {
             this.notFound.hide();
 
-            this.$wrapProductsMrk.empty();
-            this.$wrapProductsRvd.empty();
+            this.productsMrk.hide();
+            this.productsRvd.hide();
 
-            if (!dataProducts['mrk'].products.length && !dataProducts['rkv'].products.length) {
-                this.notFound.show();
-                return;
+            const dataSymbols: typeDataSymbols = this.filter.getSymbols();
+
+            console.log(dataProducts);
+
+            if (dataProducts['mrk'].products.length) {
+                console.log('mrk');
+                this.productsMrk.redraw(dataProducts['mrk'].products, dataSymbols);
+                this.productsMrk.show();
             }
-            if (dataProducts['mrk'].products.length) this.productsMrk.drawProducts(dataProducts['mrk'].products, this.$wrapProductsMrk, 'Металлорукава');
-            if (dataProducts['rkv'].products.length) this.productsRvd.drawProducts(dataProducts['rkv'].products, this.$wrapProductsRvd, 'Рукава высокого давления');
+            if (dataProducts['rkv'].products.length) {
+                console.log('rvd');
+                this.productsRvd.redraw(dataProducts['rkv'].products, dataSymbols);
+                this.productsRvd.show();
+            }
+        }
+
+        private hideProducts() {
+            this.productsMrk.hide();
+            this.productsRvd.hide();
+            this.notFound.show();
         }
 
         private async getFilterOption(): Promise<filterOptions> {
-            let response = await fetch('/assets/base/snippets/api/api.php?task=filterOptions');
+            let response = await fetch(this.pathData);
             return await response.json();
 
         }

@@ -1,103 +1,91 @@
 namespace Components {
     export class Products {
-        private dataProducts                                : itemProducts[];
+        private path                : string = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
 
-        private $wrap                                       : JQuery;
-        private $headList                                   : JQuery;
-        private $prodList                                   : JQuery;
+        private $wrap               : JQuery;
+        private $head               : JQuery;
+        private $imgLeftCut         : JQuery;
+        private $imgLeftBig         : JQuery;
+        private $imgRightCut        : JQuery;
+        private $imgRightBig        : JQuery;
+        private $imgLeft            : JQuery;
+        private $imgRight           : JQuery;
+        private $symbolLeft         : JQuery;
+        private $textLeft           : JQuery;
+        private $symbolRight        : JQuery;
+        private $textRight          : JQuery;
+        private $headList           : JQuery;
+        private $prodList           : JQuery;
 
-        constructor() {
-
+        constructor($container: JQuery, title: string, hoseImage: string) {
+            this.$wrap              = $('<div/>', { class: '.prod-result' });
+            this.initImage($container, title, hoseImage);
+            this.initTables();
         }
 
-        public drawProducts(dataProducts: itemProducts[], $wrap: JQuery, head: string): void {
-            this.dataProducts = dataProducts;
-            this.$wrap = $wrap;
+        private initImage($container: JQuery, title: string, hoseImage: string) {
+            this.$head              = $('<div/>', { class: 'prod-result-head', text: title });
+            this.$imgLeftCut        =  $('<img/>');
+            this.$imgLeftBig        =  $('<img/>');
+            this.$imgRightCut       =  $('<img/>');
+            this.$imgRightBig       =  $('<img/>');
+            this.$imgLeft           =  $('<img/>', {class: 'zk'});
+            this.$imgRight          =  $('<img/>', {class: 'zk'});
+            this.$symbolLeft        = $('<span/>', {class: 'big_txt big_txt_left'});
+            this.$textLeft          = $('<span/>', {class: 'large_text large_text_left'});
+            this.$symbolRight       = $('<span/>', {class: 'big_txt big_txt_right'});
+            this.$textRight         = $('<span/>', {class: 'large_text large_text_right'});
 
-            // this.$wrap.empty();
+            $container.append(
+                this.$wrap.append(
+                    this.$head,
+                    $('<div/>', { class: 'prod-images' }).append(
+                        $('<div/>', {class: 'topw'}).append(
+                            $('<div/>', {class: 'platform platform-left'}).append(
+                                $('<div/>', {class: 'cutimg'}).append(
+                                    this.$imgLeftCut
+                                ),
+                                $('<div/>', {class: 'bigimg'}).append(
+                                    this.$imgLeftBig
+                                )
+                            ),
+                            $('<div/>', {class: 'cv_cns c'}).append(
+                                $('<div/>', {class: 'cccc'}).append(
+                                    this.$imgLeft,
+                                    $('<img/>', {class: 'imgbc', src: hoseImage}),
+                                    this.$imgRight
+                                )
+                            ),
+                            $('<div/>', {class: 'platform platform-right'}).append(
+                                $('<div/>', {class: 'cutimg'}).append(
+                                    this.$imgRightCut
+                                ),
+                                $('<div/>', {class: 'bigimg'}).append(
+                                    this.$imgRightBig
+                                )
+                            )
+                        ),
+                        $('<div/>', {class: 'topw2'}).append(
+                            $('<div/>').append(
+                                this.$symbolLeft,
+                                this.$textLeft
+                            ),
+                            $('<div/>').append(
+                                this.$symbolRight,
+                                this.$textRight
+                            )
+                        )
+                    )
+                )
+            );
+        }
 
-
-            this.$wrap.append($('<div/>', { class: 'prod-result-head', text: head }));
-
+        private initTables() {
             this.$headList = $('<tbody/>', { class: 'product-list head prettyPagetitle' });
             this.$prodList = $('<tbody/>', { class: 'product-list body prodList' });
-            /* логика с notfound и loader */
 
-
-            // const $notFound: JQuery<HTMLElement> = $('.prod-not-found');
-            //
-            // const productsMrk = this.dataProducts['mrk'].products;
-            // const productsRvd = this.dataProducts['rkv'].products;
-
-            // $('.loader-table').addClass('hide');
-            //
-            // if (!this.dataProducts.length) {
-            //     $notFound.removeClass('hide')
-            // }
-
-            // if (this.dataProducts.length /* && $('#mrk').is(':checked')*/) {
-            //     const $resultMrk = $('#result_mrk');
-            //     this.drawImage();
-            //     this.drawTable();
-            // }
-            this.drawImage();
-            this.drawTable();
-
-        }
-
-        private drawImage(): void {
-            // const $wrapImg: JQuery = $('<div/>', { class: 'prod-images' });
-            // this.$wrap.append($wrapImg);
-            //
-            // const selectLeft: string = this.select1.$sourceSelect.find('option:checked').attr('value');
-            // const textLeft: string = this.select1.$sourceSelect.find('option:checked').attr('text');
-            // const selectRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
-            // const textRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
-            //
-            // const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
-            // const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
-            //
-            // const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
-            //
-            // const cutimgLeft: string = path + selectLeft + '_left_cut.png';
-            // const bigimgLeft: string = path + 'big/' + selectLeft + '_left_cut.png';
-            // const cutimgRight: string = path + selectRight + '_right_cut.png';
-            // const bigimgRight: string = path + 'big/' + selectRight + '_right_cut.png';
-            //
-            // const imgCenter = $wrapImg.find('.cccc');
-            //
-            // $platformLeft.find('.cutimg > img').attr('src',cutimgLeft);
-            // $platformLeft.find('.bigimg > img').attr('src',bigimgLeft);
-            // $platformRight.find('.cutimg > img').attr('src',cutimgRight);
-            // $platformRight.find('.bigimg > img').attr('src',bigimgRight);
-            //
-            // imgCenter.find('> img:nth-child(1)').attr('src',path + selectLeft + '_left.png');
-            // imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + '_right.png');
-            //
-            //
-            // console.log(selectLeft, textLeft, selectRight, textRight);
-            // $('.big_txt_left').text(selectLeft);
-            // $('.large_text_left').text(textLeft);
-            // $('.big_txt_right').text(selectRight);
-            // $('.large_text_right').text(textRight);
-        }
-
-
-
-        private drawTable(): void {
-            this.createTableTemplate();
-            // this.cleanTable();
-            this.fillTable();
-
-            /* Вынести показать скрыть в отдельный метод */
-            // this.$wrap.removeClass('hide');
-
-        }
-
-        private createTableTemplate(): void {
-            const $wrapTable = $('<div/>', { class: 'prod-table' });
             this.$wrap.append(
-                $wrapTable.append(
+                $('<div/>', {class: 'prod-table'}).append(
                     $('<table/>', { class: 'table' }).append(
                         $('<thead/>').append(
                             $('<tr/>', { class: 'table-head' }).append(
@@ -130,19 +118,75 @@ namespace Components {
                             ),
                             this.$prodList
                         )
-                    ),
+                    )
                 )
-            );
+            )
         }
 
-        private cleanTable(): void {
+        public redraw(data: itemProducts[], dataSymbols: typeDataSymbols): void {
+            this.redrawTable(data);
+            this.redrawImage(dataSymbols);
+
+        }
+
+        private redrawImage(data: typeDataSymbols): void {
+            this.$imgLeftCut.attr('src', `${this.path}${data.symbolLeft}_left_cut.png`);
+            this.$imgLeftBig.attr('src', `${this.path}big/${data.symbolLeft}_left_cut.png`);
+            this.$imgRightCut.attr('src', `${this.path}${data.symbolRight}_right_cut.png`);
+            this.$imgRightBig.attr('src', `${this.path}big/${data.symbolRight}_right_cut.png`);
+            this.$imgLeft.attr('src', `${this.path}${data.symbolLeft}_left.png`);
+            this.$imgRight.attr('src', `${this.path}${data.symbolRight}_right.png`);
+
+            this.$symbolLeft.text(data.symbolLeft);
+            this.$textLeft.text(data.textLeft);
+            this.$symbolRight.text(data.symbolRight);
+            this.$textRight.text(data.textRight);
+
+
+
+
+            // const $wrapImg: JQuery = $('<div/>', { class: 'prod-images' });
+            // this.$wrap1.append($wrapImg);
+            //
+            // const selectLeft: string = this.select1.$sourceSelect.find('option:checked').attr('value');
+            // const textLeft: string = this.select1.$sourceSelect.find('option:checked').attr('text');
+            // const selectRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('value') : '';
+            // const textRight: string = this.select2.$sourceSelect.find('option:checked').attr('value') ? this.select2.$sourceSelect.find('option:checked').attr('text') : '';
+
+            // const $platformLeft: JQuery<HTMLElement> = $wrapImg.find('.platform-left');
+            // const $platformRight: JQuery<HTMLElement> = $wrapImg.find('.platform-right');
+            //
+            // const path = 'https://fluid-line.ru/assets/snippets/product/rkv/img/';
+            //
+            // const cutimgLeft: string = path + selectLeft + '_left_cut.png';
+            // const bigimgLeft: string = path + 'big/' + selectLeft + '_left_cut.png';
+            // const cutimgRight: string = path + selectRight + '_right_cut.png';
+            // const bigimgRight: string = path + 'big/' + selectRight + '_right_cut.png';
+
+            // const imgCenter = $wrapImg.find('.cccc');
+            //
+            // $platformLeft.find('.cutimg > img').attr('src',cutimgLeft);
+            // $platformLeft.find('.bigimg > img').attr('src',bigimgLeft);
+            // $platformRight.find('.cutimg > img').attr('src',cutimgRight);
+            // $platformRight.find('.bigimg > img').attr('src',bigimgRight);
+            //
+            // imgCenter.find('> img:nth-child(1)').attr('src',path + selectLeft + '_left.png');
+            // imgCenter.find('> img:nth-child(3)').attr('src',path + selectRight + '_right.png');
+            //
+            //
+            // console.log(selectLeft, textLeft, selectRight, textRight);
+            // $('.big_txt_left').text(selectLeft);
+            // $('.large_text_left').text(textLeft);
+            // $('.big_txt_right').text(selectRight);
+            // $('.large_text_right').text(textRight);
+        }
+
+        private redrawTable(data: itemProducts[]): void {
             this.$headList.empty();
             this.$prodList.empty();
-        }
 
-        private fillTable(): void {
-            for (const key in this.dataProducts) {
-                const prod: itemProducts = this.dataProducts[key];
+            for (const key in data) {
+                const prod: itemProducts = data[key];
 
                 this.$headList.append(
                     $('<tr/>').append(
@@ -167,5 +211,14 @@ namespace Components {
                 );
             }
         }
+
+        public hide() {
+            this.$wrap.addClass('hide');
+        }
+
+        public show() {
+            this.$wrap.removeClass('hide');
+        }
+
     }
 }

@@ -7,7 +7,7 @@ $database_server = 'localhost';
 $database_user = 'root';
 $database_password = '';
 $database_connection_charset = 'utf8mb4';
-$dbase = 'fluidline_metal';
+$dbase = 'fluidline_metall';
 $table_prefix = 'modx_';
 $database_dsn = 'mysql:host=localhost;dbname=fluidline_metal;charset=utf8mb4';
 $config_options = array (

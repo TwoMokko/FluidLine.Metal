@@ -49,26 +49,27 @@
             text_gap: 8px,
             justify_content_text: center,
             padding_img: 0 20px,
-            line_height: 30px,
-            font_size: 24px,
-            margin_container: 4%,
-            banner_height: 150px,
-            border_radius: 8px
+            line_height: 48px,
+            font_size: 36px,
+            margin_container: 0,
+            banner_height: 360px
+            //border_radius: 8px,
     )); }
     @include MixScreen($sizeM, $size2XL) { @include MainBanner((
             text_gap: 8px,
             justify_content_text: center,
             padding_img: 0 40px,
-            line_height: 36px,
-            font_size: 30px,
-            margin_container: 4%
+            line_height: 48px,
+            font_size: 36px,
+            margin_container: 0,
+            banner_height: 360px
     )); }
     @include MixScreen($size2XL, $size3XL) { @include MainBanner((
             text_gap: 8px,
             justify_content_text: center,
             padding_img: 0 40px,
-            line_height: 36px,
-            font_size: 30px,
+            line_height: 48px,
+            font_size: 36px,
     )); }
     @include MixScreen($size3XL, $size5XL) { @include MainBanner((
             text_gap: 12px,

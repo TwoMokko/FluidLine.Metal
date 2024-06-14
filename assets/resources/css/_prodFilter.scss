@@ -15,7 +15,6 @@
         padding: 4px 8px;
         background-color: white;
         border-radius: 4px;
-        cursor: pointer;
     }
     input:checked + span {
         background-color: $colorAccentLightMore;
@@ -190,7 +189,7 @@
     .new-select {
         position: relative;
         padding: 20px;
-        cursor: pointer;
+
         user-select: none;
         border-radius: 8px;
         background-color: $colorBackgroundLight;
@@ -199,6 +198,9 @@
         display: flex;
         align-items: center;
         z-index: 3;
+        &:not(.disabled) {
+            cursor: pointer;
+        }
         &.not-active {
             pointer-events: none;
             opacity: 0.5;
@@ -291,7 +293,12 @@
 }
 
 .component {
-    &.GroupRadio { @include rbt; }
+    &.GroupRadio {
+        &:not(.disabled) {
+            cursor: pointer;
+        }
+        @include rbt;
+    }
 }
 
 .prod-not-found {

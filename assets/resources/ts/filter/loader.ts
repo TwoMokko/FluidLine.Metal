@@ -14,10 +14,12 @@ namespace Components {
         }
 
         public show(): void {
+            // console.log('s')
             this.$loaderFilter.removeClass('hide');
         }
 
         public hide(): void {
+            // console.log('h')
             this.$loaderFilter.addClass('hide');
         }
     }

@@ -18,23 +18,27 @@
         <div class="burger-open" onclick="showBurger(false)"></div>
         <div class="burger-space hide">
             <div class="burger-wrap">
-                <div class="burger-top">
-                    <a class="burger-logo logo">
-                        <img src="https://fluid-line.ru/assets/page/logo/logo-new.svg" alt="logo">
-                    </a>
-                    <div class="burger-close" onclick="showBurger(true)"></div>
+                <div>
+                    <div class="burger-top">
+                        <a class="burger-logo logo">
+                            <img src="https://fluid-line.ru/assets/page/logo/logo-new.svg" alt="logo">
+                        </a>
+                        <div class="burger-close" onclick="showBurger(true)"></div>
+                    </div>
+                    <div class="burger-links">
+                        <a href="/">Главная</a>
+                        <a href="/products">Металлорукава и РВД</a>
+                        <a href="/contacts">Контакты</a>
+                    </div>
                 </div>
-                <div class="burger-links">
-                    <a>Главная</a>
-                    <a>Металлорукава и РВД</a>
-                    <a>Контакты</a>
-                </div>
-                <div class="burger-contacts">
-                    <a href="mailto:mail@fld.ru">mail@fld.ru</a>
-                    <a href="tel:+74959844100">+7 495 984 41 00</a>
-                </div>
-                <div class="burger-btn">
-                    <div class="btn" onclick="showForm('/api/commercial-offer', 'post', 'Отправить спецификацию', 'letter')">Отправить спецификацию</div>
+                <div>
+                    <div class="burger-contacts">
+                        <a href="mailto:mail@fld.ru">mail@fld.ru</a>
+                        <a href="tel:+74959844100">+7 495 984 41 00</a>
+                    </div>
+                    <div class="burger-btn">
+                        <div class="btn" onclick="showForm('/api/commercial-offer', 'post', 'Отправить спецификацию', 'letter')">Отправить спецификацию</div>
+                    </div>
                 </div>
             </div>
         </div>

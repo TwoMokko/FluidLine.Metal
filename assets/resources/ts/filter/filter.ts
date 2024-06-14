@@ -1,29 +1,33 @@
 namespace Components {
     export class Filter {
-        typeEndFirst                        : Select;
-        typeEndSecond                       : Select;
-        sizeRadioFirst                      : GroupRadio;
-        sizeRadioSecond                     : GroupRadio;
-        analog                              : boolean;
+        private typeEndFirst                : Select;
+        private typeEndSecond               : Select;
+        private sizeRadioFirst              : GroupRadio;
+        private sizeRadioSecond             : GroupRadio;
+        private analog                      : boolean;
+        pathData                            : string = '/assets/base/snippets/api/api.php?task=getProducts';
+        // pathData                            : string = '/pdata.php';
 
-        dataOptions                         : filterOptions;
+        private dataOptions                 : filterOptions;
 
-        callback                            : Function;
+        private callBeforeSend              : Function;
+        private callAfterSend               : Function;
 
-        $mrkBtn                             : JQuery;
-        $rvdBtn                             : JQuery;
-        $analogBtn                          : JQuery;
-        $oxygenBtn                          : JQuery;
-        $notOxygenBtn                       : JQuery;
-        $sizeBtn                            : JQuery;
-        $cableBtn                           : JQuery;
+        private $mrkBtn                     : JQuery;
+        private $rvdBtn                     : JQuery;
+        private $analogBtn                  : JQuery;
+        private $oxygenBtn                  : JQuery;
+        private $notOxygenBtn               : JQuery;
+        private $sizeBtn                    : JQuery;
+        private $cableBtn                   : JQuery;
 
-        constructor(callback: Function, dataOptions: filterOptions) {
+        constructor(callBeforeSend: Function, callAfterSend: Function, dataOptions: filterOptions) {
             this.analog                     = true;
-            this.createElements();
-            this.callback = callback;
-
+            this.callBeforeSend             = callBeforeSend;
+            this.callAfterSend              = callAfterSend;
             this.dataOptions                = dataOptions;
+
+            this.createElements();
 
             this.typeEndFirst               = new Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond              = new Select($('.select[name="zakontsovka-2"]'));
@@ -93,7 +97,6 @@ namespace Components {
 
         private useAnalog(): void {
             let valueEndFirst = this.typeEndFirst.getValue();
-            console.log('valueEndFirst: ', valueEndFirst);
             this.typeEndSecond.setValue(valueEndFirst, false);
 
             this.useAnalogForGroupRadio();
@@ -126,11 +129,11 @@ namespace Components {
         private sendData(sendData: any): void {
             $.ajax({
                 type: 'POST',
-                url: '/assets/base/snippets/api/api.php?task=getProducts',
+                url: this.pathData,
                 data: JSON.stringify(sendData),
                 dataType: 'json',
                 success: (dataProducts: dataProducts): void => {
-                    this.callback(dataProducts);
+                    this.callAfterSend(dataProducts);
 
                     console.log('SUCCESS:');
                 },
@@ -142,6 +145,7 @@ namespace Components {
         }
 
         private prepareSendData(): void {
+            this.callBeforeSend();
             const sendData: sendData = this.getFilterData();
             console.log('send');
             this.sendData(sendData);
@@ -151,7 +155,7 @@ namespace Components {
 
 
         private createElements(): void {
-            const $form: JQuery = $('<form/>', { class: 'prod-filter container' });
+            const $form: JQuery = $('<form/>', { class: 'prod-filter' });
             $('.filter-head').after($form);
 
             this.createButtons();
@@ -255,6 +259,15 @@ namespace Components {
             this.$notOxygenBtn               = $('<input/>', { id: 'notOxygen', type: 'radio', name: 'oxygen', value: 'off' });
             this.$sizeBtn                    = $('<input/>', { id: 'size', type: 'number', name: 'length', min: '50', max: '100000', step: 'any', value: '1000' });
             this.$cableBtn                   = $('<input/>', { id: 'cable', type: 'checkbox', name: 'cable' });
+        }
+
+        public getSymbols(): typeDataSymbols {
+            return {
+                symbolLeft: this.typeEndFirst.getValue(),
+                textLeft: this.typeEndFirst.getText().split(' - ')[1],
+                symbolRight: this.typeEndSecond.getValue(),
+                textRight: this.typeEndSecond.getText().split(' - ')[1],
+            };
         }
     }
 }

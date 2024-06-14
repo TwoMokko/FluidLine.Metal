@@ -1,5 +1,5 @@
 // $(() => {
-//     new Components.FilterManager();
+//     new Components.FilterManager($('main'));
 // })
 
 document.addEventListener("DOMContentLoaded", () => {

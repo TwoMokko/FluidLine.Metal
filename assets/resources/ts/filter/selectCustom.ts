@@ -119,14 +119,16 @@ namespace Components {
             return (this.$sourceOptions.filter(':selected').val() as string);
         }
 
+        public getText(): string {
+            return (this.$sourceOptions.filter(':selected').text() as string);
+        }
+
         public setValue(value: string, event: boolean = true): void {
-            console.log('event', event);
             if (!event) {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 let $option = this.$sourceOptions.filter(`[value=${value}]`);
                 $option.attr('selected', 'selected');
                 this.$header.text($option.text());
-                console.log('opt: ', $option);
                 return;
             }
             this.$list.children(`[data-value=${value}]`).trigger('click');
@@ -139,7 +141,7 @@ namespace Components {
 
             for (const i in data) {
                 this.$sourceSelect.append(
-                    $('<option/>').text(data[i]).val(i)//.attr('text', this.dataOptions.types[i].description)
+                    $('<option/>').text(data[i]).val(i)
                 );
             }
 

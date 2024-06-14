@@ -1,97 +1,5 @@
-<div class="filter-head head container">[[*longtitle]]</div>
-
-<div class="prod-result-wrap container">
-<!--    <div class="loader-wrap loader-table hide">-->
-<!--        <div class="loader"></div>-->
-<!--        <div class="loader-text">Загрузка</div>-->
-<!--    </div>-->
-<!--    <div class="prod-result hide" id="result_mrk">-->
-<!--        <div class="prod-result-head">Металлорукава</div>-->
-<!--        <div class="prod-images">-->
-<!--            <div class="topw">-->
-<!--                <div class="platform platform-left">-->
-<!--                    <div class="cutimg">-->
-<!--                        <img src="https://fluid-line.ru/assets/snippets/product/rkv/img/F_left_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                    <div class="bigimg">-->
-<!--                        <img width="300" src="https://fluid-line.ru/assets/snippets/product/rkv/img/big/F_left_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="cv_cns c">-->
-<!--                    <div class="cccc">-->
-<!--                        <img class="zk" src="https://fluid-line.ru/assets/snippets/product/rkv/img/F_left.png" alt="">-->
-<!--                        <img class="imgbc" src="https://fluid-line.ru/assets/snippets/product/rkv/img/mr_main.png" alt="">-->
-<!--                        <img class="zk" src="https://fluid-line.ru/assets/snippets/product/rkv/img/A_right.png" alt="">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="platform platform-right">-->
-<!--                    <div class="cutimg">-->
-<!--                        <img src="https://fluid-line.ru/assets/snippets/product/rkv/img/A_right_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                    <div class="bigimg">-->
-<!--                        <img width="300" src="https://fluid-line.ru/assets/snippets/product/rkv/img/big/A_right_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="topw2">-->
-<!--                <div>-->
-<!--                    <span class="big_txt big_txt_left">F</span>-->
-<!--                    <span class="large_text large_text_left">несъёмный штуцер с внутренней резьбой</span>-->
-<!--                </div>-->
-<!--                <div>-->
-<!--                    <span class="big_txt big_txt_right">A</span>-->
-<!--                    <span class="large_text large_text_right">съёмный штуцер с наружной резьбой</span>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        [[!$prod_table]]-->
-<!--    </div>-->
-<!--    <div class="prod-result hide" id="result_rvd">-->
-<!--        <div class="prod-result-head">Рукава высокого давления</div>-->
-<!--        <div class="prod-images">-->
-<!--            <div class="topw">-->
-<!--                <div class="platform platform-left">-->
-<!--                    <div class="cutimg">-->
-<!--                        <img src="https://fluid-line.ru/assets/snippets/product/rkv/img/F_left_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                    <div class="bigimg">-->
-<!--                        <img width="300" src="https://fluid-line.ru/assets/snippets/product/rkv/img/big/F_left_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="cv_cns c">-->
-<!--                    <div class="cccc">-->
-<!--                        <img class="zk" src="https://fluid-line.ru/assets/snippets/product/rkv/img/F_left.png" alt="">-->
-<!--                        <img class="imgbc" src="https://fluid-line.ru/assets/snippets/product/rkv/img/rkv_main.png" alt="">-->
-<!--                        <img class="zk" src="https://fluid-line.ru/assets/snippets/product/rkv/img/A_right.png" alt="">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="platform platform-right">-->
-<!--                    <div class="cutimg">-->
-<!--                        <img src="https://fluid-line.ru/assets/snippets/product/rkv/img/A_right_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                    <div class="bigimg">-->
-<!--                        <img width="300" src="https://fluid-line.ru/assets/snippets/product/rkv/img/big/A_right_cut.png" alt="">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="topw2">-->
-<!--                <div>-->
-<!--                    <span class="big_txt big_txt_left">F</span>-->
-<!--                    <span class="large_text large_text_left">несъёмный штуцер с внутренней резьбой</span>-->
-<!--                </div>-->
-<!--                <div>-->
-<!--                    <span class="big_txt big_txt_right">A</span>-->
-<!--                    <span class="large_text large_text_right">съёмный штуцер с наружной резьбой</span>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        [[!$prod_table]]-->
-<!--    </div>-->
-<!--    <div class="prod-not-found hide">-->
-<!--        ТОВАРОВ ПО ДАННОМУ ЗАПРОСУ НЕ НАЙДЕНО-->
-<!--    </div>-->
+<div class="container products">
+    <div class="filter-head head">[[*longtitle]]</div>
 </div>
 
 
@@ -99,7 +7,7 @@
 
 <script>
     $(() => {
-        new Components.FilterManager();
+        new Components.FilterManager($('.products'));
     })
 </script>
 

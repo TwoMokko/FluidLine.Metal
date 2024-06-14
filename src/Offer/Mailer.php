@@ -18,10 +18,10 @@ class Mailer
         $mail = new PHPMailer();
         $mail->SMTPDebug = SMTP::DEBUG_SERVER;
         $mail->isSMTP();                                                                    // Отправка через SMTP
-        $mail->Host   = $_ENV['SMTP_HOST'];                                                   // Адрес SMTP сервера
-        $mail->Port   = 465;                                                                // Адрес порта
+        $mail->Host   = $_ENV['SMTP_HOST'];                                                 // Адрес SMTP сервера
+        $mail->Port   = $_ENV['SMTP_PORT'];                                                 // Адрес порта
         $mail->SMTPAuth   = true;                                                           // Enable SMTP authentication
-        $mail->Username   = $_ENV['SMTP_USER_NAME'];                                                // ваше имя пользователя (без домена и @) info@swagelok.su
+        $mail->Username   = $_ENV['SMTP_EMAIL'];                                                // ваше имя пользователя (без домена и @) info@swagelok.su
         $mail->Password   = $_ENV['SMTP_PASSWORD'];                                                   // ваш пароль zRX8r*5Z
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;                                    // шифрование ssl
         $mail->CharSet = "utf-8";

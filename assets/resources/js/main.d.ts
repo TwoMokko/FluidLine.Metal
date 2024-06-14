@@ -77,21 +77,23 @@ declare namespace Common {
 }
 declare namespace Components {
     class Filter {
-        typeEndFirst: Select;
-        typeEndSecond: Select;
-        sizeRadioFirst: GroupRadio;
-        sizeRadioSecond: GroupRadio;
-        analog: boolean;
-        dataOptions: filterOptions;
-        callback: Function;
-        $mrkBtn: JQuery;
-        $rvdBtn: JQuery;
-        $analogBtn: JQuery;
-        $oxygenBtn: JQuery;
-        $notOxygenBtn: JQuery;
-        $sizeBtn: JQuery;
-        $cableBtn: JQuery;
-        constructor(callback: Function, dataOptions: filterOptions);
+        private typeEndFirst;
+        private typeEndSecond;
+        private sizeRadioFirst;
+        private sizeRadioSecond;
+        private analog;
+        pathData: string;
+        private dataOptions;
+        private callBeforeSend;
+        private callAfterSend;
+        private $mrkBtn;
+        private $rvdBtn;
+        private $analogBtn;
+        private $oxygenBtn;
+        private $notOxygenBtn;
+        private $sizeBtn;
+        private $cableBtn;
+        constructor(callBeforeSend: Function, callAfterSend: Function, dataOptions: filterOptions);
         private restructureSelects;
         private setAnalog;
         private useAnalog;
@@ -104,6 +106,7 @@ declare namespace Components {
         private createSelectEndGroupRadio;
         private createOxygenLengthCable;
         private createButtons;
+        getSymbols(): typeDataSymbols;
     }
 }
 interface itemFilterOptions {
@@ -121,6 +124,12 @@ type filterOptions = {
 };
 type typesFilterOptions = {
     [key: string]: itemFilterOptions;
+};
+type typeDataSymbols = {
+    symbolLeft: string;
+    textLeft: string;
+    symbolRight: string;
+    textRight: string;
 };
 interface itemProducts {
     pagetitle: string;
@@ -167,13 +176,14 @@ declare namespace Components {
         private productsMrk;
         private productsRvd;
         private loaderFilter;
+        private pathData;
         private loaderProducts;
         private $wrapProducts;
-        private $wrapProductsMrk;
-        private $wrapProductsRvd;
-        constructor();
+        constructor($container: JQuery);
         private init;
         private redraw;
+        private showProducts;
+        private hideProducts;
         private getFilterOption;
     }
 }
@@ -187,6 +197,7 @@ declare namespace Components {
     export class GroupRadio {
         private options;
         private data;
+        private disabled;
         private $container;
         private $wrap;
         constructor($container: JQuery, data: GroupRadioData, options: GroupRadioOptions);
@@ -222,17 +233,29 @@ declare namespace Components {
 }
 declare namespace Components {
     class Products {
-        private dataProducts;
+        private path;
         private $wrap;
+        private $head;
+        private $imgLeftCut;
+        private $imgLeftBig;
+        private $imgRightCut;
+        private $imgRightBig;
+        private $imgLeft;
+        private $imgRight;
+        private $symbolLeft;
+        private $textLeft;
+        private $symbolRight;
+        private $textRight;
         private $headList;
         private $prodList;
-        constructor();
-        drawProducts(dataProducts: itemProducts[], $wrap: JQuery, head: string): void;
-        private drawImage;
-        private drawTable;
-        private createTableTemplate;
-        private cleanTable;
-        private fillTable;
+        constructor($container: JQuery, title: string, hoseImage: string);
+        private initImage;
+        private initTables;
+        redraw(data: itemProducts[], dataSymbols: typeDataSymbols): void;
+        private redrawImage;
+        private redrawTable;
+        hide(): void;
+        show(): void;
     }
 }
 declare namespace Components {
@@ -253,6 +276,7 @@ declare namespace Components {
         private close;
         getIsSelect(): boolean;
         getValue(): string;
+        getText(): string;
         setValue(value: string, event?: boolean): void;
         restructure(data: {
             [key: string]: string;

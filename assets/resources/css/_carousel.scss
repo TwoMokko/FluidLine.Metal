@@ -3,16 +3,24 @@
 @use "mixins" as *;
 
 .carousel {
-    flex: none;
-    margin-bottom: 100px;
-    &-head {
-        margin-bottom: 56px;
-        @include textHeader;
+    @mixin Carousel($params: null) {
+        display: GetParam($params, carousel_display, null);
+        flex: none;
+        margin-bottom: 100px;
+        &-head {
+            display: GetParam($params, carousel_display, null);
+            margin-bottom: 56px;
+            @include textHeader;
+        }
+        &-client {
+            display: flex;
+            justify-content: center;
+        }
     }
-    &-client {
-        display: flex;
-        justify-content: center;
-    }
+    @include MixScreen(null, $sizeM) { @include Carousel((
+            carousel_display: none
+    )); }
+    @include MixScreen($sizeM) { @include Carousel(()); }
 }
 
 .inner {

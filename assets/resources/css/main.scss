@@ -11,6 +11,7 @@
 @import "carousel";
 @import "popup";
 @import "burger";
+@import "contacts";
 
 @import "test";
 
@@ -135,6 +136,5 @@ body::-webkit-scrollbar-thumb {
 }
 .disabled {
     opacity: 0.5;
-    //background-color: #ecf5ff !important;
-    cursor: default !important;
+    cursor: default;
 }
