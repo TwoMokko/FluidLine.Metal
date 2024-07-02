@@ -13,6 +13,7 @@ namespace Components {
         private callBeforeSend              : Function;
         private callAfterSend               : Function;
 
+        private $form                       : JQuery;
         private $mrkBtn                     : JQuery;
         private $rvdBtn                     : JQuery;
         private $analogBtn                  : JQuery;
@@ -39,6 +40,12 @@ namespace Components {
 
             this.typeEndSecond.addDisabled();
             this.sizeRadioSecond.addDisabled();
+
+
+            /* new code */
+            console.log('filterData = uriParams');
+            this.setValues();
+            window.onpopstate = (event: any) => { console.log('popStateEvent(func)', event); }
 
             this.prepareSendData();
 
@@ -146,17 +153,22 @@ namespace Components {
 
         private prepareSendData(): void {
             this.callBeforeSend();
+
+            console.log('edit sendData from URI');
+
             const sendData: sendData = this.getFilterData();
-            console.log('send');
+            // console.log('send');
             this.sendData(sendData);
+
             // заменить url (история добавлять или подменять) и new URL и в конструкторе брать URL и делать запрос с новыми данными
         }
 
 
 
         private createElements(): void {
-            const $form: JQuery = $('<form/>', { class: 'prod-filter' });
-            $('.filter-head').after($form);
+            this.$form = $('<form/>', { class: 'prod-filter hide' });
+
+            $('.filter-head').after(this.$form);
 
             this.createButtons();
             const $switcher = this.createSwitcher();
@@ -167,7 +179,7 @@ namespace Components {
                 this.createSelectEndGroupRadio('второй', 'zakontsovka-2', 'size2', true),
             );
 
-            $form.append(
+            this.$form.append(
                 $switcher,
                 $wrap,
                 this.createOxygenLengthCable()
@@ -268,6 +280,26 @@ namespace Components {
                 symbolRight: this.typeEndSecond.getValue(),
                 textRight: this.typeEndSecond.getText().split(' - ')[1],
             };
+        }
+
+        public showFilter(): void {
+            this.$form.removeClass('hide');
+        }
+
+        public check(selector: string): boolean {
+            return $(selector).is(':checked');
+        }
+
+        public setValues(): void {
+            console.log('set values for all filter elements');
+        }
+
+        public popStateEvent(): void {
+            this.prepareSendData();
+            const sendData: sendData = this.getFilterData(); // дважды в коде
+            const uri = URI.toString(sendData);
+            // URI.update();
+            history.pushState({}, '', uri);
         }
     }
 }

@@ -1,0 +1,70 @@
+@use "sass:map";
+@use "function" as *;
+@use "variable" as *;
+//@use "mixins" as *;
+
+h1 {
+    @mixin H2($params: null) {
+        margin-bottom: 20px;
+        font-size: GetParam($params, font_size, 48px);
+        line-height: GetParam($params, line_height, 58px);
+        font-weight: 700;
+    }
+    @include MixScreen(null, $sizeM) { @include H2((
+            line_height: 36px,
+            font_size: 30px,
+    )); }
+    @include MixScreen($sizeM, $size2XL) { @include H2((
+            line_height: 36px,
+            font_size: 30px,
+    )); }
+    @include MixScreen($size2XL, $size5XL) { @include H2((
+            line_height: 48px,
+            font_size: 36px,
+    )); }
+    @include MixScreen($size5XL) { @include H2(()); }
+}
+
+h2 {
+    @mixin H2($params: null) {
+        margin-bottom: 20px;
+        font-size: GetParam($params, font_size, 48px);
+        line-height: GetParam($params, line_height, 58px);
+        font-weight: 700;
+    }
+    @include MixScreen(null, $sizeM) { @include H2((
+            line_height: 36px,
+            font_size: 30px,
+    )); }
+    @include MixScreen($sizeM, $size2XL) { @include H2((
+            line_height: 36px,
+            font_size: 30px,
+    )); }
+    @include MixScreen($size2XL, $size5XL) { @include H2((
+            line_height: 48px,
+            font_size: 36px,
+    )); }
+    @include MixScreen($size5XL) { @include H2(()); }
+}
+
+h3 {
+    @mixin H3($params: null) {
+        margin: 0;
+        font-size: GetParam($params, font_size, 30px);
+        line-height: GetParam($params, line_height, 36px);
+        font-weight: 700;
+    }
+    @include MixScreen(null, $sizeM) { @include H3((
+            line_height: 28px,
+            font_size: 20px,
+    )); }
+    @include MixScreen($sizeM, $size2XL) { @include H3((
+            line_height: 28px,
+            font_size: 20px,
+    )); }
+    @include MixScreen($size2XL, $size5XL) { @include H3((
+            line_height: 30px,
+            font_size: 24px,
+    )); }
+    @include MixScreen($size5XL) { @include H3(()); }
+}

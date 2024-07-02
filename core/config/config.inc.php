@@ -3,13 +3,13 @@
  *  MODX Configuration file
  */
 $database_type = 'mysql';
-$database_server = 'localhost';
+$database_server = 'MySQL-8.0';
 $database_user = 'root';
 $database_password = '';
 $database_connection_charset = 'utf8mb4';
 $dbase = 'fluidline_metall';
 $table_prefix = 'modx_';
-$database_dsn = 'mysql:host=localhost;dbname=fluidline_metal;charset=utf8mb4';
+$database_dsn = 'mysql:host=MySQL-8.0;dbname=fluidline_metall;charset=utf8mb4';
 $config_options = array (
 );
 $driver_options = array (
@@ -59,7 +59,7 @@ if (!defined('MODX_URL_SCHEME')) {
 }
 if (!defined('MODX_HTTP_HOST')) {
     if(defined('PHP_SAPI') && (PHP_SAPI == "cli" || PHP_SAPI == "embed")) {
-        $http_host='fluidline.metal';
+        $http_host='metal.loc';
         define('MODX_HTTP_HOST', $http_host);
     } else {
         $http_host = array_key_exists('HTTP_HOST', $_SERVER) ? parse_url($url_scheme . $_SERVER['HTTP_HOST'], PHP_URL_HOST) : 'fluidline.metal';
