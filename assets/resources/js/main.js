@@ -878,6 +878,52 @@ var Common;
 })(Common || (Common = {}));
 var Components;
 (function (Components) {
+    class URI {
+        static url;
+        static data;
+        static setURL( /*sendData: sendData*/) {
+            this.url = new URL(window.location.href);
+            console.log(this.url);
+            // for (const key in sendData) {
+            //     if ((key === 'type1_size' || key === 'type2_size') && sendData[key].length > 1) {
+            //         this.url.searchParams.set(key, null);
+            //     }
+            //     else {
+            //         this.url.searchParams.set(key, sendData[key]);
+            //     }
+            // }
+        }
+        static addHistory() {
+            history.pushState({}, '', this.url.href);
+        }
+        static getParams() {
+            // if (!this.setState()) return false;
+            this.data = {
+                sendData: {
+                    cable: this.url.searchParams.get('cable'),
+                    length: this.url.searchParams.get('length'),
+                    type1_size: this.url.searchParams.getAll('type1_size'),
+                    type2_size: this.url.searchParams.getAll('type2_size'),
+                    oxygen_compatibility: this.url.searchParams.get('oxygen_compatibility'),
+                    mrk_show: (this.url.searchParams.get('mrk_show') === 'true'),
+                    rvd_show: (this.url.searchParams.get('rvd_show') === 'true'),
+                },
+                additionally: {
+                    analog: (this.url.searchParams.get('analog') === 'true'),
+                    select1: this.url.searchParams.get('select1'),
+                    select2: this.url.searchParams.get('select2'),
+                }
+            };
+            return this.data;
+        }
+        static setState() {
+            return !this.url.searchParams['size'];
+        }
+    }
+    Components.URI = URI;
+})(Components || (Components = {}));
+var Components;
+(function (Components) {
     class Filter {
         typeEndFirst;
         typeEndSecond;
@@ -889,6 +935,7 @@ var Components;
         dataOptions;
         callBeforeSend;
         callAfterSend;
+        $form;
         $mrkBtn;
         $rvdBtn;
         $analogBtn;
@@ -909,6 +956,10 @@ var Components;
             this.sizeRadioSecond = new Components.GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, { name: 'size2' });
             this.typeEndSecond.addDisabled();
             this.sizeRadioSecond.addDisabled();
+            /* new code */
+            console.log('filterData = uriParams');
+            this.setValues();
+            console.log('popStateEvent(func)');
             this.prepareSendData();
             this.typeEndFirst.on('change', () => {
                 this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes);
@@ -1004,19 +1055,20 @@ var Components;
         }
         prepareSendData() {
             this.callBeforeSend();
+            console.log('edit sendData from URI');
             const sendData = this.getFilterData();
-            console.log('send');
+            // console.log('send');
             this.sendData(sendData);
             // заменить url (история добавлять или подменять) и new URL и в конструкторе брать URL и делать запрос с новыми данными
         }
         createElements() {
-            const $form = $('<form/>', { class: 'prod-filter' });
-            $('.filter-head').after($form);
+            this.$form = $('<form/>', { class: 'prod-filter hide' });
+            $('.filter-head').after(this.$form);
             this.createButtons();
             const $switcher = this.createSwitcher();
             const $wrap = $('<div/>', { class: 'prod-filter-wrap' });
             $wrap.append(this.createSelectEndGroupRadio('первой', 'zakontsovka-1', 'size1', false), this.createSelectEndGroupRadio('второй', 'zakontsovka-2', 'size2', true));
-            $form.append($switcher, $wrap, this.createOxygenLengthCable());
+            this.$form.append($switcher, $wrap, this.createOxygenLengthCable());
         }
         createSwitcher() {
             return $('<div/>', { class: 'prod-filter-switcher' }).append($('<label/>', { class: 'prod-filter-checkbox' }).append(this.$mrkBtn, $('<label/>', { for: 'mrk', text: 'Металлорукав' })), $('<label/>', { class: 'prod-filter-checkbox' }).append(this.$rvdBtn, $('<label/>', { for: 'rvd', text: 'Рукав высокого давления' })));
@@ -1052,6 +1104,15 @@ var Components;
                 textRight: this.typeEndSecond.getText().split(' - ')[1],
             };
         }
+        showFilter() {
+            this.$form.removeClass('hide');
+        }
+        check(selector) {
+            return $(selector).is(':checked');
+        }
+        setValues() {
+            console.log('set values for all filter elements');
+        }
     }
     Components.Filter = Filter;
 })(Components || (Components = {}));
@@ -1064,28 +1125,41 @@ var Components;
         notFound;
         productsMrk;
         productsRvd;
-        loaderFilter;
+        // private loaderFilter                : Loader;
         pathData = '/assets/base/snippets/api/api.php?task=filterOptions';
         // private pathData                    : string = '/data.php';
         loaderProducts;
         $wrapProducts;
         constructor($container) {
-            this.loaderFilter = new Components.Loader($container, 'loader-wrap loader-table');
+            // TODO: переписать это
+            $('.filter-head').addClass('hide');
+            $('.prod-text').addClass('hide');
+            $('.carousel').addClass('hide');
+            $('.carousel-head').addClass('hide');
+            this.loaderProducts = new Components.Loader($container, 'loader-wrap loader-table', false);
+            this.loaderProducts.show();
+            // this.loaderFilter               = new Loader($container, 'loader-wrap loader-table');
             this.getFilterOption().then((data) => {
                 this.init($container, data);
-                this.loaderFilter.hide();
+                // this.loaderFilter.hide();
             });
         }
         init($container, data) {
             this.dataOptions = data;
             this.$wrapProducts = $('<div/>', { class: 'prod-result-wrap' });
-            this.loaderProducts = new Components.Loader($container, 'loader-wrap loader-table', false);
+            // this.loaderProducts             = new Loader($container, 'loader-wrap loader-table', false);
             this.filter = new Components.Filter(() => {
                 this.$wrapProducts.addClass('hide');
                 this.loaderProducts.show();
             }, (dataProducts) => {
                 this.$wrapProducts.removeClass('hide');
                 this.loaderProducts.hide();
+                // TODO: переписать это
+                $('.filter-head').removeClass('hide');
+                $('.prod-text').removeClass('hide');
+                $('.carousel').removeClass('hide');
+                $('.carousel-head').removeClass('hide');
+                this.filter.showFilter();
                 this.redraw(dataProducts);
             }, this.dataOptions);
             this.productsMrk = new Components.Products(this.$wrapProducts, 'Металлорукав', 'https://fluid-line.ru/assets/snippets/product/rkv/img/mr_main.png');
@@ -1098,6 +1172,8 @@ var Components;
         }
         showProducts(dataProducts) {
             this.notFound.hide();
+            this.productsMrk.hideUndefined();
+            this.productsRvd.hideUndefined();
             this.productsMrk.hide();
             this.productsRvd.hide();
             const dataSymbols = this.filter.getSymbols();
@@ -1112,8 +1188,18 @@ var Components;
                 this.productsRvd.redraw(dataProducts['rkv'].products, dataSymbols);
                 this.productsRvd.show();
             }
+            if (this.filter.check('#mrk') && !dataProducts['mrk'].products.length) {
+                console.log('mrk here');
+                this.productsMrk.showUndefined();
+            }
+            if (this.filter.check('#rvd') && !dataProducts['rkv'].products.length) {
+                console.log('rvd here');
+                this.productsRvd.showUndefined();
+            }
         }
         hideProducts() {
+            this.productsMrk.hideUndefined();
+            this.productsRvd.hideUndefined();
             this.productsMrk.hide();
             this.productsRvd.hide();
             this.notFound.show();
@@ -1259,8 +1345,11 @@ var Components;
         $textRight;
         $headList;
         $prodList;
+        $undefined;
         constructor($container, title, hoseImage) {
-            this.$wrap = $('<div/>', { class: '.prod-result' });
+            this.$wrap = $('<div/>', { class: 'prod-result' });
+            this.$undefined = $('<div/>', { class: 'prod-not-found hide', text: title + ': не найдено' });
+            $container.append(this.$undefined);
             this.initImage($container, title, hoseImage);
             this.initTables();
         }
@@ -1345,6 +1434,12 @@ var Components;
         }
         show() {
             this.$wrap.removeClass('hide');
+        }
+        hideUndefined() {
+            this.$undefined.addClass('hide');
+        }
+        showUndefined() {
+            this.$undefined.removeClass('hide');
         }
     }
     Components.Products = Products;

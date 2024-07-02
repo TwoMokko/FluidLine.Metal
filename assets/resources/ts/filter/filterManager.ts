@@ -69,7 +69,7 @@ namespace Components {
         private notFound                    : NotFound;
         private productsMrk                 : Products;
         private productsRvd                 : Products;
-        private loaderFilter                : Loader;
+        // private loaderFilter                : Loader;
         private pathData                    : string = '/assets/base/snippets/api/api.php?task=filterOptions';
         // private pathData                    : string = '/data.php';
 
@@ -77,10 +77,18 @@ namespace Components {
         private $wrapProducts               : JQuery;
 
         constructor($container: JQuery) {
-            this.loaderFilter               = new Loader($container, 'loader-wrap loader-table');
+            // TODO: переписать это
+            $('.filter-head').addClass('hide');
+            $('.prod-text').addClass('hide');
+            $('.carousel').addClass('hide');
+            $('.carousel-head').addClass('hide');
+
+            this.loaderProducts             = new Loader($container, 'loader-wrap loader-table', false);
+            this.loaderProducts.show();
+            // this.loaderFilter               = new Loader($container, 'loader-wrap loader-table');
             this.getFilterOption().then((data: filterOptions) => {
                 this.init($container, data);
-                this.loaderFilter.hide();
+                // this.loaderFilter.hide();
             });
         }
 
@@ -89,13 +97,22 @@ namespace Components {
 
             this.$wrapProducts              = $('<div/>', {class: 'prod-result-wrap'});
 
-            this.loaderProducts             = new Loader($container, 'loader-wrap loader-table', false);
+            // this.loaderProducts             = new Loader($container, 'loader-wrap loader-table', false);
+
             this.filter                     = new Filter(() => {
                 this.$wrapProducts.addClass('hide');
                 this.loaderProducts.show();
             }, (dataProducts: dataProducts) => {
                 this.$wrapProducts.removeClass('hide');
                 this.loaderProducts.hide();
+
+                // TODO: переписать это
+                $('.filter-head').removeClass('hide');
+                $('.prod-text').removeClass('hide');
+                $('.carousel').removeClass('hide');
+                $('.carousel-head').removeClass('hide');
+
+                this.filter.showFilter();
                 this.redraw(dataProducts);
             }, this.dataOptions);
             this.productsMrk                = new Products(this.$wrapProducts, 'Металлорукав', 'https://fluid-line.ru/assets/snippets/product/rkv/img/mr_main.png');
@@ -112,6 +129,8 @@ namespace Components {
         private showProducts(dataProducts: dataProducts) {
             this.notFound.hide();
 
+            this.productsMrk.hideUndefined();
+            this.productsRvd.hideUndefined();
             this.productsMrk.hide();
             this.productsRvd.hide();
 
@@ -129,9 +148,20 @@ namespace Components {
                 this.productsRvd.redraw(dataProducts['rkv'].products, dataSymbols);
                 this.productsRvd.show();
             }
+
+            if (this.filter.check('#mrk') && !dataProducts['mrk'].products.length) {
+                console.log('mrk here');
+                this.productsMrk.showUndefined();
+            }
+            if (this.filter.check('#rvd') && !dataProducts['rkv'].products.length) {
+                console.log('rvd here');
+                this.productsRvd.showUndefined();
+            }
         }
 
         private hideProducts() {
+            this.productsMrk.hideUndefined();
+            this.productsRvd.hideUndefined();
             this.productsMrk.hide();
             this.productsRvd.hide();
             this.notFound.show();

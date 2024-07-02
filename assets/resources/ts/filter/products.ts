@@ -17,8 +17,14 @@ namespace Components {
         private $headList           : JQuery;
         private $prodList           : JQuery;
 
+        private $undefined          : JQuery;
+
         constructor($container: JQuery, title: string, hoseImage: string) {
-            this.$wrap              = $('<div/>', { class: '.prod-result' });
+            this.$wrap              = $('<div/>', { class: 'prod-result' });
+
+            this.$undefined         = $('<div/>', { class: 'prod-not-found hide', text: title + ': не найдено' });
+            $container.append(this.$undefined);
+
             this.initImage($container, title, hoseImage);
             this.initTables();
         }
@@ -212,12 +218,20 @@ namespace Components {
             }
         }
 
-        public hide() {
+        public hide(): void {
             this.$wrap.addClass('hide');
         }
 
-        public show() {
+        public show(): void {
             this.$wrap.removeClass('hide');
+        }
+
+        public hideUndefined(): void {
+            this.$undefined.addClass('hide');
+        }
+
+        public showUndefined(): void {
+            this.$undefined.removeClass('hide');
         }
 
     }

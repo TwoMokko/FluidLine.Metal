@@ -76,6 +76,16 @@ declare namespace Common {
     }
 }
 declare namespace Components {
+    abstract class URI {
+        private static url;
+        private static data;
+        static setURL(): void;
+        static addHistory(): void;
+        static getParams(): any;
+        static setState(): boolean;
+    }
+}
+declare namespace Components {
     class Filter {
         private typeEndFirst;
         private typeEndSecond;
@@ -86,6 +96,7 @@ declare namespace Components {
         private dataOptions;
         private callBeforeSend;
         private callAfterSend;
+        private $form;
         private $mrkBtn;
         private $rvdBtn;
         private $analogBtn;
@@ -107,6 +118,9 @@ declare namespace Components {
         private createOxygenLengthCable;
         private createButtons;
         getSymbols(): typeDataSymbols;
+        showFilter(): void;
+        check(selector: string): boolean;
+        setValues(): void;
     }
 }
 interface itemFilterOptions {
@@ -175,7 +189,6 @@ declare namespace Components {
         private notFound;
         private productsMrk;
         private productsRvd;
-        private loaderFilter;
         private pathData;
         private loaderProducts;
         private $wrapProducts;
@@ -248,6 +261,7 @@ declare namespace Components {
         private $textRight;
         private $headList;
         private $prodList;
+        private $undefined;
         constructor($container: JQuery, title: string, hoseImage: string);
         private initImage;
         private initTables;
@@ -256,6 +270,8 @@ declare namespace Components {
         private redrawTable;
         hide(): void;
         show(): void;
+        hideUndefined(): void;
+        showUndefined(): void;
     }
 }
 declare namespace Components {

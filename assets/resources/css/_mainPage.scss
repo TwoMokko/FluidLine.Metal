@@ -6,7 +6,7 @@
     @mixin MainBanner($params: null) {
             margin-left: GetParam($params, margin_container, 14%);
             margin-right: GetParam($params, margin_container, 14%);
-            margin-bottom: 60px;
+            //margin-bottom: 60px;
             position: relative;
             flex: auto;
 
@@ -21,23 +21,20 @@
                 display: flex;
                 flex-direction: column;
                 //justify-content: center;
-                gap: GetParam($params, text_gap, 32px);
+                //gap: GetParam($params, text_gap, 32px);
                 //padding-top: 130px;
                 //padding-left: 60px;
                 color: $colorTextLight;
                 justify-content: GetParam($params, justify_content_text, null);
-                padding: GetParam($params, padding_img, 130px 60px);
+                padding: GetParam($params, padding_img, 100px 60px);
                 > div {
-                    font-size: GetParam($params, font_size, 48px);
-                    line-height: GetParam($params, line_height, 58px);
-                    font-weight: 700;
+                    //font-size: GetParam($params, font_size, 48px);
+                    //line-height: GetParam($params, line_height, 58px);
+                    //font-weight: 700;
                 }
-                > div:first-child {
-                    //color: red;
-                }
-                > div:last-child {
-                    //color: green;
-                }
+                //> h1 {
+                //    width: 50%;
+                //}
             }
             > img {
                 object-fit: cover;
