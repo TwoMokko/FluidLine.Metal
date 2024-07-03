@@ -880,44 +880,41 @@ var Components;
 (function (Components) {
     class URI {
         static url;
-        static data;
-        static setURL( /*sendData: sendData*/) {
+        static sendData;
+        static init( /*sendData: sendData*/) {
             this.url = new URL(window.location.href);
             console.log(this.url);
-            // for (const key in sendData) {
-            //     if ((key === 'type1_size' || key === 'type2_size') && sendData[key].length > 1) {
-            //         this.url.searchParams.set(key, null);
-            //     }
-            //     else {
-            //         this.url.searchParams.set(key, sendData[key]);
-            //     }
-            // }
         }
-        static addHistory() {
-            history.pushState({}, '', this.url.href);
-        }
+        // public static addHistory(): void {
+        //     history.pushState({}, '', this.url.href);
+        // }
         static getParams() {
-            // if (!this.setState()) return false;
-            this.data = {
-                sendData: {
-                    cable: this.url.searchParams.get('cable'),
-                    length: this.url.searchParams.get('length'),
-                    type1_size: this.url.searchParams.getAll('type1_size'),
-                    type2_size: this.url.searchParams.getAll('type2_size'),
-                    oxygen_compatibility: this.url.searchParams.get('oxygen_compatibility'),
-                    mrk_show: (this.url.searchParams.get('mrk_show') === 'true'),
-                    rvd_show: (this.url.searchParams.get('rvd_show') === 'true'),
-                },
-                additionally: {
-                    analog: (this.url.searchParams.get('analog') === 'true'),
-                    select1: this.url.searchParams.get('select1'),
-                    select2: this.url.searchParams.get('select2'),
-                }
+            // if (!this.checkState()) return false;
+            this.sendData = {
+                cable: this.url.searchParams.get('cable'),
+                length: this.url.searchParams.get('length'),
+                type1_size: this.url.searchParams.getAll('type1_size'),
+                type2_size: this.url.searchParams.getAll('type2_size'),
+                oxygen_compatibility: this.url.searchParams.get('oxygen_compatibility'),
+                mrk_show: (this.url.searchParams.get('mrk_show') === 'true'),
+                rvd_show: (this.url.searchParams.get('rvd_show') === 'true'),
+                analog: (this.url.searchParams.get('analog') === 'true'),
+                type1_end: this.url.searchParams.get('type1_end'),
+                type2_end: this.url.searchParams.get('type2_end'),
             };
-            return this.data;
+            return this.sendData;
         }
-        static setState() {
-            return !this.url.searchParams['size'];
+        static checkState() {
+            console.log('params check state: ', this.url.searchParams);
+            return this.url.searchParams['size'];
+        }
+        static toString(newFilterData) {
+            const uri = 'uri-test';
+            this.update(uri);
+            return uri;
+        }
+        static update(uri) {
+            this.url.href = uri;
         }
     }
     Components.URI = URI;
@@ -933,6 +930,7 @@ var Components;
         pathData = '/assets/base/snippets/api/api.php?task=getProducts';
         // pathData                            : string = '/pdata.php';
         dataOptions;
+        sendData;
         callBeforeSend;
         callAfterSend;
         $form;
@@ -949,6 +947,14 @@ var Components;
             this.callAfterSend = callAfterSend;
             this.dataOptions = dataOptions;
             this.createElements();
+            // новый код
+            Components.URI.init();
+            if (Components.URI.checkState())
+                this.setFilterData();
+            // window.onpopstate = (event: any) => { console.log('popStateEvent(func)', event); }
+            // разделила везде препар сенд дата и сенд дата, надо ли
+            // вставлять ли разные данные при вызове сенд дата?
+            // до сюда
             this.typeEndFirst = new Components.Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond = new Components.Select($('.select[name="zakontsovka-2"]'));
             this.restructureSelects();
@@ -956,27 +962,27 @@ var Components;
             this.sizeRadioSecond = new Components.GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, { name: 'size2' });
             this.typeEndSecond.addDisabled();
             this.sizeRadioSecond.addDisabled();
-            /* new code */
-            console.log('filterData = uriParams');
-            this.setValues();
-            console.log('popStateEvent(func)');
             this.prepareSendData();
+            this.send();
             this.typeEndFirst.on('change', () => {
                 this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes);
                 if (this.analog) {
                     this.useAnalog();
                 }
                 this.prepareSendData();
+                this.send();
             });
             this.typeEndSecond.on('change', () => {
                 this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes);
                 this.prepareSendData();
+                this.send();
             });
             this.$analogBtn.on('change', (e) => {
                 this.setAnalog(e.target.checked);
                 if (this.analog) {
                     this.useAnalog();
                     this.prepareSendData();
+                    this.send();
                     this.typeEndSecond.addDisabled();
                     this.sizeRadioSecond.addDisabled();
                 }
@@ -990,14 +996,15 @@ var Components;
                     this.useAnalogForGroupRadio();
                 }
                 this.prepareSendData();
+                this.send();
             });
-            this.sizeRadioSecond.on('change', () => { this.prepareSendData(); });
-            this.$mrkBtn.on('change', () => { this.prepareSendData(); });
-            this.$rvdBtn.on('change', () => { this.prepareSendData(); });
-            this.$oxygenBtn.on('change', () => { this.prepareSendData(); });
-            this.$notOxygenBtn.on('change', () => { this.prepareSendData(); });
-            this.$sizeBtn.on('change', () => { this.prepareSendData(); });
-            this.$cableBtn.on('change', () => { this.prepareSendData(); });
+            this.sizeRadioSecond.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$mrkBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$rvdBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$oxygenBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$notOxygenBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$sizeBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$cableBtn.on('change', () => { this.prepareSendData(); this.send(); });
         }
         restructureSelects() {
             let data = {};
@@ -1034,16 +1041,20 @@ var Components;
                 type2_size: type2_size,
                 oxygen_compatibility: this.$oxygenBtn.is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
                 mrk_show: this.$mrkBtn.is(':checked'),
-                rvd_show: this.$rvdBtn.is(':checked')
+                rvd_show: this.$rvdBtn.is(':checked'),
+                analog: this.analog,
+                type1_end: this.typeEndFirst.getValue(),
+                type2_end: this.typeEndSecond.getValue(),
             };
         }
-        sendData(sendData) {
+        send() {
             $.ajax({
                 type: 'POST',
                 url: this.pathData,
-                data: JSON.stringify(sendData),
+                data: JSON.stringify(this.sendData),
                 dataType: 'json',
                 success: (dataProducts) => {
+                    console.log(this.sendData);
                     this.callAfterSend(dataProducts);
                     console.log('SUCCESS:');
                 },
@@ -1056,10 +1067,7 @@ var Components;
         prepareSendData() {
             this.callBeforeSend();
             console.log('edit sendData from URI');
-            const sendData = this.getFilterData();
-            // console.log('send');
-            this.sendData(sendData);
-            // заменить url (история добавлять или подменять) и new URL и в конструкторе брать URL и делать запрос с новыми данными
+            this.sendData = this.getFilterData();
         }
         createElements() {
             this.$form = $('<form/>', { class: 'prod-filter hide' });
@@ -1110,8 +1118,27 @@ var Components;
         check(selector) {
             return $(selector).is(':checked');
         }
-        setValues() {
+        // новый код
+        setFilterData() {
+            const data = Components.URI.getParams();
+            console.log('set filter data: ', data);
+            // if (data.length) this.$sizeBtn.text(data.length + '');
+            // if (data.type1_end) {
+            //     this.typeEndFirst.setValue(data.type1_end);
+            //     // дописать выборку кнопок размеров, но без отправки данных
+            // }
+            // if (data.type2_end) this.typeEndSecond.setValue(data.type2_end);
+            // if (data.type1_size !== 'null') this.sizeRadioFirst.setValue(data.type1_size);
+            // if (data.type2_size !== 'null') this.sizeRadioSecond.setValue(data.type2_size);
+            // if (data.analog) this.analog = data.analog;
             console.log('set values for all filter elements');
+        }
+        popStateEvent() {
+            this.prepareSendData();
+            this.send();
+            const uri = Components.URI.toString(this.sendData);
+            // URI.update();
+            history.pushState({}, '', uri);
         }
     }
     Components.Filter = Filter;
@@ -1541,6 +1568,8 @@ var Components;
             return this.$sourceOptions.filter(':selected').text();
         }
         setValue(value, event = true) {
+            console.log('val: ', value);
+            console.log(typeof value);
             if (!event) {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 let $option = this.$sourceOptions.filter(`[value=${value}]`);

@@ -78,11 +78,12 @@ declare namespace Common {
 declare namespace Components {
     abstract class URI {
         private static url;
-        private static data;
-        static setURL(): void;
-        static addHistory(): void;
-        static getParams(): any;
-        static setState(): boolean;
+        private static sendData;
+        static init(): void;
+        static getParams(): sendData;
+        static checkState(): boolean;
+        static toString(newFilterData: object): string;
+        static update(uri: string): void;
     }
 }
 declare namespace Components {
@@ -94,6 +95,7 @@ declare namespace Components {
         private analog;
         pathData: string;
         private dataOptions;
+        private sendData;
         private callBeforeSend;
         private callAfterSend;
         private $form;
@@ -110,7 +112,7 @@ declare namespace Components {
         private useAnalog;
         private useAnalogForGroupRadio;
         private getFilterData;
-        private sendData;
+        private send;
         private prepareSendData;
         private createElements;
         private createSwitcher;
@@ -120,7 +122,8 @@ declare namespace Components {
         getSymbols(): typeDataSymbols;
         showFilter(): void;
         check(selector: string): boolean;
-        setValues(): void;
+        setFilterData(): void;
+        popStateEvent(): void;
     }
 }
 interface itemFilterOptions {
@@ -180,6 +183,9 @@ type sendData = {
     oxygen_compatibility: string;
     mrk_show: boolean;
     rvd_show: boolean;
+    analog: boolean;
+    type1_end: string;
+    type2_end: string;
 };
 declare namespace Components {
     class FilterManager {
