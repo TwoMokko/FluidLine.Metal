@@ -58,7 +58,6 @@ type sendData = {
     oxygen_compatibility: string,
     mrk_show: boolean,
     rvd_show: boolean,
-    analog: boolean,
     type1_end: string,
     type2_end: string,
 }

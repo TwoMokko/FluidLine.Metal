@@ -15,6 +15,7 @@
  * @subpackage manager
  */
 @include(dirname(__FILE__) . '/config.core.php');
+//var_dump(__DIR__);
 if (!defined('MODX_CORE_PATH')) define('MODX_CORE_PATH', dirname(__DIR__) . '/core/');
 if (!defined('MODX_CONFIG_KEY')) define('MODX_CONFIG_KEY', 'config');
 

@@ -1,3 +1,5 @@
+/// <reference types="jquery" />
+/// <reference types="jquery" />
 declare namespace Components {
     class Carousel {
         $source: JQuery;
@@ -80,7 +82,9 @@ declare namespace Components {
         private static url;
         private static sendData;
         static init(): void;
-        static getParams(): sendData;
+        static getParams(): {
+            [key: string]: string;
+        };
         static checkState(): boolean;
         static toString(newFilterData: object): string;
         static update(uri: string): void;
@@ -122,7 +126,9 @@ declare namespace Components {
         getSymbols(): typeDataSymbols;
         showFilter(): void;
         check(selector: string): boolean;
-        setFilterData(): void;
+        prepareFilterData(data: {
+            [key: string]: string;
+        }): sendData;
         popStateEvent(): void;
     }
 }
@@ -183,7 +189,6 @@ type sendData = {
     oxygen_compatibility: string;
     mrk_show: boolean;
     rvd_show: boolean;
-    analog: boolean;
     type1_end: string;
     type2_end: string;
 };

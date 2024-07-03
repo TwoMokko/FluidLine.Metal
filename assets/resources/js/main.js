@@ -883,30 +883,21 @@ var Components;
         static sendData;
         static init( /*sendData: sendData*/) {
             this.url = new URL(window.location.href);
-            console.log(this.url);
         }
         // public static addHistory(): void {
         //     history.pushState({}, '', this.url.href);
         // }
         static getParams() {
-            // if (!this.checkState()) return false;
-            this.sendData = {
-                cable: this.url.searchParams.get('cable'),
-                length: this.url.searchParams.get('length'),
-                type1_size: this.url.searchParams.getAll('type1_size'),
-                type2_size: this.url.searchParams.getAll('type2_size'),
-                oxygen_compatibility: this.url.searchParams.get('oxygen_compatibility'),
-                mrk_show: (this.url.searchParams.get('mrk_show') === 'true'),
-                rvd_show: (this.url.searchParams.get('rvd_show') === 'true'),
-                analog: (this.url.searchParams.get('analog') === 'true'),
-                type1_end: this.url.searchParams.get('type1_end'),
-                type2_end: this.url.searchParams.get('type2_end'),
-            };
-            return this.sendData;
+            let out = {};
+            for (const [key, value] of this.url.searchParams.entries()) {
+                out[key] = value;
+            }
+            return out;
         }
         static checkState() {
             console.log('params check state: ', this.url.searchParams);
-            return this.url.searchParams['size'];
+            return true;
+            // return this.url.searchParams['size'];
         }
         static toString(newFilterData) {
             const uri = 'uri-test';
@@ -949,8 +940,8 @@ var Components;
             this.createElements();
             // новый код
             Components.URI.init();
-            if (Components.URI.checkState())
-                this.setFilterData();
+            let dataURI = Components.URI.getParams();
+            let data = this.prepareFilterData(dataURI);
             // window.onpopstate = (event: any) => { console.log('popStateEvent(func)', event); }
             // разделила везде препар сенд дата и сенд дата, надо ли
             // вставлять ли разные данные при вызове сенд дата?
@@ -958,6 +949,9 @@ var Components;
             this.typeEndFirst = new Components.Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond = new Components.Select($('.select[name="zakontsovka-2"]'));
             this.restructureSelects();
+            this.typeEndFirst.setValue(data.type1_end.toUpperCase(), false);
+            // проверить аналог, добавить в сенд дата аналог
+            this.typeEndSecond.setValue(data.type2_end.toUpperCase(), false);
             this.sizeRadioFirst = new Components.GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, { name: 'size1' });
             this.sizeRadioSecond = new Components.GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, { name: 'size2' });
             this.typeEndSecond.addDisabled();
@@ -1042,7 +1036,6 @@ var Components;
                 oxygen_compatibility: this.$oxygenBtn.is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
                 mrk_show: this.$mrkBtn.is(':checked'),
                 rvd_show: this.$rvdBtn.is(':checked'),
-                analog: this.analog,
                 type1_end: this.typeEndFirst.getValue(),
                 type2_end: this.typeEndSecond.getValue(),
             };
@@ -1119,19 +1112,20 @@ var Components;
             return $(selector).is(':checked');
         }
         // новый код
-        setFilterData() {
-            const data = Components.URI.getParams();
-            console.log('set filter data: ', data);
-            // if (data.length) this.$sizeBtn.text(data.length + '');
-            // if (data.type1_end) {
-            //     this.typeEndFirst.setValue(data.type1_end);
-            //     // дописать выборку кнопок размеров, но без отправки данных
-            // }
-            // if (data.type2_end) this.typeEndSecond.setValue(data.type2_end);
-            // if (data.type1_size !== 'null') this.sizeRadioFirst.setValue(data.type1_size);
-            // if (data.type2_size !== 'null') this.sizeRadioSecond.setValue(data.type2_size);
-            // if (data.analog) this.analog = data.analog;
-            console.log('set values for all filter elements');
+        prepareFilterData(data) {
+            let type1_end = data.type1_end ?? 'A';
+            let type2_end = data.type2_end ?? 'A';
+            return {
+                cable: data.cable ?? null,
+                length: data.length ?? '',
+                type1_size: [data.type1_size] ?? Object.keys(this.dataOptions.types[type1_end].sizes),
+                type2_size: [data.type2_size] ?? Object.keys(this.dataOptions.types[type2_end].sizes),
+                oxygen_compatibility: data.oxygen_compatibility ?? null,
+                mrk_show: true,
+                rvd_show: true,
+                type1_end: type1_end,
+                type2_end: type2_end,
+            };
         }
         popStateEvent() {
             this.prepareSendData();
@@ -1574,6 +1568,7 @@ var Components;
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 let $option = this.$sourceOptions.filter(`[value=${value}]`);
                 $option.attr('selected', 'selected');
+                console.log('opt: ', $option);
                 this.$header.text($option.text());
                 return;
             }

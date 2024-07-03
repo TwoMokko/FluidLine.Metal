@@ -33,7 +33,8 @@ namespace Components {
 
             // новый код
             URI.init();
-            if (URI.checkState()) this.setFilterData();
+            let dataURI = URI.getParams();
+            let data = this.prepareFilterData(dataURI);
             // window.onpopstate = (event: any) => { console.log('popStateEvent(func)', event); }
             // разделила везде препар сенд дата и сенд дата, надо ли
             // вставлять ли разные данные при вызове сенд дата?
@@ -43,6 +44,10 @@ namespace Components {
             this.typeEndSecond              = new Select($('.select[name="zakontsovka-2"]'));
 
             this.restructureSelects();
+
+            this.typeEndFirst.setValue(data.type1_end.toUpperCase(), false);
+            // проверить аналог, добавить в сенд дата аналог
+            this.typeEndSecond.setValue(data.type2_end.toUpperCase(), false);
 
             this.sizeRadioFirst            = new GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, {name: 'size1'});
             this.sizeRadioSecond           = new GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, {name: 'size2'});
@@ -139,7 +144,6 @@ namespace Components {
                 oxygen_compatibility: this.$oxygenBtn.is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
                 mrk_show: this.$mrkBtn.is(':checked'),
                 rvd_show: this.$rvdBtn.is(':checked'),
-                analog: this.analog,
                 type1_end: this.typeEndFirst.getValue(),
                 type2_end: this.typeEndSecond.getValue(),
             }
@@ -299,21 +303,21 @@ namespace Components {
         }
 
         // новый код
-        public setFilterData(): void {
-            const data = URI.getParams();
+        public prepareFilterData(data: {[key: string]: string}): sendData {
+            let type1_end = data.type1_end ?? 'A';
+            let type2_end = data.type2_end ?? 'A';
 
-            console.log('set filter data: ', data);
-
-            // if (data.length) this.$sizeBtn.text(data.length + '');
-            // if (data.type1_end) {
-            //     this.typeEndFirst.setValue(data.type1_end);
-            //     // дописать выборку кнопок размеров, но без отправки данных
-            // }
-            // if (data.type2_end) this.typeEndSecond.setValue(data.type2_end);
-            // if (data.type1_size !== 'null') this.sizeRadioFirst.setValue(data.type1_size);
-            // if (data.type2_size !== 'null') this.sizeRadioSecond.setValue(data.type2_size);
-            // if (data.analog) this.analog = data.analog;
-            console.log('set values for all filter elements');
+            return {
+                cable: data.cable ?? null,
+                length: data.length ?? '',
+                type1_size: [data.type1_size] ?? Object.keys(this.dataOptions.types[type1_end].sizes),
+                type2_size: [data.type2_size] ?? Object.keys(this.dataOptions.types[type2_end].sizes),
+                oxygen_compatibility: data.oxygen_compatibility ?? null,
+                mrk_show: true,
+                rvd_show: true,
+                type1_end: type1_end,
+                type2_end: type2_end,
+            }
         }
 
         public popStateEvent(): void {
