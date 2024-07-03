@@ -9,6 +9,7 @@ namespace Components {
         // pathData                            : string = '/pdata.php';
 
         private dataOptions                 : filterOptions;
+        private sendData                    : sendData;
 
         private callBeforeSend              : Function;
         private callAfterSend               : Function;
@@ -30,6 +31,14 @@ namespace Components {
 
             this.createElements();
 
+            // новый код
+            URI.init();
+            if (URI.checkState()) this.setFilterData();
+            // window.onpopstate = (event: any) => { console.log('popStateEvent(func)', event); }
+            // разделила везде препар сенд дата и сенд дата, надо ли
+            // вставлять ли разные данные при вызове сенд дата?
+            // до сюда
+
             this.typeEndFirst               = new Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond              = new Select($('.select[name="zakontsovka-2"]'));
 
@@ -42,12 +51,8 @@ namespace Components {
             this.sizeRadioSecond.addDisabled();
 
 
-            /* new code */
-            console.log('filterData = uriParams');
-            this.setValues();
-            window.onpopstate = (event: any) => { console.log('popStateEvent(func)', event); }
-
             this.prepareSendData();
+            this.send();
 
             this.typeEndFirst.on('change', () => {
                 this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes);
@@ -55,16 +60,19 @@ namespace Components {
                     this.useAnalog();
                 }
                 this.prepareSendData();
+                this.send();
             });
             this.typeEndSecond.on('change', () => {
                 this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes);
                 this.prepareSendData();
+                this.send();
             });
             this.$analogBtn.on('change', (e: JQuery.ChangeEvent) => {
                 this.setAnalog(e.target.checked);
                 if (this.analog) {
                     this.useAnalog();
                     this.prepareSendData();
+                    this.send();
                     this.typeEndSecond.addDisabled();
                     this.sizeRadioSecond.addDisabled();
                 }
@@ -78,15 +86,16 @@ namespace Components {
                     this.useAnalogForGroupRadio();
                 }
                 this.prepareSendData();
+                this.send();
             });
-            this.sizeRadioSecond.on('change', () => { this.prepareSendData(); });
+            this.sizeRadioSecond.on('change', () => { this.prepareSendData(); this.send(); });
 
-            this.$mrkBtn.on('change', () => { this.prepareSendData(); });
-            this.$rvdBtn.on('change', () => { this.prepareSendData(); });
-            this.$oxygenBtn.on('change', () => { this.prepareSendData(); });
-            this.$notOxygenBtn.on('change', () => { this.prepareSendData(); });
-            this.$sizeBtn.on('change', () => { this.prepareSendData(); });
-            this.$cableBtn.on('change', () => { this.prepareSendData(); });
+            this.$mrkBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$rvdBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$oxygenBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$notOxygenBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$sizeBtn.on('change', () => { this.prepareSendData(); this.send(); });
+            this.$cableBtn.on('change', () => { this.prepareSendData(); this.send(); });
         }
 
         private restructureSelects(): void {
@@ -129,17 +138,21 @@ namespace Components {
                 type2_size: type2_size,
                 oxygen_compatibility: this.$oxygenBtn.is(':checked') ? this.dataOptions.oxygen_compatibility_value : null,
                 mrk_show: this.$mrkBtn.is(':checked'),
-                rvd_show: this.$rvdBtn.is(':checked')
+                rvd_show: this.$rvdBtn.is(':checked'),
+                analog: this.analog,
+                type1_end: this.typeEndFirst.getValue(),
+                type2_end: this.typeEndSecond.getValue(),
             }
         }
 
-        private sendData(sendData: any): void {
+        private send(): void {
             $.ajax({
                 type: 'POST',
                 url: this.pathData,
-                data: JSON.stringify(sendData),
+                data: JSON.stringify(this.sendData),
                 dataType: 'json',
                 success: (dataProducts: dataProducts): void => {
+                    console.log(this.sendData);
                     this.callAfterSend(dataProducts);
 
                     console.log('SUCCESS:');
@@ -153,14 +166,9 @@ namespace Components {
 
         private prepareSendData(): void {
             this.callBeforeSend();
-
             console.log('edit sendData from URI');
 
-            const sendData: sendData = this.getFilterData();
-            // console.log('send');
-            this.sendData(sendData);
-
-            // заменить url (история добавлять или подменять) и new URL и в конструкторе брать URL и делать запрос с новыми данными
+            this.sendData = this.getFilterData();
         }
 
 
@@ -290,14 +298,28 @@ namespace Components {
             return $(selector).is(':checked');
         }
 
-        public setValues(): void {
+        // новый код
+        public setFilterData(): void {
+            const data = URI.getParams();
+
+            console.log('set filter data: ', data);
+
+            // if (data.length) this.$sizeBtn.text(data.length + '');
+            // if (data.type1_end) {
+            //     this.typeEndFirst.setValue(data.type1_end);
+            //     // дописать выборку кнопок размеров, но без отправки данных
+            // }
+            // if (data.type2_end) this.typeEndSecond.setValue(data.type2_end);
+            // if (data.type1_size !== 'null') this.sizeRadioFirst.setValue(data.type1_size);
+            // if (data.type2_size !== 'null') this.sizeRadioSecond.setValue(data.type2_size);
+            // if (data.analog) this.analog = data.analog;
             console.log('set values for all filter elements');
         }
 
         public popStateEvent(): void {
             this.prepareSendData();
-            const sendData: sendData = this.getFilterData(); // дважды в коде
-            const uri = URI.toString(sendData);
+            this.send();
+            const uri = URI.toString(this.sendData);
             // URI.update();
             history.pushState({}, '', uri);
         }
