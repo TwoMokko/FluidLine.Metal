@@ -17,6 +17,7 @@ namespace Components {
         private $form                       : JQuery;
         private $mrkBtn                     : JQuery;
         private $rvdBtn                     : JQuery;
+
         private $analogBtn                  : JQuery;
         private $oxygenBtn                  : JQuery;
         private $notOxygenBtn               : JQuery;
@@ -32,6 +33,7 @@ namespace Components {
             this.createElements();
 
             // новый код
+
             URI.init();
             let dataURI = URI.getParams();
             let data = this.prepareFilterData(dataURI);
@@ -45,16 +47,27 @@ namespace Components {
 
             this.restructureSelects();
 
+            this.setAnalog(data.analog);
             this.typeEndFirst.setValue(data.type1_end.toUpperCase(), false);
             // проверить аналог, добавить в сенд дата аналог
-            this.typeEndSecond.setValue(data.type2_end.toUpperCase(), false);
-
             this.sizeRadioFirst            = new GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, {name: 'size1'});
             this.sizeRadioSecond           = new GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, {name: 'size2'});
 
             this.typeEndSecond.addDisabled();
             this.sizeRadioSecond.addDisabled();
 
+            if (this.analog) {
+                this.useAnalog();
+            } else {
+                this.typeEndSecond.setValue(data.type2_end.toUpperCase(), false);
+                this.$analogBtn.prop('checked', false);
+                this.typeEndSecond.removeDisabled();
+                this.sizeRadioSecond.removeDisabled();
+            }
+
+            // TODO: переписать условие на null
+            this.$sizeBtn.val(data.length);
+            this.$cableBtn.prop('checked', data.cable);
 
             this.prepareSendData();
             this.send();
@@ -146,6 +159,7 @@ namespace Components {
                 rvd_show: this.$rvdBtn.is(':checked'),
                 type1_end: this.typeEndFirst.getValue(),
                 type2_end: this.typeEndSecond.getValue(),
+                analog: this.analog
             }
         }
 
@@ -308,6 +322,7 @@ namespace Components {
             let type2_end = data.type2_end ?? 'A';
 
             return {
+                // TODO: переписать условие на null
                 cable: data.cable ?? null,
                 length: data.length ?? '',
                 type1_size: [data.type1_size] ?? Object.keys(this.dataOptions.types[type1_end].sizes),
@@ -317,6 +332,7 @@ namespace Components {
                 rvd_show: true,
                 type1_end: type1_end,
                 type2_end: type2_end,
+                analog: (data.analog !== 'null')
             }
         }
 

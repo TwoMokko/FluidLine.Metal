@@ -1,5 +1,3 @@
-/// <reference types="jquery" />
-/// <reference types="jquery" />
 declare namespace Components {
     class Carousel {
         $source: JQuery;
@@ -191,6 +189,7 @@ type sendData = {
     rvd_show: boolean;
     type1_end: string;
     type2_end: string;
+    analog: boolean;
 };
 declare namespace Components {
     class FilterManager {

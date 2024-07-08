@@ -60,6 +60,7 @@ type sendData = {
     rvd_show: boolean,
     type1_end: string,
     type2_end: string,
+    analog: boolean
 }
 
 namespace Components {

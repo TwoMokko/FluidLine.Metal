@@ -949,13 +949,25 @@ var Components;
             this.typeEndFirst = new Components.Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond = new Components.Select($('.select[name="zakontsovka-2"]'));
             this.restructureSelects();
+            this.setAnalog(data.analog);
             this.typeEndFirst.setValue(data.type1_end.toUpperCase(), false);
             // проверить аналог, добавить в сенд дата аналог
-            this.typeEndSecond.setValue(data.type2_end.toUpperCase(), false);
             this.sizeRadioFirst = new Components.GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, { name: 'size1' });
             this.sizeRadioSecond = new Components.GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, { name: 'size2' });
             this.typeEndSecond.addDisabled();
             this.sizeRadioSecond.addDisabled();
+            if (this.analog) {
+                this.useAnalog();
+            }
+            else {
+                this.typeEndSecond.setValue(data.type2_end.toUpperCase(), false);
+                this.$analogBtn.prop('checked', false);
+                this.typeEndSecond.removeDisabled();
+                this.sizeRadioSecond.removeDisabled();
+            }
+            // TODO: переписать условие на null
+            this.$sizeBtn.val(data.length);
+            this.$cableBtn.prop('checked', data.cable);
             this.prepareSendData();
             this.send();
             this.typeEndFirst.on('change', () => {
@@ -1038,6 +1050,7 @@ var Components;
                 rvd_show: this.$rvdBtn.is(':checked'),
                 type1_end: this.typeEndFirst.getValue(),
                 type2_end: this.typeEndSecond.getValue(),
+                analog: this.analog
             };
         }
         send() {
@@ -1116,6 +1129,7 @@ var Components;
             let type1_end = data.type1_end ?? 'A';
             let type2_end = data.type2_end ?? 'A';
             return {
+                // TODO: переписать условие на null
                 cable: data.cable ?? null,
                 length: data.length ?? '',
                 type1_size: [data.type1_size] ?? Object.keys(this.dataOptions.types[type1_end].sizes),
@@ -1125,6 +1139,7 @@ var Components;
                 rvd_show: true,
                 type1_end: type1_end,
                 type2_end: type2_end,
+                analog: (data.analog !== 'null')
             };
         }
         popStateEvent() {
