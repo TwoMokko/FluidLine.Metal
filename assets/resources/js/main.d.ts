@@ -77,7 +77,7 @@ declare namespace Common {
 }
 declare namespace Components {
     abstract class URI {
-        private static url;
+        static url: URL;
         private static sendData;
         static init(): void;
         static getParams(): {
@@ -89,6 +89,7 @@ declare namespace Components {
     }
 }
 declare namespace Components {
+    import Event = JQuery.Event;
     class Filter {
         private typeEndFirst;
         private typeEndSecond;
@@ -127,7 +128,7 @@ declare namespace Components {
         prepareFilterData(data: {
             [key: string]: string;
         }): sendData;
-        popStateEvent(): void;
+        popStateEvent(event: Event): void;
     }
 }
 interface itemFilterOptions {

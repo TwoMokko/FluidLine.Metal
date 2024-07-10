@@ -139,25 +139,19 @@ namespace Components {
 
             const dataSymbols: typeDataSymbols = this.filter.getSymbols();
 
-            console.log(dataProducts);
-
             if (dataProducts['mrk'].products.length) {
-                console.log('mrk');
                 this.productsMrk.redraw(dataProducts['mrk'].products, dataSymbols);
                 this.productsMrk.show();
             }
             if (dataProducts['rkv'].products.length) {
-                console.log('rvd');
                 this.productsRvd.redraw(dataProducts['rkv'].products, dataSymbols);
                 this.productsRvd.show();
             }
 
             if (this.filter.check('#mrk') && !dataProducts['mrk'].products.length) {
-                console.log('mrk here');
                 this.productsMrk.showUndefined();
             }
             if (this.filter.check('#rvd') && !dataProducts['rkv'].products.length) {
-                console.log('rvd here');
                 this.productsRvd.showUndefined();
             }
         }

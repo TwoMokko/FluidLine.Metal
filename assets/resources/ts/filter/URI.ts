@@ -1,6 +1,6 @@
 namespace Components {
     export abstract  class URI {
-        private static url              : URL;
+        public static url              : URL;
         private static sendData         : sendData;
 
         public static init(/*sendData: sendData*/): void {
@@ -21,20 +21,26 @@ namespace Components {
         }
 
         public static checkState(): boolean {
-            console.log('params check state: ', this.url.searchParams);
             return true;
             // return this.url.searchParams['size'];
 
         }
 
         public static toString(newFilterData: object): string {
-            const uri = 'uri-test';
-            this.update(uri);
-            return uri;
+            for (const key in newFilterData) {
+                if ((key === 'type1_size' || key === 'type2_size') && newFilterData[key].length > 1) {
+                    this.url.searchParams.set(key, 'null');
+                    continue;
+                }
+                this.url.searchParams.set(key, newFilterData[key]);
+            }
+            return this.url.href;
         }
 
         public static update(uri: string): void {
+            // this.url.href = 'aaa';
             this.url.href = uri;
+            // this.url.href = this.url.origin + uri;
         }
     }
 }

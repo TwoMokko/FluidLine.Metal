@@ -124,14 +124,11 @@ namespace Components {
         }
 
         public setValue(value: string, event: boolean = true): void {
-            console.log('val: ', value);
-            console.log(typeof value);
             if (!event) {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 let $option = this.$sourceOptions.filter(`[value=${value}]`);
                 $option.attr('selected', 'selected');
 
-                console.log('opt: ', $option);
                 this.$header.text($option.text());
                 return;
             }

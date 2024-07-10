@@ -57,7 +57,6 @@ var Components;
             this.$content.append($(this.$elements[num]).clone());
         }
         toRight() {
-            console.log(this);
             if (this.scrolling)
                 return;
             this.scrolling = true;
@@ -862,7 +861,6 @@ var Common;
         static sendJQ(url, func) {
             $.post(url, function (data) {
                 // $( ".result" ).html( data );
-                console.log(data);
             }).done(function () {
                 console.log("second success");
             })
@@ -895,17 +893,23 @@ var Components;
             return out;
         }
         static checkState() {
-            console.log('params check state: ', this.url.searchParams);
             return true;
             // return this.url.searchParams['size'];
         }
         static toString(newFilterData) {
-            const uri = 'uri-test';
-            this.update(uri);
-            return uri;
+            for (const key in newFilterData) {
+                if ((key === 'type1_size' || key === 'type2_size') && newFilterData[key].length > 1) {
+                    this.url.searchParams.set(key, 'null');
+                    continue;
+                }
+                this.url.searchParams.set(key, newFilterData[key]);
+            }
+            return this.url.href;
         }
         static update(uri) {
+            // this.url.href = 'aaa';
             this.url.href = uri;
+            // this.url.href = this.url.origin + uri;
         }
     }
     Components.URI = URI;
@@ -942,20 +946,29 @@ var Components;
             Components.URI.init();
             let dataURI = Components.URI.getParams();
             let data = this.prepareFilterData(dataURI);
-            // window.onpopstate = (event: any) => { console.log('popStateEvent(func)', event); }
+            window.onpopstate = (event) => { this.popStateEvent(event); };
             // разделила везде препар сенд дата и сенд дата, надо ли
             // вставлять ли разные данные при вызове сенд дата?
             // до сюда
             this.typeEndFirst = new Components.Select($('.select[name="zakontsovka-1"]'));
             this.typeEndSecond = new Components.Select($('.select[name="zakontsovka-2"]'));
             this.restructureSelects();
-            this.setAnalog(data.analog);
+            if (dataURI.length) {
+                this.$mrkBtn.prop('checked', data.mrk_show);
+                this.$rvdBtn.prop('checked', data.rvd_show);
+                this.setAnalog(data.analog);
+            }
             this.typeEndFirst.setValue(data.type1_end.toUpperCase(), false);
             // проверить аналог, добавить в сенд дата аналог
             this.sizeRadioFirst = new Components.GroupRadio($('#size1'), this.dataOptions.types[this.typeEndFirst.getValue()].sizes, { name: 'size1' });
             this.sizeRadioSecond = new Components.GroupRadio($('#size2'), this.dataOptions.types[this.typeEndSecond.getValue()].sizes, { name: 'size2' });
             this.typeEndSecond.addDisabled();
             this.sizeRadioSecond.addDisabled();
+            // выбрать кнопку размера
+            if (dataURI.length && data.type1_size)
+                this.sizeRadioFirst.setValue(data.type1_size.toString(), false);
+            if (dataURI.length && data.type2_size)
+                this.sizeRadioSecond.setValue(data.type2_size.toString(), false);
             if (this.analog) {
                 this.useAnalog();
             }
@@ -965,9 +978,11 @@ var Components;
                 this.typeEndSecond.removeDisabled();
                 this.sizeRadioSecond.removeDisabled();
             }
-            // TODO: переписать условие на null
+            // перенести в проверку if (dataURI.length)
             this.$sizeBtn.val(data.length);
             this.$cableBtn.prop('checked', data.cable);
+            this.$oxygenBtn.prop('checked', data.oxygen_compatibility);
+            this.$notOxygenBtn.prop('checked', !data.oxygen_compatibility);
             this.prepareSendData();
             this.send();
             this.typeEndFirst.on('change', () => {
@@ -1060,7 +1075,6 @@ var Components;
                 data: JSON.stringify(this.sendData),
                 dataType: 'json',
                 success: (dataProducts) => {
-                    console.log(this.sendData);
                     this.callAfterSend(dataProducts);
                     console.log('SUCCESS:');
                 },
@@ -1070,10 +1084,12 @@ var Components;
                 }
             });
         }
-        prepareSendData() {
+        prepareSendData(pushState = true) {
             this.callBeforeSend();
-            console.log('edit sendData from URI');
             this.sendData = this.getFilterData();
+            const uri = Components.URI.toString(this.sendData);
+            if (pushState)
+                history.pushState({}, '', uri);
         }
         createElements() {
             this.$form = $('<form/>', { class: 'prod-filter hide' });
@@ -1105,7 +1121,7 @@ var Components;
                 .prop('checked', true);
             this.$analogBtn = $('<input/>', { id: 'analog', type: 'checkbox', name: 'analog' })
                 .prop('checked', true);
-            this.$oxygenBtn = $('<input/>', { id: 'oxygen', type: 'radio', name: 'oxygen', value: 'on' }).prop('checked', true);
+            this.$oxygenBtn = $('<input/>', { id: 'oxygen', type: 'radio', name: 'oxygen', value: 'on' });
             this.$notOxygenBtn = $('<input/>', { id: 'notOxygen', type: 'radio', name: 'oxygen', value: 'off' });
             this.$sizeBtn = $('<input/>', { id: 'size', type: 'number', name: 'length', min: '50', max: '100000', step: 'any', value: '1000' });
             this.$cableBtn = $('<input/>', { id: 'cable', type: 'checkbox', name: 'cable' });
@@ -1129,25 +1145,58 @@ var Components;
             let type1_end = data.type1_end ?? 'A';
             let type2_end = data.type2_end ?? 'A';
             return {
-                // TODO: переписать условие на null
-                cable: data.cable ?? null,
-                length: data.length ?? '',
+                cable: data.cable === '2' ? '2' : null,
+                length: data.length ?? '1000',
                 type1_size: [data.type1_size] ?? Object.keys(this.dataOptions.types[type1_end].sizes),
                 type2_size: [data.type2_size] ?? Object.keys(this.dataOptions.types[type2_end].sizes),
-                oxygen_compatibility: data.oxygen_compatibility ?? null,
-                mrk_show: true,
-                rvd_show: true,
+                oxygen_compatibility: data.oxygen_compatibility === '2' ? '2' : null,
+                mrk_show: data.mrk_show === 'true' ? true : null,
+                rvd_show: data.rvd_show === 'true' ? true : null,
                 type1_end: type1_end,
                 type2_end: type2_end,
-                analog: (data.analog !== 'null')
+                analog: data.analog === 'true'
             };
         }
-        popStateEvent() {
-            this.prepareSendData();
+        popStateEvent(event) {
+            Components.URI.init();
+            let dataURI = Components.URI.getParams();
+            let data = this.prepareFilterData(dataURI);
+            this.restructureSelects();
+            if (dataURI.length) {
+                this.$mrkBtn.prop('checked', data.mrk_show);
+                this.$rvdBtn.prop('checked', data.rvd_show);
+                this.setAnalog(data.analog);
+            }
+            this.typeEndFirst.setValue(data.type1_end.toUpperCase(), false);
+            // проверить аналог, добавить в сенд дата аналог
+            this.sizeRadioFirst.restructure(this.dataOptions.types[this.typeEndFirst.getValue()].sizes);
+            this.sizeRadioSecond.restructure(this.dataOptions.types[this.typeEndSecond.getValue()].sizes);
+            this.typeEndSecond.addDisabled();
+            this.sizeRadioSecond.addDisabled();
+            // выбрать кнопку размера
+            if (dataURI.length && data.type1_size)
+                this.sizeRadioFirst.setValue(data.type1_size.toString(), false);
+            if (dataURI.length && data.type2_size)
+                this.sizeRadioSecond.setValue(data.type2_size.toString(), false);
+            if (this.analog) {
+                this.useAnalog();
+            }
+            else {
+                this.typeEndSecond.setValue(data.type2_end.toUpperCase(), false);
+                this.$analogBtn.prop('checked', false);
+                this.typeEndSecond.removeDisabled();
+                this.sizeRadioSecond.removeDisabled();
+            }
+            // перенести в проверку if (dataURI.length)
+            this.$sizeBtn.val(data.length);
+            this.$cableBtn.prop('checked', data.cable);
+            this.$oxygenBtn.prop('checked', data.oxygen_compatibility);
+            this.$notOxygenBtn.prop('checked', !data.oxygen_compatibility);
+            this.prepareSendData(false);
             this.send();
-            const uri = Components.URI.toString(this.sendData);
+            // const uri = URI.toString(this.sendData);
             // URI.update();
-            history.pushState({}, '', uri);
+            // history.pushState({}, '', uri);
         }
     }
     Components.Filter = Filter;
@@ -1213,23 +1262,18 @@ var Components;
             this.productsMrk.hide();
             this.productsRvd.hide();
             const dataSymbols = this.filter.getSymbols();
-            console.log(dataProducts);
             if (dataProducts['mrk'].products.length) {
-                console.log('mrk');
                 this.productsMrk.redraw(dataProducts['mrk'].products, dataSymbols);
                 this.productsMrk.show();
             }
             if (dataProducts['rkv'].products.length) {
-                console.log('rvd');
                 this.productsRvd.redraw(dataProducts['rkv'].products, dataSymbols);
                 this.productsRvd.show();
             }
             if (this.filter.check('#mrk') && !dataProducts['mrk'].products.length) {
-                console.log('mrk here');
                 this.productsMrk.showUndefined();
             }
             if (this.filter.check('#rvd') && !dataProducts['rkv'].products.length) {
-                console.log('rvd here');
                 this.productsRvd.showUndefined();
             }
         }
@@ -1334,11 +1378,9 @@ var Components;
             $loaderWrap.append(this.$loaderFilter);
         }
         show() {
-            // console.log('s')
             this.$loaderFilter.removeClass('hide');
         }
         hide() {
-            // console.log('h')
             this.$loaderFilter.addClass('hide');
         }
     }
@@ -1577,13 +1619,10 @@ var Components;
             return this.$sourceOptions.filter(':selected').text();
         }
         setValue(value, event = true) {
-            console.log('val: ', value);
-            console.log(typeof value);
             if (!event) {
                 this.$sourceOptions.filter(':selected').removeAttr('selected');
                 let $option = this.$sourceOptions.filter(`[value=${value}]`);
                 $option.attr('selected', 'selected');
-                console.log('opt: ', $option);
                 this.$header.text($option.text());
                 return;
             }

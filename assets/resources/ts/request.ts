@@ -125,7 +125,6 @@ namespace Common {
         public static sendJQ(url: string, func?: Function): void {
             $.post( url, function( data: any ) {
                 // $( ".result" ).html( data );
-                console.log(data);
             }) .done(function() {
                 console.log( "second success" );
             })

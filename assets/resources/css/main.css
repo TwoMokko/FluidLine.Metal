@@ -1103,7 +1103,7 @@
   left: 0;
   cursor: pointer;
   width: 100%;
-  z-index: 2;
+  z-index: 4;
   background-color: #FFF;
   user-select: none;
   color: rgba(0, 0, 0, 0.6);

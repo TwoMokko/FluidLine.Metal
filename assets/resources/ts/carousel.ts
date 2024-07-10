@@ -80,7 +80,6 @@ namespace Components {
         }
 
         private toRight() {
-            console.log(this);
             if (this.scrolling) return;
             this.scrolling = true;
 
