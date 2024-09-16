@@ -1,3 +1,5 @@
+/// <reference types="jquery" />
+/// <reference types="jquery" />
 declare namespace Components {
     class Carousel {
         $source: JQuery;
@@ -291,6 +293,8 @@ declare namespace Components {
         $sourceOptions: JQuery;
         private readonly $header;
         private $list;
+        private $imgWrapHover;
+        private $imgHover;
         private isOpen;
         private isSelect;
         private readonly duration;

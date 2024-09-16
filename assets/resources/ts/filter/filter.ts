@@ -108,6 +108,10 @@ namespace Components {
                 else {
                     this.typeEndSecond.removeDisabled();
                     this.sizeRadioSecond.removeDisabled();
+
+                    this.sendData = this.getFilterData();
+                    const uri = URI.toString(this.sendData);
+                    history.pushState({}, '', uri);
                 }
             });
             this.sizeRadioFirst.on('change', () => {

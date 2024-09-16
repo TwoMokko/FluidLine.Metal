@@ -5,6 +5,8 @@ namespace Components {
 
         private readonly $header                : JQuery;
         private $list                           : JQuery;
+        private $imgWrapHover                   : JQuery;
+        private $imgHover                       : JQuery;
 
         private isOpen                          : boolean;  // флаг, состояние: открыт или закрыт селект
         private isSelect                        : boolean;  // флаг, состояние: выбрано что-то или нет
@@ -22,6 +24,11 @@ namespace Components {
 
             /* Create Elements */
             const $wrap = $('<div/>', {class: 'select-wrap'});
+
+            this.$imgWrapHover = $('<div/>', {class: 'img-hover'});
+            this.$imgHover = $('<img alt="img" src=""/>');
+            this.$imgWrapHover.hide();
+
             this.$header = $('<div>', {
                 class: 'new-select',
                 text: this.$sourceOptions.filter(':selected').text()
@@ -33,6 +40,7 @@ namespace Components {
 
             /* Building DOM */
             $wrap.append(
+                this.$imgWrapHover.append(this.$imgHover),
                 this.$header,
                 this.$list.append(
                     this.getOptions()
@@ -91,6 +99,19 @@ namespace Components {
 
                 this.close();
             });
+
+            $option.hover((event) => {
+                console.log('top: ', event.target.offsetTop);
+                console.log('scroll: ', this.$list.scrollTop());
+                const top = event.target.offsetTop - this.$list.scrollTop();
+                const imgPath = `https://fluid-line.ru/assets/snippets/product/rkv/img/tips/${value}.png`;
+
+                this.$imgHover.attr('src', imgPath);
+                this.$imgWrapHover.css('top', `${top}px`)
+                this.$imgWrapHover.show();
+            }, () => {
+                this.$imgWrapHover.hide();
+            })
 
             return $option;
         }

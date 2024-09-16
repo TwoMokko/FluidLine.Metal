@@ -27,6 +27,7 @@ namespace Components {
         }
 
         public static toString(newFilterData: object): string {
+            console.log({newFilterData});
             for (const key in newFilterData) {
                 if ((key === 'type1_size' || key === 'type2_size') && newFilterData[key].length > 1) {
                     this.url.searchParams.set(key, 'null');

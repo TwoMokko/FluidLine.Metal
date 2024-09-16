@@ -1168,6 +1168,18 @@
   margin-bottom: 70px;
 }
 
+.img-hover {
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  right: -300px;
+}
+.img-hover > img {
+  width: 300px;
+  height: auto;
+  object-fit: contain;
+}
+
 /* Colors */
 /* Sizes */
 .prod-table {

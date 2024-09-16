@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "@types/jquery": "^3.5.30",
     "composer": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.5.30"
   }
 }
