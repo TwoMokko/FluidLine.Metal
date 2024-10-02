@@ -13,7 +13,6 @@ var Components;
         countDisplayElems;
         countScrollElems;
         lastElement;
-        firstElement;
         countElements;
         scrolling;
         constructor($source) {
@@ -32,14 +31,13 @@ var Components;
             this.init($source);
             /* Events */
             this.$right.on('click', () => this.toRight());
-            // this.$left.on('click', () => this.toLeft());
+            this.$left.on('click', () => this.toLeft());
             this.$source.after(this.$wrap);
         }
         init($source) {
             this.countDisplayElems = 6;
             this.countScrollElems = 3;
             this.lastElement = null;
-            this.firstElement = null;
             this.countElements = this.$elements.length;
             this.scrolling = false;
             let num = this.lastElement;
@@ -70,53 +68,53 @@ var Components;
                 this.append(num);
             }
             this.lastElement = num;
-            // this.firstElement = this.getPrevious(num - this.countScrollElems - 1);
-            this.shift('left'); // сдвинуть
+            this.shift(); // сдвинуть
             setTimeout(() => { this.removeScrollElements('first-child'); }, 1000); // удалить первые
             this.scrolling = false;
         }
-        // private getPrevious(current: number | null): number {
-        //     if (current === null) return this.countElements - 1;
-        //     if (current === 0) return this.countElements - 1;
-        //     return current - 1;
-        // }
-        //
-        // private prepend(num: number): void {
-        //     this.$content.prepend(
-        //         $(this.$elements[num]).clone()
-        //     )
-        // }
-        //
-        // private toLeft() {
-        //     if (this.scrolling) return;
-        //     this.scrolling = true;
-        //
-        //     this.$content.addClass('animated');
-        //
-        //     let num = this.firstElement;
-        //     for (let i: number = 1; i <= this.countScrollElems; i++) {
-        //         num = this.getPrevious(num);
-        //         this.prepend(num);
-        //     }
-        //
-        //     this.firstElement = num;
-        //     this.lastElement = this.getNext(num + this.countScrollElems);
-        //
-        //
-        //     this.shift('right'); // сдвинуть
-        //     setTimeout(() => { this.removeScrollElements('last-child') }, 1000); // удалить первые
-        //
-        //     this.scrolling = false;
-        // }
-        shift(orientation) {
-            let shift = -(this.$content.children(':first-child').width() * this.countScrollElems);
-            this.$content.css(`margin-${orientation}`, shift);
+        getPrevious(current) {
+            if (current === null)
+                return this.countElements - 1;
+            if (current <= 0)
+                return this.countElements - 1;
+            return current - 1;
         }
-        removeScrollElements(orientation) {
+        prepend(num) {
+            this.$content.prepend($(this.$elements[num]).clone());
+        }
+        toLeft() {
+            if (this.scrolling)
+                return;
+            this.scrolling = true;
+            this.$content.removeClass('animated');
+            // TODO: чему равен num и lastElement?
+            let num = this.lastElement - this.countDisplayElems + 1;
+            for (let i = 1; i <= this.countScrollElems; i++) {
+                num = this.getPrevious(num);
+                this.prepend(num);
+            }
+            this.lastElement = this.getNext(num + this.countDisplayElems - 1);
+            this.shift();
+            setTimeout(() => {
+                this.$content.addClass('animated');
+                this.$content.css('margin-left', 0);
+            }, 100);
+            setTimeout(() => {
+                for (let i = 1; i <= this.countScrollElems; i++) {
+                    this.$content.children(`:last-child`).remove();
+                }
+            }, 1000); // удалить первые
+            this.scrolling = false;
+        }
+        shift() {
+            let shift = -(this.$content.children(':first-child').width() * this.countScrollElems);
+            this.$content.css('margin-left', shift);
+        }
+        removeScrollElements(child) {
             this.$content.removeClass('animated');
             this.$content.css('margin-left', 0);
             for (let i = 1; i <= this.countScrollElems; i++) {
-                this.$content.children(`:${orientation}`).remove();
+                this.$content.children(`:${child}`).remove();
             }
         }
     }

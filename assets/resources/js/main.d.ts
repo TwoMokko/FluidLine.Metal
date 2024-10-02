@@ -13,7 +13,6 @@ declare namespace Components {
         countDisplayElems: number;
         countScrollElems: number;
         lastElement: number | null;
-        firstElement: number | null;
         countElements: number;
         scrolling: boolean;
         constructor($source: JQuery);
@@ -21,6 +20,9 @@ declare namespace Components {
         private getNext;
         private append;
         private toRight;
+        private getPrevious;
+        private prepend;
+        private toLeft;
         private shift;
         private removeScrollElements;
     }
