@@ -52,6 +52,8 @@ var Components;
                 return 0;
             if (current >= this.countElements - 1)
                 return 0;
+            // if (current === this.countElements - 1) return 0;
+            // if (current > this.countElements - 1) return 245;
             return current + 1;
         }
         append(num) {
@@ -66,6 +68,7 @@ var Components;
             for (let i = 1; i <= this.countScrollElems; i++) {
                 num = this.getNext(num);
                 this.append(num);
+                console.log({ num });
             }
             this.lastElement = num;
             this.shift(); // сдвинуть
@@ -75,8 +78,10 @@ var Components;
         getPrevious(current) {
             if (current === null)
                 return this.countElements - 1;
-            if (current <= 0)
+            if (current === 0)
                 return this.countElements - 1;
+            if (current < 0)
+                return this.countElements + current + this.countScrollElems - 1;
             return current - 1;
         }
         prepend(num) {
@@ -89,11 +94,16 @@ var Components;
             this.$content.removeClass('animated');
             // TODO: чему равен num и lastElement?
             let num = this.lastElement - this.countDisplayElems + 1;
+            console.log(num, 'fiiiirst');
             for (let i = 1; i <= this.countScrollElems; i++) {
                 num = this.getPrevious(num);
+                console.log('here', num);
                 this.prepend(num);
+                this.lastElement = this.getNext(num + this.countDisplayElems - 1 - num);
+                console.log('log', num - 1 + this.countDisplayElems - num);
+                console.log(this.lastElement, 'last');
             }
-            this.lastElement = this.getNext(num + this.countDisplayElems - 1);
+            // this.lastElement = this.getNext(num + this.countScrollElems - 1);
             this.shift();
             setTimeout(() => {
                 this.$content.addClass('animated');
